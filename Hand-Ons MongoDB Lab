@@ -1,0 +1,825 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "1_Run_MongoDB_in_colab.ipynb",
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sreent/data-management-intro/blob/main/Hand-Ons%20MongoDB%20Lab\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "kOmt80VpVa2W"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "# Introduction to MongoDB"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "nvKR9mh7Vkun"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "MongoDB is a free and open-source database program, developed by [MongoDB Inc](https://www.mongodb.com/).\n",
+        "Latest stable release is the 4.0.0  ( 21 June 2018 ), [here](https://www.mongodb.com/download-center#community) download the MongoDB community server."
+      ]
+    },
+    {
+      "metadata": {
+        "id": "vM6ta952S2z2"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "# Installing MongoDB in Google Colab"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "oy8y1i4jl-Ce"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "Now, we are going to install MongoDB server in Google Colab with educative purpose.<br>\n",
+        "Be aware that **all data will be deleted after 12 hours**.\n",
+        "\n",
+        "If you need a persistent MongoDB server, you need to install it locally, download MongoDB community server (free) from [here](http://www.google.com/search?q=mongodb+download+community+server&btnI)\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sudo wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb\n",
+        "!sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb\n",
+        "\n",
+        "# Import the public key used by the package management system\n",
+        "!wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -\n",
+        "\n",
+        "# Create a list file for MongoDB\n",
+        "!echo \"deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse\" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list\n",
+        "\n",
+        "# Reload the local package database\n",
+        "!apt-get update\n",
+        "\n",
+        "# Install the MongoDB packages\n",
+        "!apt-get install -y mongodb-org\n",
+        "\n",
+        "# Start MongoDB\n",
+        "!service mongod start\n",
+        "\n",
+        "# Install pymongo\n",
+        "!pip install pymongo\n",
+        "\n",
+        "# Create Data Folder\n",
+        "!mkdir -p /data/db\n",
+        "\n",
+        "# Start MongoDB\n",
+        "!mongod --fork --logpath /var/log/mongodb.log --dbpath /data/db"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "zgXgWsKqFlWM",
+        "outputId": "be6bcc43-7ee8-4067-d8a7-476883770d3c"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "--2024-01-28 17:36:47--  http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb\n",
+            "Resolving archive.ubuntu.com (archive.ubuntu.com)... 185.125.190.36, 91.189.91.82, 91.189.91.83, ...\n",
+            "Connecting to archive.ubuntu.com (archive.ubuntu.com)|185.125.190.36|:80... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 1318204 (1.3M) [application/x-debian-package]\n",
+            "Saving to: ‘libssl1.1_1.1.1f-1ubuntu2_amd64.deb’\n",
+            "\n",
+            "libssl1.1_1.1.1f-1u 100%[===================>]   1.26M  1.47MB/s    in 0.9s    \n",
+            "\n",
+            "2024-01-28 17:36:48 (1.47 MB/s) - ‘libssl1.1_1.1.1f-1ubuntu2_amd64.deb’ saved [1318204/1318204]\n",
+            "\n",
+            "Selecting previously unselected package libssl1.1:amd64.\n",
+            "(Reading database ... 121671 files and directories currently installed.)\n",
+            "Preparing to unpack libssl1.1_1.1.1f-1ubuntu2_amd64.deb ...\n",
+            "Unpacking libssl1.1:amd64 (1.1.1f-1ubuntu2) ...\n",
+            "Setting up libssl1.1:amd64 (1.1.1f-1ubuntu2) ...\n",
+            "debconf: unable to initialize frontend: Dialog\n",
+            "debconf: (No usable dialog-like program is installed, so the dialog based frontend cannot be used. at /usr/share/perl5/Debconf/FrontEnd/Dialog.pm line 78.)\n",
+            "debconf: falling back to frontend: Readline\n",
+            "debconf: unable to initialize frontend: Readline\n",
+            "debconf: (This frontend requires a controlling tty.)\n",
+            "debconf: falling back to frontend: Teletype\n",
+            "Processing triggers for libc-bin (2.35-0ubuntu3.4) ...\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_5.so.3 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbbind_2_0.so.3 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbb.so.12 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc_proxy.so.2 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbbind.so.3 is not a symbolic link\n",
+            "\n",
+            "/sbin/ldconfig.real: /usr/local/lib/libtbbmalloc.so.2 is not a symbolic link\n",
+            "\n",
+            "Warning: apt-key is deprecated. Manage keyring files in trusted.gpg.d instead (see apt-key(8)).\n",
+            "OK\n",
+            "deb [ arch=amd64,arm64 ] http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse\n",
+            "Get:1 https://cloud.r-project.org/bin/linux/ubuntu jammy-cran40/ InRelease [3,626 B]\n",
+            "Hit:2 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64  InRelease\n",
+            "Get:3 http://security.ubuntu.com/ubuntu jammy-security InRelease [110 kB]\n",
+            "Hit:4 http://archive.ubuntu.com/ubuntu jammy InRelease\n",
+            "Ign:5 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 InRelease\n",
+            "Get:6 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [119 kB]\n",
+            "Get:7 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 Release [5,029 B]\n",
+            "Get:8 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 Release.gpg [866 B]\n",
+            "Hit:9 https://ppa.launchpadcontent.net/c2d4u.team/c2d4u4.0+/ubuntu jammy InRelease\n",
+            "Hit:10 https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy InRelease\n",
+            "Hit:11 http://archive.ubuntu.com/ubuntu jammy-backports InRelease\n",
+            "Hit:12 https://ppa.launchpadcontent.net/graphics-drivers/ppa/ubuntu jammy InRelease\n",
+            "Get:13 https://ppa.launchpadcontent.net/ubuntugis/ppa/ubuntu jammy InRelease [23.8 kB]\n",
+            "Get:14 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [1,390 kB]\n",
+            "Get:15 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [1,676 kB]\n",
+            "Get:16 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1,059 kB]\n",
+            "Get:17 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse arm64 Packages [56.9 kB]\n",
+            "Get:18 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 Packages [66.9 kB]\n",
+            "Get:19 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [1,671 kB]\n",
+            "Get:20 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [1,713 kB]\n",
+            "Get:21 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1,325 kB]\n",
+            "Get:22 https://ppa.launchpadcontent.net/ubuntugis/ppa/ubuntu jammy/main amd64 Packages [66.2 kB]\n",
+            "Fetched 9,286 kB in 5s (1,994 kB/s)\n",
+            "Reading package lists... Done\n",
+            "W: http://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/4.4/Release.gpg: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.\n",
+            "Reading package lists... Done\n",
+            "Building dependency tree... Done\n",
+            "Reading state information... Done\n",
+            "The following additional packages will be installed:\n",
+            "  mongodb-database-tools mongodb-org-database-tools-extra mongodb-org-mongos mongodb-org-server\n",
+            "  mongodb-org-shell mongodb-org-tools\n",
+            "The following NEW packages will be installed:\n",
+            "  mongodb-database-tools mongodb-org mongodb-org-database-tools-extra mongodb-org-mongos\n",
+            "  mongodb-org-server mongodb-org-shell mongodb-org-tools\n",
+            "0 upgraded, 7 newly installed, 0 to remove and 81 not upgraded.\n",
+            "Need to get 102 MB of archives.\n",
+            "After this operation, 203 MB of additional disk space will be used.\n",
+            "Get:1 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 mongodb-database-tools amd64 100.9.4 [52.0 MB]\n",
+            "Get:2 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 mongodb-org-shell amd64 4.4.28 [13.4 MB]\n",
+            "Get:3 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 mongodb-org-server amd64 4.4.28 [20.8 MB]\n",
+            "Get:4 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 mongodb-org-mongos amd64 4.4.28 [16.1 MB]\n",
+            "Get:5 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 mongodb-org-database-tools-extra amd64 4.4.28 [7,756 B]\n",
+            "Get:6 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 mongodb-org-tools amd64 4.4.28 [2,896 B]\n",
+            "Get:7 http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4/multiverse amd64 mongodb-org amd64 4.4.28 [3,524 B]\n",
+            "Fetched 102 MB in 3s (40.9 MB/s)\n",
+            "Selecting previously unselected package mongodb-database-tools.\n",
+            "(Reading database ... 121681 files and directories currently installed.)\n",
+            "Preparing to unpack .../0-mongodb-database-tools_100.9.4_amd64.deb ...\n",
+            "Unpacking mongodb-database-tools (100.9.4) ...\n",
+            "Selecting previously unselected package mongodb-org-shell.\n",
+            "Preparing to unpack .../1-mongodb-org-shell_4.4.28_amd64.deb ...\n",
+            "Unpacking mongodb-org-shell (4.4.28) ...\n",
+            "Selecting previously unselected package mongodb-org-server.\n",
+            "Preparing to unpack .../2-mongodb-org-server_4.4.28_amd64.deb ...\n",
+            "Unpacking mongodb-org-server (4.4.28) ...\n",
+            "Selecting previously unselected package mongodb-org-mongos.\n",
+            "Preparing to unpack .../3-mongodb-org-mongos_4.4.28_amd64.deb ...\n",
+            "Unpacking mongodb-org-mongos (4.4.28) ...\n",
+            "Selecting previously unselected package mongodb-org-database-tools-extra.\n",
+            "Preparing to unpack .../4-mongodb-org-database-tools-extra_4.4.28_amd64.deb ...\n",
+            "Unpacking mongodb-org-database-tools-extra (4.4.28) ...\n",
+            "Selecting previously unselected package mongodb-org-tools.\n",
+            "Preparing to unpack .../5-mongodb-org-tools_4.4.28_amd64.deb ...\n",
+            "Unpacking mongodb-org-tools (4.4.28) ...\n",
+            "Selecting previously unselected package mongodb-org.\n",
+            "Preparing to unpack .../6-mongodb-org_4.4.28_amd64.deb ...\n",
+            "Unpacking mongodb-org (4.4.28) ...\n",
+            "Setting up mongodb-org-server (4.4.28) ...\n",
+            "Adding system user `mongodb' (UID 104) ...\n",
+            "Adding new user `mongodb' (UID 104) with group `nogroup' ...\n",
+            "Not creating home directory `/home/mongodb'.\n",
+            "Adding group `mongodb' (GID 107) ...\n",
+            "Done.\n",
+            "Adding user `mongodb' to group `mongodb' ...\n",
+            "Adding user mongodb to group mongodb\n",
+            "Done.\n",
+            "System has not been booted with systemd as init system (PID 1). Can't operate.\n",
+            "Failed to connect to bus: Host is down\n",
+            "Setting up mongodb-org-shell (4.4.28) ...\n",
+            "Setting up mongodb-database-tools (100.9.4) ...\n",
+            "Setting up mongodb-org-mongos (4.4.28) ...\n",
+            "Setting up mongodb-org-database-tools-extra (4.4.28) ...\n",
+            "Setting up mongodb-org-tools (4.4.28) ...\n",
+            "Setting up mongodb-org (4.4.28) ...\n",
+            "Processing triggers for man-db (2.10.2-1) ...\n",
+            "mongod: unrecognized service\n",
+            "Collecting pymongo\n",
+            "  Downloading pymongo-4.6.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (677 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m677.1/677.1 kB\u001b[0m \u001b[31m5.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting dnspython<3.0.0,>=1.16.0 (from pymongo)\n",
+            "  Downloading dnspython-2.5.0-py3-none-any.whl (305 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m305.4/305.4 kB\u001b[0m \u001b[31m7.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: dnspython, pymongo\n",
+            "Successfully installed dnspython-2.5.0 pymongo-4.6.1\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!mkdir -p /data/db"
+      ],
+      "metadata": {
+        "id": "AfDrug3QKExf"
+      },
+      "execution_count": 2,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!mongod --fork --logpath /var/log/mongodb.log --dbpath /data/db"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8q87zIZoJVQb",
+        "outputId": "c94927fd-2e6a-4c01-e914-bed8befb6e4f"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "about to fork child process, waiting until server is ready for connections.\n",
+            "forked process: 2655\n",
+            "child process started successfully, parent exiting\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pymongo import MongoClient\n",
+        "try:\n",
+        "    client = MongoClient('localhost', 27017)\n",
+        "    print(\"MongoDB is running\")\n",
+        "except Exception as e:\n",
+        "    print(\"Error connecting to MongoDB: \", e)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "NWLbKWc1JZwK",
+        "outputId": "4500a3d7-5285-4beb-e964-23daecc9e30b"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "MongoDB is running\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sudo apt-get install netstat"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "NLh97l7ZGE1o",
+        "outputId": "2cba65de-fda7-479e-9739-b6e8823fa108"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Reading package lists... Done\n",
+            "Building dependency tree... Done\n",
+            "Reading state information... Done\n",
+            "E: Unable to locate package netstat\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!service mongod start"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pAjP2VEJKWYT",
+        "outputId": "749be6cb-c5b1-4749-b05f-610f96316ee5"
+      },
+      "execution_count": 17,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "mongod: unrecognized service\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sudo apt-get install -y mongodb-org\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "G9QglvjtKkza",
+        "outputId": "181cc5e8-5ff2-4789-b32b-d36f0231f5a0"
+      },
+      "execution_count": 24,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Reading package lists... Done\n",
+            "Building dependency tree... Done\n",
+            "Reading state information... Done\n",
+            "Some packages could not be installed. This may mean that you have\n",
+            "requested an impossible situation or if you are using the unstable\n",
+            "distribution that some required packages have not yet been created\n",
+            "or been moved out of Incoming.\n",
+            "The following information may help to resolve the situation:\n",
+            "\n",
+            "The following packages have unmet dependencies:\n",
+            " mongodb-org-mongos : Depends: libssl1.1 (>= 1.1.1) but it is not installable\n",
+            " mongodb-org-server : Depends: libssl1.1 (>= 1.1.1) but it is not installable\n",
+            "E: Unable to correct problems, you have held broken packages.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!cat /etc/mongod.conf"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6NagVl8WKvTL",
+        "outputId": "a6242c38-6676-4b62-bd31-0776b2d6f0c2"
+      },
+      "execution_count": 34,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "# mongod.conf\n",
+            "\n",
+            "# for documentation of all options, see:\n",
+            "#   http://docs.mongodb.org/manual/reference/configuration-options/\n",
+            "\n",
+            "# Where and how to store data.\n",
+            "storage:\n",
+            "  dbPath: /var/lib/mongodb\n",
+            "#  engine:\n",
+            "#  wiredTiger:\n",
+            "\n",
+            "# where to write logging data.\n",
+            "systemLog:\n",
+            "  destination: file\n",
+            "  logAppend: true\n",
+            "  path: /var/log/mongodb/mongod.log\n",
+            "\n",
+            "# network interfaces\n",
+            "net:\n",
+            "  port: 27017\n",
+            "  bindIp: 127.0.0.1\n",
+            "\n",
+            "\n",
+            "# how the process runs\n",
+            "processManagement:\n",
+            "  timeZoneInfo: /usr/share/zoneinfo\n",
+            "\n",
+            "#security:\n",
+            "\n",
+            "#operationProfiling:\n",
+            "\n",
+            "#replication:\n",
+            "\n",
+            "#sharding:\n",
+            "\n",
+            "## Enterprise-Only Options:\n",
+            "\n",
+            "#auditLog:\n",
+            "\n",
+            "#snmp:\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!ls /etc/init.d"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Bg87NvVRMSUn",
+        "outputId": "e8e7ea05-28dd-4f20-8ee7-ee3c39cb5dce"
+      },
+      "execution_count": 35,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "dbus  fio  hwclock.sh  kmod  procps  rsync  x11-common\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile /etc/init.d/mongod\n",
+        "#! /bin/sh\n",
+        "### BEGIN INIT INFO\n",
+        "# Provides:          mongodb\n",
+        "# Default-Start:     2 3 4 5\n",
+        "# Default-Stop:      0 1 6\n",
+        "# Short-Description: Mongodb startup script\n",
+        "# Description:       Mongodb start stop daemon sends SIGINT to terminate\n",
+        "#                    say man signal to see details\n",
+        "\n",
+        "# Please check the startup params and replication options\n",
+        "#Mongo db usage:\n",
+        "#  run                      run db\n",
+        "#  msg [msg] [port]         send a request to the db server listening on port (or default)\n",
+        "#  msglots                  send many test messages, and then wait for answer on the last one\n",
+        "#  longmsg                  send a long test message to the db server\n",
+        "#  quicktest                just check basic assertions and exit\n",
+        "#  test2                    run test2() - see code\n",
+        "#\n",
+        "#Options:\n",
+        "# --help                    show this usage information\n",
+        "# --port <portno>           specify port number, default is 27017\n",
+        "# --dbpath <root>           directory for datafiles, default is /data/db/\n",
+        "# --quiet                   quieter output\n",
+        "# --cpu                     show cpu+iowait utilization periodically\n",
+        "# --noauth                  run without security\n",
+        "# --auth                    run with security\n",
+        "# --verbose\n",
+        "# -v+                       increase verbose level -v = --verbose\n",
+        "# --objcheck                inspect client data for validity on receipt\n",
+        "# --quota                   enable db quota management\n",
+        "# --appsrvpath <path>       root directory for the babble app server\n",
+        "# --nocursors               diagnostic/debugging option\n",
+        "# --nohints                 ignore query hints\n",
+        "# --nohttpinterface         disable http interface\n",
+        "# --nojni\n",
+        "# --oplog<n>                0=off 1=W 2=R 3=both 7=W+some reads\n",
+        "# --oplogSize <size_in_MB>  custom size if creating new replication operation log\n",
+        "# --sysinfo                 print some diagnostic system information\n",
+        "#\n",
+        "#Replication:\n",
+        "# --master\n",
+        "# --slave\n",
+        "# --source <server:port>    when a slave, specifies master\n",
+        "# --only <dbname>           when a slave, only replicate db <dbname>\n",
+        "# --pairwith <server:port> <arbiter>\n",
+        "# --autoresync\n",
+        "\n",
+        "### END INIT INFO\n",
+        "\n",
+        "# Author: Kunthar <kunthar@gmail.com> (with very slight edits by colin@mixedcontent.com)\n",
+        "#\n",
+        "\n",
+        "# Do NOT \"set -e\"\n",
+        "\n",
+        "# Check the paths and data dir with additional options at startup...\n",
+        "PATH=/sbin:/usr/bin/mongod\n",
+        "DESC=\"Mongodb Service\"\n",
+        "NAME=mongod\n",
+        "DAEMON=/usr/bin/mongod\n",
+        "DBPATH=/data/db\n",
+        "#If security matters, please change arg to --auth\n",
+        "DAEMON_ARGS=\"--dbpath $DBPATH --noauth\"\n",
+        "PIDFILE=/var/run/$NAME.pid\n",
+        "SCRIPTNAME=/etc/init.d/$NAME\n",
+        "LOGFILE=/var/log/mongod.log\n",
+        "\n",
+        "# Exit if the package is not installed\n",
+        "[ -x \"$DAEMON\" ] || exit 0\n",
+        "\n",
+        "# Load the VERBOSE setting and other rcS variables\n",
+        ". /lib/init/vars.sh\n",
+        "\n",
+        "# Define LSB log_* functions.\n",
+        "# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.\n",
+        ". /lib/lsb/init-functions\n",
+        "\n",
+        "#\n",
+        "# Function that starts the daemon/service\n",
+        "#\n",
+        "do_start()\n",
+        "{\n",
+        "\techo -e \"Starting $DESC \\n\"\n",
+        "        start-stop-daemon -Sm -p $PIDFILE --exec $DAEMON -- $DAEMON_ARGS >> $LOGFILE&\n",
+        "\techo -e \"\\nstarted\"\n",
+        "\n",
+        "}\n",
+        "\n",
+        "#\n",
+        "# Function that stops the daemon/service\n",
+        "#\n",
+        "do_stop()\n",
+        "{\n",
+        "\techo -e \"Stopping $DESC by sending ctrl+c \\n\"\n",
+        "\t#Be nice send ctrl+c to mongod daemon\n",
+        "\tstart-stop-daemon --stop --signal 2 -q --pidfile $PIDFILE --name $NAME\n",
+        "\t# Many daemons don't delete their pidfiles when they exit.\n",
+        "\trm -f $PIDFILE\n",
+        "\techo -e \"\\nstopped\"\n",
+        "}\n",
+        "\n",
+        "#\n",
+        "# Function that sends a SIGHUP to the daemon/service\n",
+        "#\n",
+        "do_reload() {\n",
+        "\t#\n",
+        "\t# If the daemon can reload its configuration without\n",
+        "\t# restarting (for example, when it is sent a SIGHUP),\n",
+        "\t# then implement that here.\n",
+        "\t#\n",
+        "\tstart-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME\n",
+        "\treturn 0\n",
+        "}\n",
+        "\n",
+        "case \"$1\" in\n",
+        "  start)\n",
+        "\t[ \"$VERBOSE\" != no ] && log_daemon_msg \"Starting $DESC\" \"$NAME\"\n",
+        "\tdo_start\n",
+        "\tcase \"$?\" in\n",
+        "\t\t0|1) [ \"$VERBOSE\" != no ] && log_end_msg 0 ;;\n",
+        "\t\t2) [ \"$VERBOSE\" != no ] && log_end_msg 1 ;;\n",
+        "\tesac\n",
+        "\t;;\n",
+        "  stop)\n",
+        "\t[ \"$VERBOSE\" != no ] && log_daemon_msg \"Stopping $DESC\" \"$NAME\"\n",
+        "\tdo_stop\n",
+        "\tcase \"$?\" in\n",
+        "\t\t0|1) [ \"$VERBOSE\" != no ] && log_end_msg 0 ;;\n",
+        "\t\t2) [ \"$VERBOSE\" != no ] && log_end_msg 1 ;;\n",
+        "\tesac\n",
+        "\t;;\n",
+        "  #reload|force-reload)\n",
+        "\t#\n",
+        "\t# If do_reload() is not implemented then leave this commented out\n",
+        "\t# and leave 'force-reload' as an alias for 'restart'.\n",
+        "\t#\n",
+        "\t#log_daemon_msg \"Reloading $DESC\" \"$NAME\"\n",
+        "\t#do_reload\n",
+        "\t#log_end_msg $?\n",
+        "\t#;;\n",
+        "  restart|force-reload)\n",
+        "\t#\n",
+        "\t# If the \"reload\" option is implemented then remove the\n",
+        "\t# 'force-reload' alias\n",
+        "\t#\n",
+        "\tlog_daemon_msg \"Restarting $DESC\" \"$NAME\"\n",
+        "\tdo_stop\n",
+        "\tcase \"$?\" in\n",
+        "\t  0|1)\n",
+        "\t\tdo_start\n",
+        "\t\tcase \"$?\" in\n",
+        "\t\t\t0) log_end_msg 0 ;;\n",
+        "\t\t\t1) log_end_msg 1 ;; # Old process is still running\n",
+        "\t\t\t*) log_end_msg 1 ;; # Failed to start\n",
+        "\t\tesac\n",
+        "\t\t;;\n",
+        "\t  *)\n",
+        "\t  \t# Failed to stop\n",
+        "\t\tlog_end_msg 1\n",
+        "\t\t;;\n",
+        "\tesac\n",
+        "\t;;\n",
+        "  *)\n",
+        "\t#echo \"Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}\" >&2\n",
+        "\techo \"Usage: $SCRIPTNAME {start|stop}\" >&2\n",
+        "\texit 3\n",
+        "\t;;\n",
+        "esac\n",
+        "\n",
+        ":"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YZeONL3YE1Vg",
+        "outputId": "1a81558a-8e57-475f-d9fd-bf1983edd19e"
+      },
+      "execution_count": 20,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Overwriting /etc/init.d/mongod\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!chmod 755 /etc/init.d/mongod\n",
+        "!chown root:root /etc/init.d/mongod"
+      ],
+      "metadata": {
+        "id": "VizI1_iEe6le"
+      },
+      "execution_count": 23,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sudo /etc/init.d/mongod restart > /dev/null"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DfUniSfhfEie",
+        "outputId": "a8b19781-1c87-4d02-c835-d26e9a87e164"
+      },
+      "execution_count": 25,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/etc/init.d/mongod: 28: /lib/init/vars.sh: cat: not found\n",
+            "/etc/init.d/mongod: 97: rm: not found\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!ulimit -n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "DQ_25kh8f3Nv",
+        "outputId": "6163b52a-0ca4-4d1f-d48d-5ab18723d6e2"
+      },
+      "execution_count": 53,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "1048576\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!mkdir -p /data                                          # data folder creation\n",
+        "!mkdir -p /data/db\n"
+      ],
+      "metadata": {
+        "id": "vujWfuiegIOe"
+      },
+      "execution_count": 66,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!mongosh"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "QNvTuf_QibUW",
+        "outputId": "19110a81-6e25-4f95-b34c-21a6b015ddfd"
+      },
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b]0;mongosh mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000\u0007Current Mongosh Log ID:\t65b688ad0881e767bc8b41e8\n",
+            "Connecting to:\t\t\u001b[1m\u001b[32mmongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.1.1\u001b[0m\n",
+            "MongoNetworkError: connect ECONNREFUSED 127.0.0.1:27017\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!ps -ax | grep mongo"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xfI-R5eSzg0G",
+        "outputId": "288d2e55-d719-4967-f23c-a182665a929f"
+      },
+      "execution_count": 15,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "   8022 ?        S      0:00 /bin/bash -c ps -ax | grep mongo\n",
+            "   8024 ?        S      0:00 grep mongo\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!mongod --quiet --eval  \"printjson(db.adminCommand('listDatabases'))\""
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "avHvzSOT0bQn",
+        "outputId": "c858b092-9e75-4c40-ac54-b4a898f2634a"
+      },
+      "execution_count": 30,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Error parsing command line: unrecognised option '--eval'\n",
+            "try 'mongod --help' for more information\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "aIf-MxI9_Yji"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
