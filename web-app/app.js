@@ -39,7 +39,6 @@ app.get('/', (req, res) => {
 });
 
 // Define routes for each research question
-// Route for the first research question
 app.get('/city-rankings', (req, res) => {
   const query = 'SELECT city_name, AVG(aqi_value) AS average_aqi FROM pollutions JOIN cities ON pollutions.city_id = cities.city_id GROUP BY city_name ORDER BY average_aqi DESC';
   db.query(query, (err, results) => {
@@ -52,8 +51,53 @@ app.get('/city-rankings', (req, res) => {
   });
 });
 
-// Add similar routes for the other research questions
-// ...
+app.get('/national-urban-aq', (req, res) => {
+  const query = 'SELECT country_name, AVG(aqi_value) AS average_aqi FROM pollutions JOIN cities ON pollutions.city_id = cities.city_id JOIN countries ON cities.country_id = countries.country_id GROUP BY country_name ORDER BY average_aqi';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching national urban air quality:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.render('national-urban-aq', { countries: results });
+  });
+});
+
+app.get('/dominant-pollutants', (req, res) => {
+  const query = 'SELECT pollutant_name, AVG(aqi_value) AS average_aqi FROM pollutions JOIN pollutants ON pollutions.pollutant_id = pollutants.pollutant_id GROUP BY pollutant_name ORDER BY average_aqi DESC';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching dominant pollutants:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.render('dominant-pollutants', { pollutants: results });
+  });
+});
+
+app.get('/pollutant-prevalence', (req, res) => {
+  const query = 'SELECT city_name FROM cities WHERE EXISTS (SELECT * FROM pollutions p1 JOIN pollutants pol1 ON p1.pollutant_id = pol1.pollutant_id AND pol1.pollutant_name = "NO2" WHERE p1.city_id = cities.city_id AND p1.aqi_value > (SELECT p2.aqi_value FROM pollutions p2 JOIN pollutants pol2 ON p2.pollutant_id = pol2.pollutant_id AND pol2.pollutant_name = "CO" WHERE p2.city_id = cities.city_id))';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching pollutant prevalence:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.render('pollutant-prevalence', { cities: results });
+  });
+});
+
+app.get('/urban-centers-profile', (req, res) => {
+  const query = 'SELECT city_name, pollutant_name, AVG(aqi_value) AS average_aqi FROM pollutions JOIN cities ON pollutions.city_id = cities.city_id JOIN pollutants ON pollutions.pollutant_id = pollutants.pollutant_id GROUP BY city_name, pollutant_name HAVING AVG(aqi_value) > (SELECT AVG(aqi_value) FROM pollutions) ORDER BY average_aqi DESC';
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching pollution profiles of urban centers:', err);
+      res.status(500).send('Error fetching data');
+      return;
+    }
+    res.render('urban-centers-profile', { profiles: results });
+  });
+});
 
 // Start the server
 const PORT = process.env.PORT || 3000;
