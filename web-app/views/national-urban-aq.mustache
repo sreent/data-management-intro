@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Urban Air Quality Rankings</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>National Urban Air Quality Rankings</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Country</th>
+          <th>Average Urban AQI</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#countries}}
+        <tr>
+          <td>{{rank}}</td>
+          <td>{{country_name}}</td>
+          <td>{{average_aqi}}</td>
+        </tr>
+        {{/countries}}
+      </tbody>
+    </table>
+    <a href="/" class="return-button">Return to Main Page</a>
+  </div>
+  <script src="/js/scripts.js"></script>
+</body>
+</html>
