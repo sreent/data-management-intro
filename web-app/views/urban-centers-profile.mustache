@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pollution Profiles of Urban Centers</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Pollution Profiles of Urban Centers</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>City</th>
+          <th>Pollutant</th>
+          <th>Average AQI</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#profiles}}
+        <tr>
+          <td>{{city_name}}</td>
+          <td>{{pollutant_name}}</td>
+          <td>{{average_aqi}}</td>
+        </tr>
+        {{/profiles}}
+      </tbody>
+    </table>
+    <a href="/" class="return-button">Return to Main Page</a>
+  </div>
+  <script src="/js/scripts.js"></script>
+</body>
+</html>
