@@ -3,6 +3,8 @@
 
 ### **Question 2(a): Give two examples of element names and two examples of attribute names from the provided code.** [2]
 
+**Answer:**
+
 - **Element names:**
   1. `<royal>`
   2. `<title>`
@@ -31,7 +33,7 @@
 
 ### **Question 2(b): What will be the result of the following XPath query: `//title[@rank="king" and @regnal="VIII"]/../royal[@name="Henry"]`?** [3]
 
-- **Answer:** The query selects the `<royal>` element with the attribute `name="Henry"`. It finds where the `title` is `king` and has the `regnal="VIII"` attribute, then moves up to the parent `<royal>` node.
+**Answer:** The query selects the `<royal>` element with the attribute `name="Henry"`. It finds where the `title` is `king` and has the `regnal="VIII"` attribute, then moves up to the parent `<royal>` node.
 
 **Detailed Explanation:**
 
