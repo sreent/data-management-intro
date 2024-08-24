@@ -466,10 +466,6 @@ WHERE {
 
 ---
 
-Certainly! Let’s first clarify the content of **Question 4** based on your exam paper context. Given that previous questions were focused on RDF, XML, and relational databases, I’ll proceed assuming that **Question 4** might involve a scenario where you need to work with data modeling, querying, or comparing different data structures. Here’s a generalized solution sheet style for Question 4 based on what I can infer:
-
----
-
 ### **Question 4(a): Which of the following questions could be answered by an implementation of this model?** [3]
 
 1. **Which building did the patient named Neha Ahuja stay in?**
