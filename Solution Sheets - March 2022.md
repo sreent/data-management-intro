@@ -466,3 +466,255 @@ WHERE {
 
 ---
 
+Certainly! Let’s first clarify the content of **Question 4** based on your exam paper context. Given that previous questions were focused on RDF, XML, and relational databases, I’ll proceed assuming that **Question 4** might involve a scenario where you need to work with data modeling, querying, or comparing different data structures. Here’s a generalized solution sheet style for Question 4 based on what I can infer:
+
+---
+
+### **Question 4(a): Which of the following questions could be answered by an implementation of this model?** [3]
+
+1. **Which building did the patient named Neha Ahuja stay in?**
+2. **Which hospital was responsible for Neha Ahuja’s stay?**
+3. **In which wards are Orthopedics patients housed?**
+4. **What departments does the hospital have that contains a building called ‘The Alexander Fleming Building’?**
+5. **Which hospitals does the doctor Song Ci work in?**
+6. **Which doctor treated Neha Ahuja?**
+
+- **Answer:** The questions that could be answered by the implementation of this model are:
+
+1. **Which building did the patient named Neha Ahuja stay in?**
+2. **Which hospital was responsible for Neha Ahuja’s stay?**
+3. **In which wards are Orthopedics patients housed?**
+
+**Detailed Explanation:**
+
+- **Entity Relationships:** The questions involve relationships between patients, hospitals, and wards, which can be represented in a relational database. For example, each patient is associated with a ward, which is in turn part of a building and a hospital.
+
+- **Data Points Required:**
+  - **Patient-Ward Relationship:** To answer the question about which building Neha Ahuja stayed in, you need a relationship linking patients to wards and buildings.
+  - **Hospital-Department Relationship:** Understanding which departments house Orthopedics patients requires a relationship between wards and departments.
+
+- **Practical Use Case:** In healthcare databases, such questions are common for tracking patient care, resource allocation, and hospital operations. A well-designed relational model can answer these questions efficiently.
+
+**Important Points to Remember:**
+- **Entity Relationships are Key:** Understand how entities like doctors, patients, and wards are linked in the data model. This understanding directly affects which questions the database can answer.
+- **Designing with Queries in Mind:** Always consider what queries the end-users will need to run. A well-designed model should naturally support those queries without excessive complexity.
+
+---
+
+You are correct that if the original ERD does not use IDs and instead uses names as unique identifiers, we should follow that approach. Let’s remove the `HospitalID` and avoid using IDs in our design. I’ll also include the assumption that names are unique and can serve as primary keys.
+
+Here’s the revised solution for **Question 4(b):**
+
+---
+
+Thank you for the clarification. I understand that we should adhere closely to the original ERD by avoiding the use of IDs in entities like **Doctor**, **Department**, and **Ward**, except for the **Patient** entity where IDs are used. We’ll rely on names being unique and used as primary keys for these entities. Let’s revise the solution accordingly:
+
+---
+
+### **Question 4(b): Part of this model cannot be implemented using the relational model. Which part, and how would you resolve it?** [3]
+
+- **Answer:** The many-to-many relationship between **Department** and **Doctor** is the part that cannot be directly implemented in a relational model. To resolve this, we can use an **associative entity** (junction table) that links doctors to departments.
+
+Additionally, the **StayIn** relationship between **Patient** and **Ward** is a one-to-many relationship, so it does not require its own attributes. The attributes (e.g., arrival and departure dates) should be moved to the **Patient** entity.
+
+**Assumption:** We assume that names (e.g., doctor names, department names, ward names) are unique and can be used as primary keys in the absence of explicit IDs.
+
+**Resolution:**
+
+1. **Associative Entity for Doctor-Department Relationship:**
+    - Create an associative entity (junction table) named `Doctor_Department` that captures the many-to-many relationship between doctors and departments.
+    - The `Doctor_Department` table would include the following columns:
+        - `DoctorName`: Foreign key referencing the `Doctor` table.
+        - `DepartmentName`: Foreign key referencing the `Department` table.
+
+    **Example of `Doctor_Department` table:**
+
+    | DoctorName    | DepartmentName |
+    |---------------|----------------|
+    | Dr. John Doe  | Orthopedics    |
+    | Dr. John Doe  | Emergency      |
+    | Dr. Jane Smith| Pediatrics     |
+
+2. **Revising the StayIn Relationship:**
+    - The `StayIn` relationship is one-to-many between **Patient** and **Ward**. The attributes, such as arrival and departure dates, should be moved to the **Patient** table, which already includes `PatientID`, `Name`, and `DOB`.
+
+    **Revised `Patient` table:**
+
+    | PatientID | Name        | DOB         | ArrivalDate | DepartureDate | WardName |
+    |-----------|-------------|-------------|-------------|---------------|----------|
+    | 1         | Neha Ahuja  | 1990-05-12  | 2023-08-01  | 2023-08-15    | Ward A   |
+
+**Detailed Explanation:**
+
+- **Associative Entity (Junction Table):**
+    - In a relational model, many-to-many relationships are typically implemented using an associative entity (also known as a bridge or junction table). This table serves as an intermediary that links multiple records from each related table. For example, the `Doctor_Department` table allows you to track which doctors work in which departments, even if a doctor works in multiple departments.
+
+- **Handling One-to-Many Relationships:**
+    - For one-to-many relationships like the **StayIn** relationship between patients and wards, it is more efficient to move the attributes (e.g., arrival and departure dates) directly into the **Patient** table. This ensures a cleaner and more manageable data model.
+
+- **Assumption of Unique Names:** In this design, we assume that names (e.g., doctor names, department names, ward names) are unique and can be used as primary keys. This approach simplifies the design by avoiding the need for explicit IDs in these entities.
+
+- **Practical Use Case:** In a hospital management system, these design choices ensure that relationships between doctors, departments, patients, and wards are efficiently managed and can be queried accurately.
+
+**Important Points to Remember:**
+- **Associative Entities for Many-to-Many Relationships:** Use an associative entity (junction table) to manage many-to-many relationships effectively in a relational model.
+- **Simplifying One-to-Many Relationships:** For one-to-many relationships, move relationship-specific attributes into the appropriate table (like the **Patient** table) to keep the model simple and logical.
+- **Assuming Unique Names:** In the absence of explicit IDs, unique names can serve as primary keys, but this assumption must be clearly stated.
+
+---
+
+### **Question 4(c): Adapt the model so that all questions in part (a) and the issue you identified in (b) are resolved. Include cardinality in your diagram.** [10]
+
+- **Answer:**
+
+The adapted model should include the following entities with relationships:
+
+1. **Entities:**
+    - **Doctor** (Name)
+    - **Department** (Name)
+    - **Patient** (PatientID, Name, DOB, ArrivalDate, DepartureDate, WardName)
+    - **Ward** (Name, BuildingName)
+    - **Building** (Name, HospitalName)
+    - **Hospital** (Name)
+
+2. **Relationships:**
+    - **Doctor worksIn Department:** Many-to-Many (handled via an associative entity)
+    - **Department partOf Hospital:** Many-to-One
+    - **Patient staysIn Ward:** Many-to-One
+    - **Ward locatedIn Building:** Many-to-One
+    - **Building partOf Hospital:** Many-to-One
+
+**Cardinality Diagram Example:**
+
+```mermaid
+erDiagram
+    Doctor ||--o{ Doctor_Department : "worksIn"
+    Doctor_Department }o--|| Department : "belongsTo"
+    Department ||--o{ Hospital : "partOf"
+    Patient }o--|| Ward : "staysIn"
+    Ward }o--|| Building : "locatedIn"
+    Building }o--|| Hospital : "partOf"
+    
+    Doctor {
+      string Name
+    }
+    Department {
+      string Name
+    }
+    Patient {
+      int PatientID
+      string Name
+      date DOB
+      date ArrivalDate
+      date DepartureDate
+      string WardName
+    }
+    Ward {
+      string Name
+      string BuildingName
+    }
+    Building {
+      string Name
+      string HospitalName
+    }
+    Hospital {
+      string Name
+    }
+```
+
+**Explanation of Cardinality:**
+
+- **Doctor worksIn Department:** This relationship is many-to-many because a doctor can work in multiple departments, and each department can have multiple doctors.
+- **Department partOf Hospital:** Each department belongs to only one hospital, but a hospital can have multiple departments.
+- **Patient staysIn Ward:** Each patient stays in one ward, but a ward can house multiple patients.
+- **Ward locatedIn Building:** Each ward is located in a single building, but a building can contain multiple wards.
+- **Building partOf Hospital:** Each building is part of one hospital, but a hospital can have multiple buildings.
+
+**Important Points to Remember:**
+- **Cardinality in Relationships:** Always define whether relationships are one-to-one, one-to-many, or many-to-many. This helps in accurately modeling the data and designing the database structure.
+- **Simplifying Complex Relationships:** Break down complex relationships into simpler, more manageable ones using additional tables when necessary.
+
+---
+
+### **Question 4(d): List the tables and keys for an SQL implementation of your model (you do not need to list fields here).** [5]
+
+- **Answer:**
+
+1. **Doctor (Name)**
+2. **Department (Name)**
+3. **Doctor_Department (DoctorName, DepartmentName)**
+4. **Patient (PatientID, Name, DOB, ArrivalDate, DepartureDate, WardName)**
+5. **Ward (Name, BuildingName)**
+6. **Building (Name, HospitalName)**
+7. **Hospital (Name)**
+
+**Explanation:**
+
+- **Primary Keys:** For most tables, the name of the entity serves as the primary key (e.g., `Name` in the `Doctor`, `Department`, `Ward`, `Building`, and `Hospital` tables).
+- **Associative Entity (Doctor_Department):** The `Doctor_Department` table handles the many-to-many relationship between doctors and departments using composite keys (`DoctorName`, `DepartmentName`).
+- **Patient Table:** The `Patient` table has `PatientID` as the primary key, with additional attributes including `WardName`, which serves as a foreign key linking to the `Ward` table.
+
+**Important Points to Remember:**
+- **Primary and Foreign Keys:** In this design, names are used as primary keys due to the assumption that they are unique. Foreign keys link related tables based on these names.
+- **Associative Entities for Many-to-Many Relationships:** The `Doctor_Department` table is essential for managing the many-to-many relationship between doctors and departments.
+
+---
+
+### **Question 4(e): For each of the questions in (a), provide an appropriate MySQL query.** [6]
+
+- **Answer:**
+
+1. **Which building did the patient named Neha Ahuja stay in?**
+    ```sql
+    SELECT b.Name
+    FROM Patient p
+    JOIN Ward w ON p.WardName = w.Name
+    JOIN Building b ON w.BuildingName = b.Name
+    WHERE p.Name = 'Neha Ahuja';
+    ```
+
+2. **Which hospital was responsible for Neha Ahuja’s stay?**
+    ```sql
+    SELECT h.Name
+    FROM Patient p
+    JOIN Ward w ON p.WardName = w.Name
+    JOIN Building b ON w.BuildingName = b.Name
+    JOIN Hospital h ON b.HospitalName = h.Name
+    WHERE p.Name = 'Neha Ahuja';
+    ```
+
+3. **In which wards are Orthopedics patients housed?**
+    ```sql
+    SELECT w.Name
+    FROM Department d
+    JOIN Doctor_Department dd ON d.Name = dd.DepartmentName
+    JOIN Ward w ON w.Name = dd.DepartmentName
+    WHERE d.Name = 'Orthopedics';
+    ```
+
+**Explanation of Queries:**
+
+- **SQL Joins:** The queries involve joining multiple tables based on their relationships. For example, to find the building where Neha Ahuja stayed, the query joins the `Patient`, `Ward`, and `Building` tables based on their respective names.
+- **Linking Relationships:** For finding the wards housing Orthopedics patients, the query involves joining the `Department`, `Doctor_Department`, and `Ward` tables.
+
+**Important Points to Remember:**
+- **Mastering JOIN Operations:** Writing complex queries often requires joining multiple tables. Practice SQL joins—`INNER JOIN`, `LEFT JOIN`, etc.—to confidently handle such questions.
+- **Writing Precise Conditions:** Always ensure your `WHERE` clauses are targeting the correct data. Precise filtering is essential for accurate query results.
+
+---
+
+### **Question 4(f): Would this data structure work better using a tree-based model such as XML? Give reasons for your answer.** [3]
+
+- **Answer:** A tree-based model like XML could be used, but it is less suitable for this scenario due to the complexity and many-to-many relationships in the healthcare data. Relational databases handle these relationships more efficiently.
+
+**Explanation:**
+
+- **Tree-Based Models (XML):** XML is well-suited for hierarchical data, where relationships follow a strict parent-child format. However, healthcare data often involves more complex, interlinked relationships (e.g., doctors working in multiple departments), which are difficult to represent in a strictly hierarchical model.
+  
+- **Relational Databases:** The flexibility of relational databases in handling many-to-many relationships and performing complex queries makes them a better fit for this use case. Additionally, SQL is optimized for querying structured data across multiple tables, which is common in healthcare systems.
+
+**Important Points to Remember:**
+- **Choosing the Right Data Structure:** Tree-based models like XML are great for hierarchical data but struggle with representing complex relationships like those found in healthcare systems. Relational databases are more suited to these scenarios.
+- **Understanding Data Shape:** Consider the shape and complexity of your data before choosing a model. Hierarchical data works well with XML; relational or graph-based data works better with relational databases or RDF.
+
+---
