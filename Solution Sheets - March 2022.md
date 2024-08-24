@@ -434,31 +434,35 @@ WHERE {
 
 ---
 
-### **Question 3(i): How would you approach the query version in (c) in SQL?** [6]
+### **Question 3(i): How would you approach the query version in (a) in SQL?** [6]
 
 - **Answer:**
   ```sql
   SELECT DISTINCT t1.Subject
   FROM TripleTable t1
   JOIN TripleTable t2 ON t1.Subject = t2.Subject
-  JOIN TripleTable t3 ON t2.Object = t3.Subject
   WHERE t1.Predicate = 'instanceOf' AND t1.Object = 'Human'
-    AND t2.Predicate = 'placeOfBirth'
-    AND (t2.Object = 'New York City' OR t3.Object = 'New York City');
+    AND t2.Predicate = 'placeOfBirth' AND t2.Object = 'New York City';
   ```
 
 **Detailed Explanation:**
 
-- **Handling Hierarchical Relationships in SQL:**
-  - The query uses multiple joins to capture cases where "New York City" may be an indirect location (e.g., Brooklyn, a borough within New York City). By joining the triple table on `Subject` and then further joining based on `Object`, the query can handle hierarchical or nested locations.
+- **Triple Table Structure:**
+  - The query assumes the data is stored in a triple table with three columns: `Subject`, `Predicate`, and `Object`. This structure is flexible and can accommodate RDF-like data by storing each statement as a separate row.
 
-- **Comparing with SPARQL:**
-  - In the original SPARQL query, a path expression (`wdt:P19/wdt:P131* wd:Q60`) is used to navigate hierarchical relationships. The equivalent in SQL is joining the triple table multiple times to simulate navigating through levels of hierarchy.
+- **Understanding the Query:**
+  - The first part of the query filters for entities that are instances of "Human". This is equivalent to the condition in the SPARQL query: `wdt:P31 wd:Q5`.
+  - The second part of the query checks for entities whose place of birth is "New York City", similar to `wdt:P19 wd:Q60` in SPARQL.
+  - By joining the table on `Subject`, the query links the two conditions, ensuring that the entity satisfies both.
 
-- **Practical Use Case:** This approach works well when translating RDF data structures into SQL queries. It allows you to maintain the flexibility of RDF in a relational database context, using joins to simulate path expressions.
+- **Handling Distinct Results:**
+  - The `DISTINCT` keyword ensures that each unique entity (subject) is returned only once, even if there are multiple statements related to that entity.
+
+- **Practical Use Case:** This SQL query structure is particularly useful when working with RDF data stored in a relational database. It provides the flexibility to query for entities based on various properties while maintaining the simplicity of a triple table design.
 
 **Important Points to Remember:**
-- **Recursive Joins in SQL:** Handling hierarchical or graph-like relationships in relational databases often requires recursive joins or multiple levels of joins, as seen here.
-- **Adapting RDF Concepts in SQL:** The triple table approach provides a flexible way to store and query RDF-style data using SQL, offering a hybrid solution between relational databases and graph models.
+- **Triple Table for RDF Data:** A triple table (Subject, Predicate, Object) is an effective way to store RDF-like data in a relational database. It provides the flexibility needed for complex queries while remaining simple and scalable.
+- **SQL Joins for Linking Conditions:** The join operation is essential in linking related conditions in the triple table, allowing you to replicate the logic of SPARQL queries in SQL.
 
 ---
+
