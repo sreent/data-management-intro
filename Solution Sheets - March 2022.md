@@ -33,9 +33,7 @@
 
 ### **Question 2(b): What will be the result of the following XPath query: `//title[@rank="king" and @regnal="VIII"]/../royal[@name="Henry"]`?** [3]
 
-**Answer:** 
-
-The query selects the `<royal>` element with the attribute `name="Henry"`. It finds where the `title` is `king` and has the `regnal="VIII"` attribute, then moves up to the parent `<royal>` node.
+**Answer:** The query selects the `<royal>` element with the attribute `name="Henry"`. It finds where the `title` is `king` and has the `regnal="VIII"` attribute, then moves up to the parent `<royal>` node.
 
 **Detailed Explanation:**
 
@@ -58,9 +56,7 @@ The query selects the `<royal>` element with the attribute `name="Henry"`. It fi
 
 ### **Question 2(c): What (in general terms) will be returned by the following XPath query: `//title[@rank="king" or @rank="queen"]/../relationship/children/royal/relationship/children/royal/`?** [3]
 
-**Answer:**
-
-The query returns all `<royal>` elements that are descendants of `children` nodes, where the ancestor node has a `title` element with either `king` or `queen` rank.
+**Answer:** The query returns all `<royal>` elements that are descendants of `children` nodes, where the ancestor node has a `title` element with either `king` or `queen` rank.
 
 **Detailed Explanation:**
 
@@ -82,9 +78,7 @@ The query returns all `<royal>` elements that are descendants of `children` node
 
 ### **Question 2(d): Mary I of England was also queen consort of Spain from 16 January 1556 until her death. Give an XML fragment that would record this information and say where you would add it to the code above.** [4]
 
-**Answer:** 
-
-This fragment should be added under the `<royal name="Mary">` element.
+**Answer:** This fragment should be added under the `<royal name="Mary">` element.
 
 ```xml
 <relationship type="marriage" spouse="#PhilipOfSpain" from="1556-01-16">
@@ -159,9 +153,7 @@ This fragment should be added under the `<royal name="Mary">` element.
 
 ### **Question 2(f): One colleague suggests that the data is really a graph, not a tree, and should be represented as Linked Data using RDF. The other thinks it can be modeled as a set of relations and so should be transformed into a relational database. Who is correct?** [6]
 
-**Answer:** 
-
-Both colleagues have valid points:
+**Answer:** Both colleagues have valid points:
 
 - **RDF (Linked Data):** RDF is better if the data involves complex, many-to-many relationships that resemble a graph. It’s useful for scenarios where connections between entities are more important than a strict hierarchy. For instance, RDF is ideal if you need to represent the network of relationships between historical figures, like alliances, rivalries, or lineage.
   
@@ -219,3 +211,254 @@ Both colleagues have valid points:
 
 ---
 
+### **Question 3(a): **What will the following query return?** [2]
+
+```sparql
+SELECT DISTINCT ?person
+WHERE {
+  ?person wdt:P31 wd:Q5;
+          wdt:P19 wd:Q60.
+}
+```
+
+- **Answer:** The query returns a list of distinct people (`?person`) who are classified as humans (`wd:Q5`) and whose place of birth is New York City (`wd:Q60`).
+
+**Detailed Explanation:**
+
+- **SPARQL Query Language:**
+  - SPARQL is a powerful language used for querying RDF (Resource Description Framework) data. It is commonly used with linked data sources like Wikidata.
+  - In this query, `?person` represents a variable that will hold the result of the query.
+
+- **Understanding the Query:**
+  - The triple `?person wdt:P31 wd:Q5` specifies that the person must be an instance of a human (`wd:Q5`).
+  - The second triple `?person wdt:P19 wd:Q60` specifies that the person’s place of birth must be New York City (`wd:Q60`).
+  - The query retrieves all unique individuals who satisfy both conditions.
+
+- **Practical Use Case:** Suppose you are interested in finding all notable individuals who were born in New York City. This query would allow you to extract that list from Wikidata.
+
+**Important Points to Remember:**
+- **Triple Patterns:** SPARQL queries are based on triple patterns (subject-predicate-object) that allow you to define conditions for selecting data.
+- **Wikidata’s Properties:** Properties like `wdt:P31` (instance of) and `wdt:P19` (place of birth) are commonly used when working with person-related queries.
+
+---
+
+### **Question 3(b): **What assumptions does this query make? What data must be present for it to work?** [2]
+
+- **Answer:** The query assumes that:
+  1. Each person entity has both the `instance of` (`wdt:P31`) and `place of birth` (`wdt:P19`) properties defined.
+  2. The place of birth for the entities being queried is specifically New York City (`wd:Q60`).
+
+**Detailed Explanation:**
+
+- **Data Requirements for the Query:**
+  - For the query to work as intended, the RDF dataset must have the correct properties (`wdt:P31` and `wdt:P19`) defined for each person entity. Without these properties, the query will not return the expected results.
+  - The query also assumes that New York City is represented by the specific entity ID `wd:Q60`. If there are other representations of New York City, they won’t be captured by this query.
+
+- **Practical Consideration:** When working with linked data, it’s crucial to ensure that entities are consistently defined and use the correct property-value pairs.
+
+**Important Points to Remember:**
+- **Data Completeness:** SPARQL queries rely heavily on the completeness and consistency of the data. Missing properties or inconsistencies in entity representation can lead to incorrect or incomplete results.
+- **Entity IDs in Wikidata:** Always ensure that you’re using the correct entity IDs (like `wd:Q60` for New York City) when constructing SPARQL queries.
+
+---
+
+### **Question 3(c): **How does the following query differ? Does it resolve any of the assumptions you listed in (b) above?** [4]
+
+```sparql
+SELECT DISTINCT ?person
+WHERE {
+  ?person wdt:P31 wd:Q5;
+          wdt:P19/wdt:P131* wd:Q60.
+}
+```
+
+- **Answer:** The query uses a more flexible approach by incorporating the path expression `wdt:P19/wdt:P131* wd:Q60`, which resolves the assumption about New York City being the direct place of birth.
+
+**Detailed Explanation:**
+
+- **Path Expressions in SPARQL:**
+  - The expression `wdt:P19/wdt:P131* wd:Q60` allows the query to account for cases where New York City is not directly specified as the place of birth but is instead part of a larger administrative division (e.g., "Queens, New York City").
+  - The `*` operator represents zero or more steps, meaning the query can traverse multiple levels of administrative entities to find a match for New York City.
+
+- **How the Query Resolves Assumptions:**
+  - In the previous query, only direct matches for New York City were captured. This query handles cases where the place of birth might be a smaller locality within New York City, thereby broadening the scope of the results.
+
+- **Practical Use Case:** If you want to capture all people born in any part of New York City, including boroughs like Manhattan or Brooklyn, this query is more appropriate.
+
+**Important Points to Remember:**
+- **Path Expressions in SPARQL:** The use of path expressions (`/wdt:P131*`) allows for flexible and hierarchical searches, making your query more robust against variations in data structure.
+- **Handling Indirect Relationships:** In RDF datasets, entities are often linked indirectly through intermediate properties. Path expressions help navigate such complexities.
+
+---
+
+### **Question 3(d): **The results of these queries are not particularly human-readable. Why not?** [1]
+
+- **Answer:** The results consist of entity URIs (like `http://www.wikidata.org/entity/Q42`) rather than human-readable names, making them difficult to interpret without additional context.
+
+**Detailed Explanation:**
+
+- **Entity URIs in RDF:**
+  - In RDF and linked data, entities are represented by unique URIs. While these URIs are machine-readable and provide precise references, they are not user-friendly.
+
+- **Human-Readable Labels:**
+  - To make the results more understandable, it’s common to include human-readable labels in SPARQL queries by using the `rdfs:label` property or similar techniques.
+
+- **Practical Consideration:** When building applications that query linked data, it’s important to format results in a way that is accessible to end-users by converting URIs to meaningful labels.
+
+**Important Points to Remember:**
+- **Handling URIs in Results:** Always consider how to present URIs in a human-readable format, especially when displaying results to end-users.
+- **Using Labels in SPARQL:** Including labels alongside URIs can make query results more accessible and easier to interpret.
+
+---
+
+### **Question 3(e): **How would you rewrite the query given in (c) to return something more readable?** [5]
+
+- **Answer:**
+```sparql
+SELECT DISTINCT ?person ?personLabel
+WHERE {
+  ?person wdt:P31 wd:Q5;
+          wdt:P19/wdt:P131* wd:Q60.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+```
+
+**Detailed Explanation:**
+
+- **Adding Labels for Readability:**
+  - The query introduces the `?personLabel` variable, which retrieves the human-readable label associated with each person using the `SERVICE wikibase:label` block.
+  - The `bd:serviceParam` parameter is used to specify the preferred language for the labels, with English (`en`) as the default.
+
+- **Improved User Experience:**
+  - The rewritten query returns both the entity URI (`?person`) and the corresponding label (`?personLabel`), making the results much easier to understand for users.
+
+- **Practical Use Case:** When developing applications or dashboards that present data from Wikidata, including labels is essential for making the output user-friendly.
+
+**Important Points to Remember:**
+- **Using the `SERVICE` Clause in SPARQL:** The `SERVICE` clause allows you to fetch additional metadata, such as labels or descriptions, making your results more informative.
+- **Localization and Language Preferences:** In multilingual datasets like Wikidata, always consider language preferences when retrieving labels to enhance user accessibility.
+
+---
+
+### **Question 3(f): **The Internet Movie Database (IMDB) provides a way to retrieve actors based on their place of birth. Compare the IMDB approach and the Wikidata approach.** [4]
+
+- **Answer:** IMDB and Wikidata differ in their approach to querying and data accessibility:
+
+**IMDB:**
+  - **Specialized for Movies:** IMDB is highly specialized in movie-related data, offering detailed information about actors, films, and production teams. It has pre-built search functionalities that cater specifically to entertainment data.
+  - **Limited API Access:** While IMDB allows users to perform searches on its website (like finding actors born in specific places), it does not expose these searches via an API, limiting programmatic access to such data.
+
+**Wikidata:**
+  - **Generalized Knowledge Base:** Wikidata is a broader, community-driven knowledge graph that covers a wide range of topics beyond movies. It allows for flexible querying using SPARQL, enabling users to search for actors by place of birth, among other criteria.
+  - **Open and Flexible API:** Unlike IMDB, Wikidata provides an open SPARQL endpoint that allows users to query its data programmatically. This makes it easier to perform complex searches and retrieve customized datasets.
+
+**Detailed Explanation:**
+
+- **Specialization vs. Flexibility:**
+  - IMDB excels in offering rich, curated information specifically about movies and entertainment, while Wikidata offers a more flexible and extensible approach to linked data that spans various domains.
+  
+- **Access and Integration:**
+  - Wikidata’s open API and SPARQL endpoint make it a better choice for developers and researchers who need to
+
+ integrate diverse data sources or perform custom queries that go beyond predefined searches.
+
+**Important Points to Remember:**
+- **APIs and Access:** When choosing between platforms, consider the availability and flexibility of their APIs. Wikidata’s open SPARQL endpoint offers more control compared to IMDB’s limited API.
+- **Domain Specialization:** While Wikidata is versatile, specialized platforms like IMDB may offer more detailed data within their specific domain (e.g., film and entertainment).
+
+---
+
+### **Question 3(g): **IMDB has specialized information about movies that may not be available in Wikidata. How might you combine the strengths of both Wikidata and IMDB?** [2]
+
+- **Answer:** You can combine the strengths of both platforms by integrating IMDB’s specialized movie data with Wikidata’s linked data structure. This could be achieved through the following approach:
+
+1. **Linking Entities Across Platforms:** Use IMDB IDs stored in Wikidata to cross-reference entities (e.g., actors) between both databases, allowing you to enrich data from one source with detailed information from the other.
+2. **Federated Queries and APIs:** Implement a federated query system or API that first retrieves general information from Wikidata, then supplements it with specific movie-related data from IMDB.
+
+**Detailed Explanation:**
+
+- **Entity Mapping and Cross-Referencing:**
+  - Wikidata already stores IMDB IDs for many entities (e.g., actors, movies). By leveraging these cross-references, you can create a seamless integration where general data is retrieved from Wikidata and then augmented with specialized data from IMDB.
+
+- **Practical Integration Use Case:** Imagine building a movie recommendation system that needs both detailed filmography data (from IMDB) and broader contextual information (from Wikidata). By combining these sources, you can provide more comprehensive insights.
+
+**Important Points to Remember:**
+- **Cross-Referencing Linked Data:** Use existing IDs in Wikidata (e.g., IMDB IDs) to link data across platforms, creating richer datasets.
+- **Federated Queries:** Combining results from multiple data sources allows you to leverage the strengths of each platform, providing more complete information.
+
+---
+
+### **Question 3(h): How would you represent the information queried in (b) using the relational model? Illustrate your model with a comparable query in SQL.** [4]
+
+- **Answer:** In the relational model, you can represent RDF data using a **triple table** with three columns: **Subject**, **Predicate**, and **Object**. This structure allows you to store RDF triples, where each row represents a relationship in the form of a subject-predicate-object statement.
+
+- **Table Design:**
+  - **Triple Table:**
+    - **Subject:** Stores the entity (e.g., a person).
+    - **Predicate:** Stores the property or relationship (e.g., "place of birth").
+    - **Object:** Stores the value or related entity (e.g., New York City).
+
+  | Subject          | Predicate          | Object         |
+  |------------------|-------------------|----------------|
+  | `Person1`        | `instanceOf`      | `Human`        |
+  | `Person1`        | `placeOfBirth`    | `New York City`|
+  | `Person2`        | `instanceOf`      | `Human`        |
+  | `Person2`        | `placeOfBirth`    | `Brooklyn`     |
+
+- **SQL Query Example:**
+  ```sql
+  SELECT DISTINCT Subject
+  FROM TripleTable
+  WHERE Predicate = 'instanceOf' AND Object = 'Human'
+    AND Subject IN (
+      SELECT Subject
+      FROM TripleTable
+      WHERE Predicate = 'placeOfBirth' AND Object = 'New York City'
+    );
+  ```
+
+**Detailed Explanation:**
+
+- **Triple Table Structure:**
+  - The triple table structure mirrors the flexibility of RDF. Each row stores a single RDF statement (subject-predicate-object), making it easy to represent relationships and attributes.
+  - This structure is simple yet powerful, allowing you to model various types of data without predefined table schemas.
+
+- **SQL Query Logic:**
+  - The query first checks if the subject is a "Human" and then checks if their place of birth is "New York City". The nested query ensures that only subjects meeting both conditions are returned.
+
+- **Practical Use Case:** This approach is effective when you need to store and query RDF-like data in a relational database, allowing for flexibility and scalability similar to an RDF store.
+
+**Important Points to Remember:**
+- **Storing RDF in Relational Databases:** The triple table structure (subject, predicate, object) is a common method for representing RDF data in relational databases.
+- **Flexible Queries:** Using this structure, you can perform flexible and dynamic queries, similar to SPARQL, using standard SQL.
+
+---
+
+### **Question 3(i): How would you approach the query version in (c) in SQL?** [6]
+
+- **Answer:**
+  ```sql
+  SELECT DISTINCT t1.Subject
+  FROM TripleTable t1
+  JOIN TripleTable t2 ON t1.Subject = t2.Subject
+  JOIN TripleTable t3 ON t2.Object = t3.Subject
+  WHERE t1.Predicate = 'instanceOf' AND t1.Object = 'Human'
+    AND t2.Predicate = 'placeOfBirth'
+    AND (t2.Object = 'New York City' OR t3.Object = 'New York City');
+  ```
+
+**Detailed Explanation:**
+
+- **Handling Hierarchical Relationships in SQL:**
+  - The query uses multiple joins to capture cases where "New York City" may be an indirect location (e.g., Brooklyn, a borough within New York City). By joining the triple table on `Subject` and then further joining based on `Object`, the query can handle hierarchical or nested locations.
+
+- **Comparing with SPARQL:**
+  - In the original SPARQL query, a path expression (`wdt:P19/wdt:P131* wd:Q60`) is used to navigate hierarchical relationships. The equivalent in SQL is joining the triple table multiple times to simulate navigating through levels of hierarchy.
+
+- **Practical Use Case:** This approach works well when translating RDF data structures into SQL queries. It allows you to maintain the flexibility of RDF in a relational database context, using joins to simulate path expressions.
+
+**Important Points to Remember:**
+- **Recursive Joins in SQL:** Handling hierarchical or graph-like relationships in relational databases often requires recursive joins or multiple levels of joins, as seen here.
+- **Adapting RDF Concepts in SQL:** The triple table approach provides a flexible way to store and query RDF-style data using SQL, offering a hybrid solution between relational databases and graph models.
+
+---
