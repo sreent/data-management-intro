@@ -311,9 +311,24 @@ WHERE {
 
 ---
 
-### Question 3(e): **How would you rewrite the query given in (c) to return something more readable?** [5]
+### Question 3(e): How would you rewrite the query given in (c) to return something more readable? [5]
 
 - **Answer:**
+
+For querying a general RDF dataset (not limited to Wikidata), you can rewrite the query using `rdfs:label`:
+
+```sparql
+SELECT DISTINCT ?person ?label
+WHERE {
+  ?person wdt:P31 wd:Q5;
+          wdt:P19/wdt:P131* wd:Q60.
+  OPTIONAL { ?person rdfs:label ?label }
+  FILTER (lang(?label) = "en")
+}
+```
+
+For querying **Wikidata** specifically, using the `SERVICE` clause remains effective:
+
 ```sparql
 SELECT DISTINCT ?person ?personLabel
 WHERE {
@@ -326,17 +341,23 @@ WHERE {
 **Detailed Explanation:**
 
 - **Adding Labels for Readability:**
-  - The query introduces the `?personLabel` variable, which retrieves the human-readable label associated with each person using the `SERVICE wikibase:label` block.
-  - The `bd:serviceParam` parameter is used to specify the preferred language for the labels, with English (`en`) as the default.
+  - In RDF datasets, `rdfs:label` is a commonly used property to store human-readable labels or names associated with entities. Adding an `OPTIONAL` block in SPARQL queries helps to retrieve these labels if they are present.
+  - The `FILTER` clause restricts the query to return labels in the specified language (in this case, English).
+
+- **Using `wikibase:label` for Wikidata:**
+  - When querying Wikidata, the `SERVICE wikibase:label` block is highly efficient for retrieving labels in multiple languages and provides automatic localization.
+  - The `bd:serviceParam` parameter allows specifying language preferences, with English as the fallback.
 
 - **Improved User Experience:**
-  - The rewritten query returns both the entity URI (`?person`) and the corresponding label (`?personLabel`), making the results much easier to understand for users.
+  - Returning both the entity URI (`?person`) and the corresponding human-readable label (`?label` or `?personLabel`) makes the query results more understandable for users, especially when visualizing the data in applications or reports.
 
-- **Practical Use Case:** When developing applications or dashboards that present data from Wikidata, including labels is essential for making the output user-friendly.
+**Practical Use Case:** Whether working with general RDF data or querying specialized linked data like Wikidata, including labels is essential for creating user-friendly outputs that are meaningful beyond raw URIs.
 
 **Important Points to Remember:**
-- **Using the `SERVICE` Clause in SPARQL:** The `SERVICE` clause allows you to fetch additional metadata, such as labels or descriptions, making your results more informative.
-- **Localization and Language Preferences:** In multilingual datasets like Wikidata, always consider language preferences when retrieving labels to enhance user accessibility.
+
+- **Using `rdfs:label` for General RDF Datasets:** For non-Wikidata queries, `rdfs:label` is the standard property for retrieving human-readable labels. Always include it in your queries when working with custom RDF data.
+- **Using the `SERVICE` Clause in SPARQL for Wikidata:** The `SERVICE` clause in Wikidata is highly efficient for pulling in labels with built-in localization, streamlining data presentation.
+- **Localization and Language Preferences:** In multilingual datasets like Wikidata, always consider language preferences when retrieving labels to ensure accessible and relevant results.
 
 ---
 
