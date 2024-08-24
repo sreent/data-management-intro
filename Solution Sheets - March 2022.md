@@ -1,7 +1,7 @@
 
 ---
 
-### **Question 2(a): Give two examples of element names and two examples of attribute names from the provided code.** [2]
+### Question 2(a): Give two examples of element names and two examples of attribute names from the provided code.** [2]
 
 **Answer:**
 
@@ -31,7 +31,7 @@
 
 ---
 
-### **Question 2(b): What will be the result of the following XPath query: `//title[@rank="king" and @regnal="VIII"]/../royal[@name="Henry"]`?** [3]
+### Question 2(b): What will be the result of the following XPath query: `//title[@rank="king" and @regnal="VIII"]/../royal[@name="Henry"]`?** [3]
 
 **Answer:** The query selects the `<royal>` element with the attribute `name="Henry"`. It finds where the `title` is `king` and has the `regnal="VIII"` attribute, then moves up to the parent `<royal>` node.
 
@@ -54,7 +54,7 @@
 
 ---
 
-### **Question 2(c): What (in general terms) will be returned by the following XPath query: `//title[@rank="king" or @rank="queen"]/../relationship/children/royal/relationship/children/royal/`?** [3]
+### Question 2(c): What (in general terms) will be returned by the following XPath query: `//title[@rank="king" or @rank="queen"]/../relationship/children/royal/relationship/children/royal/`?** [3]
 
 **Answer:** The query returns all `<royal>` elements that are descendants of `children` nodes, where the ancestor node has a `title` element with either `king` or `queen` rank.
 
@@ -76,7 +76,7 @@
 
 ---
 
-### **Question 2(d): Mary I of England was also queen consort of Spain from 16 January 1556 until her death. Give an XML fragment that would record this information and say where you would add it to the code above.** [4]
+### Question 2(d): Mary I of England was also queen consort of Spain from 16 January 1556 until her death. Give an XML fragment that would record this information and say where you would add it to the code above.** [4]
 
 **Answer:** This fragment should be added under the `<royal name="Mary">` element.
 
@@ -104,7 +104,7 @@
 
 ---
 
-### **Question 2(e): The historian argues with colleagues about the strengths and weaknesses of this approach, using XML, and this model in particular. What are the strengths and weaknesses?** [7]
+### Question 2(e): The historian argues with colleagues about the strengths and weaknesses of this approach, using XML, and this model in particular. What are the strengths and weaknesses?** [7]
 
 **Answer:** 
 
@@ -151,7 +151,7 @@
 
 ---
 
-### **Question 2(f): One colleague suggests that the data is really a graph, not a tree, and should be represented as Linked Data using RDF. The other thinks it can be modeled as a set of relations and so should be transformed into a relational database. Who is correct?** [6]
+### Question 2(f): One colleague suggests that the data is really a graph, not a tree, and should be represented as Linked Data using RDF. The other thinks it can be modeled as a set of relations and so should be transformed into a relational database. Who is correct?** [6]
 
 **Answer:** Both colleagues have valid points:
 
@@ -177,7 +177,7 @@
 
 ---
 
-### **Question 2(g): Choosing one of the two suggested approaches (relational database or RDF), explain (with examples) how it might solve the strengths and weaknesses you listed in (e) above.** [10]
+### Question 2(g): Choosing one of the two suggested approaches (relational database or RDF), explain (with examples) how it might solve the strengths and weaknesses you listed in (e) above.** [10]
 
 **Answer:** 
 
@@ -211,7 +211,7 @@
 
 ---
 
-### **Question 3(a): **What will the following query return?** [2]
+### Question 3(a): **What will the following query return?** [2]
 
 ```sparql
 SELECT DISTINCT ?person
@@ -242,7 +242,7 @@ WHERE {
 
 ---
 
-### **Question 3(b): **What assumptions does this query make? What data must be present for it to work?** [2]
+### Question 3(b): **What assumptions does this query make? What data must be present for it to work?** [2]
 
 - **Answer:** The query assumes that:
   1. Each person entity has both the `instance of` (`wdt:P31`) and `place of birth` (`wdt:P19`) properties defined.
@@ -262,7 +262,7 @@ WHERE {
 
 ---
 
-### **Question 3(c): **How does the following query differ? Does it resolve any of the assumptions you listed in (b) above?** [4]
+### Question 3(c): **How does the following query differ? Does it resolve any of the assumptions you listed in (b) above?** [4]
 
 ```sparql
 SELECT DISTINCT ?person
@@ -291,7 +291,7 @@ WHERE {
 
 ---
 
-### **Question 3(d): **The results of these queries are not particularly human-readable. Why not?** [1]
+### Question 3(d): **The results of these queries are not particularly human-readable. Why not?** [1]
 
 - **Answer:** The results consist of entity URIs (like `http://www.wikidata.org/entity/Q42`) rather than human-readable names, making them difficult to interpret without additional context.
 
@@ -311,7 +311,7 @@ WHERE {
 
 ---
 
-### **Question 3(e): **How would you rewrite the query given in (c) to return something more readable?** [5]
+### Question 3(e): **How would you rewrite the query given in (c) to return something more readable?** [5]
 
 - **Answer:**
 ```sparql
@@ -340,7 +340,7 @@ WHERE {
 
 ---
 
-### **Question 3(f): **The Internet Movie Database (IMDB) provides a way to retrieve actors based on their place of birth. Compare the IMDB approach and the Wikidata approach.** [4]
+### Question 3(f): **The Internet Movie Database (IMDB) provides a way to retrieve actors based on their place of birth. Compare the IMDB approach and the Wikidata approach.** [4]
 
 - **Answer:** IMDB and Wikidata differ in their approach to querying and data accessibility:
 
@@ -368,7 +368,7 @@ WHERE {
 
 ---
 
-### **Question 3(g): **IMDB has specialized information about movies that may not be available in Wikidata. How might you combine the strengths of both Wikidata and IMDB?** [2]
+### Question 3(g): **IMDB has specialized information about movies that may not be available in Wikidata. How might you combine the strengths of both Wikidata and IMDB?** [2]
 
 - **Answer:** You can combine the strengths of both platforms by integrating IMDB’s specialized movie data with Wikidata’s linked data structure. This could be achieved through the following approach:
 
@@ -388,7 +388,7 @@ WHERE {
 
 ---
 
-### **Question 3(h): How would you represent the information queried in (b) using the relational model? Illustrate your model with a comparable query in SQL.** [4]
+### Question 3(h): How would you represent the information queried in (b) using the relational model? Illustrate your model with a comparable query in SQL.** [4]
 
 - **Answer:** In the relational model, you can represent RDF data using a **triple table** with three columns: **Subject**, **Predicate**, and **Object**. This structure allows you to store RDF triples, where each row represents a relationship in the form of a subject-predicate-object statement.
 
@@ -434,7 +434,7 @@ WHERE {
 
 ---
 
-### **Question 3(i): How would you approach the query version in (a) in SQL?** [6]
+### Question 3(i): How would you approach the query version in (a) in SQL? [6]
 
 - **Answer:**
   ```sql
@@ -497,16 +497,6 @@ WHERE {
 
 ---
 
-You are correct that if the original ERD does not use IDs and instead uses names as unique identifiers, we should follow that approach. Let’s remove the `HospitalID` and avoid using IDs in our design. I’ll also include the assumption that names are unique and can serve as primary keys.
-
-Here’s the revised solution for **Question 4(b):**
-
----
-
-Thank you for the clarification. I understand that we should adhere closely to the original ERD by avoiding the use of IDs in entities like **Doctor**, **Department**, and **Ward**, except for the **Patient** entity where IDs are used. We’ll rely on names being unique and used as primary keys for these entities. Let’s revise the solution accordingly:
-
----
-
 ### **Question 4(b): Part of this model cannot be implemented using the relational model. Which part, and how would you resolve it?** [3]
 
 - **Answer:** The many-to-many relationship between **Department** and **Doctor** is the part that cannot be directly implemented in a relational model. To resolve this, we can use an **associative entity** (junction table) that links doctors to departments.
@@ -559,7 +549,7 @@ Additionally, the **StayIn** relationship between **Patient** and **Ward** is a 
 
 ---
 
-### **Question 4(c): Adapt the model so that all questions in part (a) and the issue you identified in (b) are resolved. Include cardinality in your diagram.** [10]
+### Question 4(c): Adapt the model so that all questions in part (a) and the issue you identified in (b) are resolved. Include cardinality in your diagram. [10]
 
 - **Answer:**
 
@@ -632,7 +622,7 @@ erDiagram
 
 ---
 
-### **Question 4(d): List the tables and keys for an SQL implementation of your model (you do not need to list fields here).** [5]
+### Question 4(d): List the tables and keys for an SQL implementation of your model (you do not need to list fields here). [5]
 
 - **Answer:**
 
@@ -656,7 +646,7 @@ erDiagram
 
 ---
 
-### **Question 4(e): For each of the questions in (a), provide an appropriate MySQL query.** [6]
+### Question 4(e): For each of the questions in (a), provide an appropriate MySQL query. [6]
 
 - **Answer:**
 
