@@ -34,6 +34,7 @@
 ### **Question 2(b): What will be the result of the following XPath query: `//title[@rank="king" and @regnal="VIII"]/../royal[@name="Henry"]`?** [3]
 
 **Answer:** 
+
 The query selects the `<royal>` element with the attribute `name="Henry"`. It finds where the `title` is `king` and has the `regnal="VIII"` attribute, then moves up to the parent `<royal>` node.
 
 **Detailed Explanation:**
@@ -57,7 +58,9 @@ The query selects the `<royal>` element with the attribute `name="Henry"`. It fi
 
 ### **Question 2(c): What (in general terms) will be returned by the following XPath query: `//title[@rank="king" or @rank="queen"]/../relationship/children/royal/relationship/children/royal/`?** [3]
 
-- **Answer:** The query returns all `<royal>` elements that are descendants of `children` nodes, where the ancestor node has a `title` element with either `king` or `queen` rank.
+**Answer:**
+
+The query returns all `<royal>` elements that are descendants of `children` nodes, where the ancestor node has a `title` element with either `king` or `queen` rank.
 
 **Detailed Explanation:**
 
@@ -79,13 +82,15 @@ The query selects the `<royal>` element with the attribute `name="Henry"`. It fi
 
 ### **Question 2(d): Mary I of England was also queen consort of Spain from 16 January 1556 until her death. Give an XML fragment that would record this information and say where you would add it to the code above.** [4]
 
+**Answer:** 
+
+This fragment should be added under the `<royal name="Mary">` element.
+
 ```xml
 <relationship type="marriage" spouse="#PhilipOfSpain" from="1556-01-16">
     <title rank="queen" territory="Spain" regnal="consort" from="1556-01-16" to="1558-11-17" />
 </relationship>
 ```
-
-- **Answer:** This fragment should be added under the `<royal name="Mary">` element.
 
 **Detailed Explanation:**
 
@@ -106,6 +111,8 @@ The query selects the `<royal>` element with the attribute `name="Henry"`. It fi
 ---
 
 ### **Question 2(e): The historian argues with colleagues about the strengths and weaknesses of this approach, using XML, and this model in particular. What are the strengths and weaknesses?** [7]
+
+**Answer:** 
 
 **Strengths:**
 
@@ -152,7 +159,9 @@ The query selects the `<royal>` element with the attribute `name="Henry"`. It fi
 
 ### **Question 2(f): One colleague suggests that the data is really a graph, not a tree, and should be represented as Linked Data using RDF. The other thinks it can be modeled as a set of relations and so should be transformed into a relational database. Who is correct?** [6]
 
-**Answer:** Both colleagues have valid points:
+**Answer:** 
+
+Both colleagues have valid points:
 
 - **RDF (Linked Data):** RDF is better if the data involves complex, many-to-many relationships that resemble a graph. It’s useful for scenarios where connections between entities are more important than a strict hierarchy. For instance, RDF is ideal if you need to represent the network of relationships between historical figures, like alliances, rivalries, or lineage.
   
@@ -177,6 +186,8 @@ The query selects the `<royal>` element with the attribute `name="Henry"`. It fi
 ---
 
 ### **Question 2(g): Choosing one of the two suggested approaches (relational database or RDF), explain (with examples) how it might solve the strengths and weaknesses you listed in (e) above.** [10]
+
+**Answer:** 
 
 **Relational Database Approach:**
 
