@@ -142,9 +142,7 @@
 
 ---
 
-**(h
-
-) Give an example of an element that would not be valid given this schema code (assume that `text-list-attr` only defines attributes).** [3]
+**(h) Give an example of an element that would not be valid given this schema code (assume that `text-list-attr` only defines attributes).** [3]
 
 - **Answer:** An invalid example would be:
 
@@ -335,8 +333,6 @@ SELECT ?a ?b WHERE {
 | Name   | Start Date  |
 |--------|-------------|
 | JIN    | 2013-06-13  |
-
-
 | RM     | 2013-06-13  |
 
 - **Navigating Relationships in SPARQL:** The query navigates through multiple levels of relationships, demonstrating how SPARQL can handle complex linked data structures. By chaining predicates using semicolons (`;`), the query traverses from the band to the members, retrieving relevant details.
