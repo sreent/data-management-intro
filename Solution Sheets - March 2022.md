@@ -33,24 +33,37 @@
 
 ### Question 2(b): What will be the result of the following XPath query: `//title[@rank="king" and @regnal="VIII"]/../royal[@name="Henry"]`?** [3]
 
-**Answer:** The query selects the `<royal>` element with the attribute `name="Henry"`. It finds where the `title` is `king` and has the `regnal="VIII"` attribute, then moves up to the parent `<royal>` node.
+**Answer:** This XPath query would select the `<royal>` element with the `name` attribute equal to "Henry," but only if it is a sibling to a `<title>` element with the attributes `rank="king"` and `regnal="VIII"`.
+
+The selected `<royal>` element is:
+
+```xml
+<royal name="Henry" xml:id="HenryVIII">
+```
 
 **Detailed Explanation:**
 
-- **XPath Overview:**
-  - XPath is a query language specifically designed to navigate and select nodes (elements, attributes, or text) within an XML document. It uses path expressions to traverse through the document structure and filter nodes based on specified criteria.
-  - **Example:** If you have a complex XML document representing a royal family tree, you can use XPath to find all titles held by royals named Henry who were kings.
+- **XPath Breakdown:**
+  - `//title[@rank="king" and @regnal="VIII"]`: Selects all `<title>` elements where `rank="king"` and `regnal="VIII"`.
+  - `/..`: Moves up to the parent element of each selected `<title>` element.
+  - `/royal[@name="Henry"]`: Selects the `<royal>` element with `name="Henry"` that is a sibling of the `<title>` element.
 
-- **Understanding the Query:**
-  - The expression `//title[@rank="king" and @regnal="VIII"]` searches for any `<title>` element where `rank="king"` and `regnal="VIII"`. The `@` symbol is used to target attributes in the XPath query.
-  - The `..` operator moves up from the `<title>` element to its parent `<royal>` element. This is useful when you want to select an ancestor node based on conditions found in a descendant.
-  - The query then checks if this `<royal>` element has an attribute `name="Henry"`, and if it does, that node is returned.
+- **Real-World Scenario Connection:**  
+XPath queries like this are commonly used in XML-based data processing to navigate complex hierarchies, such as family trees or historical records, based on specific attributes.
 
-- **Practical Use Case:** Imagine you are exploring a database of monarchs, and you need to find a specific royal person (e.g., Henry VIII) based on both their title and family context. This XPath query would allow you to extract that specific person based on the attributes you know.
+- **Common Pitfalls and Mistakes:**
+  - Misunderstanding sibling versus parent-child relationships.
+  - Misusing the `..` syntax, which could lead to unintended selections.
 
 **Important Points to Remember:**
-- **XPath and Attribute Selection:** Use `@` to target specific attributes. This is crucial when you need to filter nodes based on certain criteria like `rank="king"`.
-- **Hierarchy Navigation:** XPath allows both upward (`..`) and downward (`/`) traversal. Understanding when to move up to a parent node and when to drill down is essential when handling hierarchical data.
+
+- XPath is highly sensitive to element structure, and the use of `..` is critical when navigating relationships between elements.
+- Combining multiple conditions in XPath allows for powerful and precise querying of XML documents.
+
+**Key Takeaways:**
+
+- XPath is a flexible tool for querying hierarchical data structures, making it essential for XML processing tasks.
+- Proper use of navigation and conditions in XPath queries ensures accurate selection of the intended data.
 
 ---
 
