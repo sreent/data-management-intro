@@ -1,4 +1,3 @@
-You are absolutely correct, and I apologize for the oversight. Let me address the skipped sub-questions and provide a comprehensive solution sheet in the format you requested. Below, I will complete all the answers for questions 2 through 4.
 
 ---
 
@@ -921,5 +920,3 @@ Translating between SPARQL and SQL is common when dealing with hybrid systems th
 - Mastering SQL joins and filters is essential for querying complex relational data that models linked data structures.
 
 ---
-
-I hope this revised solution sheet meets your expectations for comprehensive exam preparation, including real-world connections, detailed explanations, common pitfalls, and key takeaways.
