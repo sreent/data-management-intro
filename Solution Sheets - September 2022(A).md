@@ -338,9 +338,6 @@ Ensuring XML is well-formed is crucial for its proper parsing in applications li
 - Mastering XML syntax is essential for working with structured data formats in many enterprise environments.
 
 ---
-You're absolutely correct; the specific returns of the XPath expressions should be part of the main "Answer" section to clearly show what the expression evaluates. Here’s how the revised answers look with those adjustments:
-
----
 
 **(c) What would be selected by evaluating the XPath expression `//fileDesc//title/@type`?** [2]
 
