@@ -338,35 +338,54 @@ Ensuring XML is well-formed is crucial for its proper parsing in applications li
 - Mastering XML syntax is essential for working with structured data formats in many enterprise environments.
 
 ---
+You're absolutely correct; the specific returns of the XPath expressions should be part of the main "Answer" section to clearly show what the expression evaluates. Here’s how the revised answers look with those adjustments:
+
+---
 
 **(c) What would be selected by evaluating the XPath expression `//fileDesc//title/@type`?** [2]
 
 **Answer:**
 
-The XPath expression would select the value of the `type` attribute for the `title` element inside `fileDesc`.
+The XPath expression would select the value of the `type` attribute for the `title` element inside `fileDesc`. 
+
+**Result Returned:**
+
+In the provided XML fragment:
+
+```xml
+<fileDesc>
+  <title type="collection">Christ Church MSS.</title>
+</fileDesc>
+```
+
+The XPath expression `//fileDesc//title/@type` would return:
+
+```plaintext
+collection
+```
 
 **Detailed Explanation:**
 
-- **XPath Syntax:** The double slashes (`//`) indicate searching for any matching elements in the document structure.
-- **Attribute Selection:** The `@type` syntax selects the attribute value for the specified element.
+- **XPath Syntax:** The double slashes (`//`) indicate that the search can occur at any level within the document, allowing for flexible navigation through nested structures.
+- **Attribute Selection:** The `@type` syntax specifies that the expression is selecting the value of the `type` attribute, not the element itself.
 
 **Real-World Scenario Connection:**
 
-XPath is used extensively in web scraping, document querying, and XML processing to extract specific information from structured documents.
+XPath is used extensively in scenarios like document parsing or data extraction from XML databases, where specific metadata (like types or classifications) needs to be identified and processed.
 
 **Common Pitfalls and Mistakes:**
 
-- Misusing double slashes, leading to unintended selections.
-- Confusing element selection with attribute selection.
+- **Misusing Double Slashes:** Overusing `//` can result in unintended selections across the document.
+- **Confusing Element Selection with Attribute Selection:** It’s essential to understand that `@type` selects the attribute, not the element itself.
 
 **Important Points to Remember:**
 
-- XPath provides powerful querying capabilities for structured data formats like XML.
-- Attribute selection is performed using the `@` symbol in XPath.
+- The `@` symbol is used for selecting attributes in XPath queries.
+- Double slashes allow for flexible navigation across multiple levels of a document.
 
 **Key Takeaways:**
 
-- XPath is a versatile tool for querying XML documents, especially when precise selections are needed.
+- XPath is powerful for querying XML documents, particularly when you need to extract precise attribute values.
 
 ---
 
@@ -374,30 +393,49 @@ XPath is used extensively in web scraping, document querying, and XML processing
 
 **Answer:**
 
-The expression would select the `persName` element that is a sibling to the `resp` element with the text 'Cataloguer'.
+The expression would select the `persName` elements that are siblings of the `resp` element containing the text `'Cataloguer'`.
+
+**Result Returned:**
+
+In the provided XML fragment:
+
+```xml
+<respStmt>
+  <resp>Cataloguer</resp>
+  <persName>Ralph Hanna</persName>
+  <persName>David Rundle</persName>
+</respStmt>
+```
+
+The XPath expression `//resp[text()= 'Cataloguer']/../persName` would return:
+
+```plaintext
+Ralph Hanna
+David Rundle
+```
 
 **Detailed Explanation:**
 
-- **XPath Sibling Navigation:** The `../` syntax moves up to the parent element, and then the `persName` sibling element is selected.
-- **Text Matching:** The `[text()= 'Cataloguer']` condition ensures only `resp` elements with the specified text are considered.
+- **Sibling Navigation:** The `../` syntax moves up from the `resp` element to its parent, allowing the selection of sibling elements.
+- **Text Filtering:** The condition `[text()= 'Cataloguer']` ensures only `resp` elements with that specific text are considered.
 
 **Real-World Scenario Connection:**
 
-XPath queries like this are common when processing document-based data where relationships between elements need to be navigated and filtered based on specific criteria.
+This type of XPath query is common in systems that manage relationships within document-based data, such as digital archives or XML-based metadata repositories.
 
 **Common Pitfalls and Mistakes:**
 
-- Misunderstanding the `../` syntax for navigating up the document tree.
-- Incorrectly placing conditions, leading to unintended results.
+- **Misunderstanding `../` Syntax:** The `../` operator is critical for navigating to the parent element, and errors here can lead to unintended results.
+- **Incorrect Text Matching:** Failing to match the text precisely can cause the query to miss the intended elements.
 
 **Important Points to Remember:**
 
-- Understanding XPath’s navigation and conditional filtering is key to precise querying.
-- The `../` syntax is essential for moving between related elements in XML structures.
+- The `../` syntax is key to navigating up the XML document tree.
+- Conditions like `[text()= 'Cataloguer']` allow for precise filtering within queries.
 
 **Key Takeaways:**
 
-- XPath’s ability to navigate and filter based on content is invaluable for extracting relevant data from complex XML documents.
+- XPath’s ability to navigate both horizontally and vertically within the document tree makes it invaluable for structured data extraction.
 
 ---
 
