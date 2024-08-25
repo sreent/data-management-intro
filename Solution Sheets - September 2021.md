@@ -670,8 +670,6 @@ zoo:BucerosBicornis a schema:Species ;
 - When creating instance data, be mindful of maintaining clear and consistent relationships between entities using RDF properties, ensuring the model remains both scalable and extensible.
 
 **Key Takeaways:**
-- RDF’s graph-based approach is ideal for modeling complex relationships and integrating with external datasets, making it an essential tool for semantic
-
- data representation, particularly in fields like digital humanities, conservation, and linked open data initiatives.
+- RDF’s graph-based approach is ideal for modeling complex relationships and integrating with external datasets, making it an essential tool for semantic data representation, particularly in fields like digital humanities, conservation, and linked open data initiatives.
 
 ---
