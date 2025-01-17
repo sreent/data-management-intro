@@ -3,7 +3,7 @@
 
 ## **Question 1(a)**
 
-**Prompt:**  
+**Question:**  
 An E/R diagram for a zoo-breeding program shows **Keeper** and **Animal** in a **many-to-many** relationship. If this ER model is implemented in a **relational** database, what change is needed?
 
 **Correct Answer:**  
@@ -69,7 +69,7 @@ This transforms one **M:N** relationship into **two** **1:N** relationships (`Ke
 
 ## **Question 1(b)**
 
-**Prompt:**  
+**Question:**  
 Evaluate the normalization level of this table:
 
 | Animal  | Species      | Feed      |
@@ -136,7 +136,7 @@ Evaluate the normalization level of this table:
 
 ## **Question 1(c)**
 
-**Prompt:**  
+**Question:**  
 A temporary admin needs to add, update, delete records in the `Students` table. Which `GRANT` is best?
 
 **Correct Answer:**  
@@ -187,7 +187,7 @@ A temporary admin needs to add, update, delete records in the `Students` table. 
 
 ## **Question 1(d)**
 
-**Prompt:**  
+**Question:**  
 Count the RDF triples in the Turtle snippet:
 
 ```turtle
@@ -242,7 +242,7 @@ A triple = Subject + Predicate + Object. The snippet effectively expands to:
 
 ## **Question 1(e)**
 
-**Prompt:**  
+**Question:**  
 Why is the XML snippet **not well-formed**?
 
 ```xml
@@ -311,7 +311,7 @@ Why is the XML snippet **not well-formed**?
 
 ## **Question 1(f)**
 
-**Prompt:**  
+**Question:**  
 The same XML is **not valid** per the schema. Ignoring well-formedness, which statements identify the **schema violations**?
 
 1. cast should come before title  
@@ -369,7 +369,7 @@ The same XML is **not valid** per the schema. Ignoring well-formedness, which st
 
 ## **Question 1(g)**
 
-**Prompt:**  
+**Question:**  
 Comparing **MongoDB** with **SQL**, which statements are **true**?
 
 1. Unlike SQL, MongoDB has no explicit indexes.  
@@ -422,7 +422,7 @@ Comparing **MongoDB** with **SQL**, which statements are **true**?
 
 ## **Question 1(h)**
 
-**Prompt:**  
+**Question:**  
 A researcher wants a set of documents for quick, free digitization, then discards irrelevant items. Should the IR system focus on **precision** or **recall**?
 
 **Correct Answer:**  
@@ -464,7 +464,7 @@ A researcher wants a set of documents for quick, free digitization, then discard
 
 ## **Question 1(i)**
 
-**Prompt:**  
+**Question:**  
 What distinguishes a **general graph** from a **tree**?
 
 1. A graph does not need a root node; a tree does.  
@@ -514,7 +514,7 @@ What distinguishes a **general graph** from a **tree**?
 
 ## **Question 1(j)**
 
-**Prompt:**  
+**Question:**  
 Which statements about **types of SQL joins** are correct?
 
 1. A LEFT JOIN will produce at least as many rows as an INNER JOIN.  
