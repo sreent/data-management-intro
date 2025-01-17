@@ -1,175 +1,219 @@
 
 ---
 
-### **Question 2: Bird Spotter’s Records in MySQL Database**
+# **Question 2: Bird Spotter’s Records in MySQL Database**
 
----
+## **2(a)**
 
-**(a) This sightings table is in a MySQL database. Give a query to retrieve all bird types seen since the first of January 2021.** [4]
+### **Question**
+A sightings table in MySQL contains various bird sightings. **Write a query** to retrieve all distinct bird **Species** that have been seen **since January 1, 2021**.
 
-- **Answer:**
-
+### **Correct Answer**
 ```sql
-SELECT DISTINCT Species 
-FROM Sightings 
+SELECT DISTINCT Species
+FROM Sightings
 WHERE Date >= '2021-01-01';
 ```
 
-**Detailed Explanation:**
+---
 
-- **Understanding the Query:** The query uses `SELECT DISTINCT` to retrieve unique bird species from the `Sightings` table, filtered by the date condition `WHERE Date >= '2021-01-01'`. The query ensures that only species sighted on or after January 1, 2021, are included.
-- **Date Comparison in SQL:** The date format (YYYY-MM-DD) is standard in SQL, ensuring compatibility across different database systems.
-- **Use of `DISTINCT`:** The `DISTINCT` keyword eliminates duplicates, so only unique bird species are returned, regardless of how many times they appear in the dataset.
+### **Detailed Explanation**
+- **Filtering by Date:** `WHERE Date >= '2021-01-01'` ensures only sightings from January 1, 2021 onward are returned.  
+- **Eliminating Duplicates:** `SELECT DISTINCT` returns unique `Species`, preventing repeats.  
+- **Standard Date Format:** In SQL, `YYYY-MM-DD` is the usual string format for dates, ensuring proper comparison logic.
 
-**Real-World Scenario Connection:**
-- In conservation databases, tracking sightings of endangered species over time often involves filtering by date and ensuring that only distinct species are listed. This kind of query can be used in applications monitoring species populations, like bird-watching apps or biodiversity tracking systems.
+### **Real-World Scenario Connection**
+- **Conservation Tracking:** If a bird-watching society wants to see which **new** bird species have shown up this year, they can run a query like this to see distinct species after a certain date. This helps biologists track migrations or changes in habitat usage.
 
-**Common Pitfalls and Mistakes:**
-- **Incorrect Date Format:** Always ensure that the date format follows the correct `YYYY-MM-DD` structure, as deviations can lead to unexpected errors.
-- **Neglecting `DISTINCT`:** Forgetting to include `DISTINCT` could lead to repeated species names if they are sighted multiple times, resulting in inaccurate counts.
+### **Edge Cases / “What If?”**
+- **What if** the table columns are named differently (e.g. `BirdSpecies`)? Adjust the query accordingly.  
+- **What if** you want *all columns* for sightings? You’d omit `DISTINCT` or use `SELECT *`.
 
-**Important Points to Remember:**
-- Use `DISTINCT` when you want unique values from a column, especially when dealing with data that might have repeated entries.
-- Date comparisons are straightforward in SQL, but always ensure that the format matches the database’s expected input.
+### **DIY Exploration**
+- **Try** removing `DISTINCT` to see how many total sightings there are (with duplicates).  
+- **Try** a different date range (e.g. `WHERE Date BETWEEN '2021-01-01' AND '2021-06-30'`).
 
-**Key Takeaways:**
-- Filtering records based on dates and retrieving unique values is a fundamental skill in SQL, especially in applications that track time-sensitive data.
+### **Key Terms**
+- **`SELECT DISTINCT`:** Returns unique values from a column.  
+- **Date Comparison:** Uses standard `'YYYY-MM-DD'` format in SQL.
+
+### **Common Pitfalls**
+- **Forgetting `DISTINCT`:** Results in repeated species.  
+- **Incorrect Date Format:** `'2021-1-1'` (missing zero) can sometimes cause issues or different interpretations.
+
+### **Key Takeaways**
+- Date filtering + `DISTINCT` is a **fundamental** SQL pattern to isolate unique entries within a time window.
 
 ---
 
-**(b) Is this table in 1NF? Explain your reasoning.** [3]
+## **2(b)**
 
-- **Answer:** Yes, the table is in 1NF (First Normal Form).
+### **Question**
+**Is the sightings table in 1NF (First Normal Form)?** Explain your reasoning.
 
-**Detailed Explanation:**
-
-- **1NF Requirements:** A table is in 1NF if all attributes contain atomic (indivisible) values, and each entry in a column is of the same data type.
-- **Evaluating the Table:** In this table, each field contains a single value per row (e.g., one species, one date, one number sighted), and all values are atomic. There are no repeating groups or multi-valued attributes, meeting the criteria for 1NF.
-- **Column Consistency:** All entries in a column share the same data type (e.g., the `Species` column contains only species names), ensuring consistency and integrity.
-
-**Real-World Scenario Connection:**
-- In relational database design, ensuring that tables adhere to 1NF is crucial for data integrity. For instance, in applications where customer data is stored, ensuring each field is atomic prevents errors during data entry or updates.
-
-**Common Pitfalls and Mistakes:**
-- **Overlooking Atomicity:** Ensure that values are truly atomic (e.g., storing only one conservation status per entry). Storing lists or sets of values in a single field would violate 1NF.
-- **Misinterpreting 1NF Requirements:** Remember that 1NF doesn’t allow repeating groups or multi-valued attributes, which are common mistakes when designing databases.
-
-**Important Points to Remember:**
-- A table in 1NF has atomic values and consistent data types across all rows in a column, laying the foundation for higher levels of normalization.
-- 1NF is the first step toward creating a well-structured, scalable database.
-
-**Key Takeaways:**
-- Achieving 1NF is crucial for database design as it ensures data is stored in the simplest, most manageable form while preparing the database for further normalization.
+### **Correct Answer**
+Yes, it **is** in 1NF.
 
 ---
 
-**(c) Normalize this data, listing the tables that result and their primary and foreign keys.** [7]
+### **Detailed Explanation**
+- **1NF Requirements:** All columns contain **atomic** values, and no column has repeated groups or arrays.  
+- **Evaluating Table Structure:** Each row in the sightings table presumably has a single `Species`, a single `Date`, and a single integer or numeric `NumberSighted`. None of these are multi-valued; hence it meets 1NF.
 
-- **Answer:**
+### **Real-World Scenario Connection**
+- **Basic Data Integrity:** 1NF ensures every column has one piece of data. In a spreadsheet of sightings, you don’t want columns containing “multiple species” or “mixed data formats.”
 
-After normalization, we get the following tables:
+### **Edge Cases / “What If?”**
+- **What if** the table had a field like `MultipleSpeciesSighted` with comma-separated species? That would violate 1NF.
 
-1. **Species Table**
-   - **Primary Key:** `SpeciesName`
-   - **Attributes:** `ConservationStatus`
+### **DIY Exploration**
+- **Check** your own database tables for multi-valued columns (like “tags” or “categories” in one field). Such designs break 1NF and complicate queries.
 
-2. **Location Table**
-   - **Primary Key:** `LocationID`
-   - **Attributes:** `NatureReserve`, `Latitude`, `Longitude`
+### **Key Terms**
+- **1NF:** Each cell is atomic, no repeating groups, consistent data type in each column.
 
-3. **Sightings Table**
-   - **Primary Key:** `SightingID`
-   - **Attributes:** `SpeciesName`, `Date`, `NumberSighted`, `LocationID`
-   - **Foreign Keys:** `SpeciesName` references `Species(SpeciesName)`, `LocationID` references `Location(LocationID)`
+### **Common Pitfalls**
+- **Storing Lists** in a single field (like `Species = "crow, robin"`). This breaks 1NF.
 
-**Detailed Explanation:**
-
-- **Breaking Down the Table:** The original table contains redundant data (e.g., repeating `Species` and `ConservationStatus` values). By splitting this into separate tables (e.g., `Species`, `Location`, and `Sightings`), we achieve 3NF, where each non-key attribute depends only on the primary key.
-- **Primary and Foreign Keys:** The primary keys uniquely identify each record, while foreign keys maintain relationships between the tables, linking species to sightings and locations.
-
-**Real-World Scenario Connection:**
-- In a CRM system, normalizing customer information might involve separating customers, orders, and products into different tables. By linking them through keys, businesses can efficiently manage large datasets without redundancy.
-
-**Common Pitfalls and Mistakes:**
-- **Overlooking Redundancies:** Always check for repeating groups or redundant data that can be moved to a separate table during normalization.
-- **Inconsistent Foreign Keys:** Ensure that foreign keys correctly link related entities across tables, as inconsistent relationships can lead to orphaned records.
-
-**Important Points to Remember:**
-- Normalization reduces redundancy and dependency, leading to a more efficient and maintainable database design.
-- Achieving 3NF typically involves breaking down tables into smaller, related tables based on functional dependencies.
-
-**Key Takeaways:**
-- Proper normalization up to 3NF enhances data integrity and reduces redundancy, making it easier to manage and query the database efficiently.
+### **Key Takeaways**
+- 1NF is the **foundation** for normalization. Ensuring columns have single (atomic) values simplifies queries and updates.
 
 ---
 
-**(d) What normal form have you reached? Explain your conclusion.** [4]
+## **2(c)**
 
-- **Answer:** The data has been normalized to 3NF (Third Normal Form).
+### **Question**
+**Normalize** the sightings data. **List** the tables, their primary keys, and foreign keys after normalization.
 
-**Detailed Explanation:**
+### **Correct Answer (Example 3NF Design)**
+1. **Species**  
+   - **PK:** `SpeciesName`  
+   - Attributes: `ConservationStatus`
 
-- **3NF Requirements:** A table is in 3NF if it is in 2NF and all attributes are dependent only on the primary key, with no transitive dependencies.
-- **Evaluating the Tables:** In our normalized structure:
-  - All non-key attributes in each table are fully dependent on the primary key (e.g., in the `Sightings` table, `SpeciesName`, `Date`, and `NumberSighted` are dependent on `SightingID`).
-  - There are no transitive dependencies (i.e., no non-key attribute depends on another non-key attribute).
+2. **Location**  
+   - **PK:** `LocationID`  
+   - Attributes: `NatureReserve`, `Latitude`, `Longitude`
 
-**Real-World Scenario Connection:**
-- In inventory management systems, achieving 3NF ensures that product, supplier, and order information are stored without redundancy, leading to more efficient data retrieval and updates.
-
-**Common Pitfalls and Mistakes:**
-- **Ignoring Transitive Dependencies:** Ensure there are no attributes that depend indirectly on the primary key through another non-key attribute, a common mistake when normalizing to 3NF.
-- **Confusing 2NF and 3NF:** Remember that 2NF focuses on eliminating partial dependencies, while 3NF eliminates transitive dependencies to achieve a more refined database structure.
-
-**Important Points to Remember:**
-- 3NF is typically the target level of normalization for relational databases, balancing complexity and data integrity.
-- Transitive dependencies must be removed to achieve 3NF, ensuring that all attributes depend only on the primary key.
-
-**Key Takeaways:**
-- Achieving 3NF ensures that the database structure is optimized for both data integrity and efficiency, reducing redundancy and simplifying data management.
+3. **Sightings**  
+   - **PK:** `SightingID`  
+   - Attributes: `SpeciesName`, `Date`, `NumberSighted`, `LocationID`  
+   - **Foreign Keys:**  
+     - `SpeciesName` → **references** Species(`SpeciesName`)  
+     - `LocationID` → **references** Location(`LocationID`)
 
 ---
 
-**(e) Give a query for your new tables to retrieve bird types and their conservation status for birds seen since the first of January 2021.** [5]
+### **Detailed Explanation**
+- **Breaking Out Species:** Repeated fields about conservation status belong in a separate `Species` table.  
+- **Handling Locations:** Repeated location data (nature reserve names, lat/long) belong in a `Location` table.  
+- **Sightings Table:** Links `Species` and `Location` via FKs and stores date and number sighted.
 
-- **Answer:**
+### **Real-World Scenario Connection**
+- **Database Efficiency:** By **removing redundancy**, updates become easier. If a species’ conservation status changes, you only update one table, not every sightings row.
 
+### **Edge Cases / “What If?”**
+- **What if** you also want to track bird watchers’ info? You might add a `User` or `Observer` table, linking them via an ID.
+
+### **DIY Exploration**
+- **Try** writing the actual `CREATE TABLE` statements for each table. Ensure you define PK/FK constraints properly.
+
+### **Key Terms**
+- **3NF:** Third Normal Form eliminates transitive dependencies—every non-key attribute depends only on the table’s primary key.  
+- **Functional Dependencies:** The relationships that define which columns depend on which keys.
+
+### **Common Pitfalls**
+- **Leaving Redundant Data** in a single table, leading to data anomalies.  
+- **Not Defining** foreign keys—losing referential integrity.
+
+### **Key Takeaways**
+- Proper normalization (to at least 3NF) **reduces data redundancy** and **improves consistency** in relational databases.
+
+---
+
+## **2(d)**
+
+### **Question**
+**What normal form** have we **reached**? **Explain** your conclusion.
+
+### **Correct Answer**
+3NF (Third Normal Form).
+
+---
+
+### **Detailed Explanation**
+- **Why 3NF?:**  
+  1. Already in 2NF (no partial dependencies on a composite key).  
+  2. **No transitive dependencies** (attributes depending on other non-key attributes).  
+  3. Each non-key attribute depends on the table’s primary key only.
+
+### **Real-World Scenario Connection**
+- **Business Databases:** Most enterprise systems aim for 3NF to avoid anomalies and keep queries performant.
+
+### **Edge Cases / “What If?”**
+- **If** there were extra columns that indirectly depended on something else (like an attribute that depends on `ConservationStatus`), that might break 3NF.
+
+### **DIY Exploration**
+- **Try** verifying each table’s dependencies with “Dependency Diagrams” to confirm no transitive dependencies remain.
+
+### **Key Terms**
+- **Transitive Dependency:** A non-key attribute depends on another non-key attribute, which depends on the key.
+
+### **Common Pitfalls**
+- **Confusing 2NF & 3NF:** 2NF addresses partial dependencies (only relevant if you have a composite primary key); 3NF addresses transitive dependencies.
+
+### **Key Takeaways**
+- Reaching 3NF typically **satisfies** most real-world use cases: data is well-structured, with minimal redundancy.
+
+---
+
+## **2(e)**
+
+### **Question**
+Given your **new tables**, write a **SQL query** to retrieve **bird types (SpeciesName) and their ConservationStatus** for sightings **since January 1, 2021**.
+
+### **Correct Answer**
 ```sql
-SELECT s.SpeciesName, sp.ConservationStatus 
+SELECT s.SpeciesName, sp.ConservationStatus
 FROM Sightings s
 JOIN Species sp ON s.SpeciesName = sp.SpeciesName
 WHERE s.Date >= '2021-01-01';
 ```
 
-**Detailed Explanation:**
+---
 
-- **Joining the Tables:** The query joins the `Sightings` and `Species` tables on `SpeciesName` to retrieve both the bird species and their conservation status.
-- **Filtering by Date:** The `WHERE` clause ensures that only sightings from January 1, 2021, onward are included, aligning with the criteria set in the question.
-- **Selecting Relevant Columns:** The query selects only the `SpeciesName` and `ConservationStatus`, providing the necessary information while keeping the output focused.
+### **Detailed Explanation**
+- **Joining Tables:** `Sightings` → `Species` on the shared `SpeciesName`.  
+- **Date Filter:** `s.Date >= '2021-01-01'` selects only sightings from 2021 onwards.  
+- **Selecting Relevant Fields:** We want the species name and conservation status. The join ensures these fields come together.
 
-**Real-World Scenario Connection:**
-- In environmental monitoring systems, such queries are used to track sightings of endangered species over specific periods, helping researchers or organizations monitor conservation efforts.
+### **Real-World Scenario Connection**
+- **Conservation Monitoring:** Quickly see which species are being sighted in a certain period along with their conservation statuses, enabling targeted research or protection measures.
 
-**Common Pitfalls and Mistakes:**
-- **Incorrect Join Conditions:** Ensure that the join correctly links the tables using the appropriate keys. Mismatched keys can lead to incorrect or incomplete results.
-- **Overlooking Date Filtering:** Always double-check date conditions to avoid returning irrelevant records, especially when dealing with large datasets.
+### **Edge Cases / “What If?”**
+- **What if** some sightings have `SpeciesName` not in `Species` table? A standard `JOIN` would exclude them. A `LEFT JOIN` might be needed if you want to see sightings even if the species table is missing records.
 
-**Important Points to Remember:**
-- Properly structuring joins and filtering criteria is crucial for retrieving accurate data, especially when querying across
+### **DIY Exploration**
+- **Try** adding `ORDER BY sp.ConservationStatus` to organize by status.  
+- **Try** counting how many sightings each species has, e.g. `COUNT(*)`.
 
- multiple related tables.
-- Understanding how to navigate relationships between normalized tables is essential for effective SQL querying.
+### **Key Terms**
+- **Inner Join:** Only rows with matching keys in both tables appear.
 
-**Key Takeaways:**
-- Joins and date filters are common SQL operations that allow you to extract meaningful insights from normalized relational data, a critical skill in real-world database management.
+### **Common Pitfalls**
+- **Omitting a Join Condition:** Could produce a **CROSS JOIN** with unintentional results.
+
+### **Key Takeaways**
+- Knowing how to properly **JOIN** in SQL is crucial for retrieving information spread across multiple normalized tables.
 
 ---
 
-**(f) The bird spotter wants to be sure that their next set of updates goes in correctly. Would a transaction make a difference? Give example SQL operations to illustrate your argument.** [7]
+## **2(f)**
 
-- **Answer:** Yes, a transaction would help ensure data integrity by allowing multiple operations to be treated as a single unit.
+### **Question**
+The bird spotter wants to ensure their **next set of updates** is **consistent**. **Would a transaction help?** Illustrate with example SQL.
 
-**Example SQL Operations:**
+### **Correct Answer**
+Yes. **Transactions** ensure data integrity for multiple statements. For example:
 
 ```sql
 START TRANSACTION;
@@ -177,104 +221,131 @@ START TRANSACTION;
 INSERT INTO Sightings (SpeciesName, Date, NumberSighted, LocationID)
 VALUES ('Wood pigeon', '2021-09-07', 5, 2);
 
-UPDATE Species 
-SET ConservationStatus = 'Endangered' 
+UPDATE Species
+SET ConservationStatus = 'Endangered'
 WHERE SpeciesName = 'Wood pigeon';
 
 COMMIT;
 ```
 
-**Detailed Explanation:**
+---
 
-- **Why Use Transactions:** Transactions ensure that either all operations succeed together or none are applied. This is critical for maintaining consistency, especially in scenarios involving multiple updates or inserts. If any part of the transaction fails, a `ROLLBACK` can be issued to revert all changes, ensuring that the database remains in a consistent state.
-- **Commit and Rollback:** The `COMMIT` statement finalizes the transaction, while `ROLLBACK` undoes any changes if an error occurs before committing.
+### **Detailed Explanation**
+- **Atomicity:** If any statement fails, you can `ROLLBACK`, preventing partial updates.  
+- **Consistency:** The bird spotter’s data remains consistent—no record will show a bird without also updating its conservation status or vice versa.  
+- **Commit & Rollback:** `COMMIT` finalizes changes; `ROLLBACK` undoes them.
 
-**Real-World Scenario Connection:**
-- In financial systems, transactions are crucial when processing payments. For instance, when transferring funds between accounts, the debit and credit operations must both succeed, or neither should apply to avoid inconsistencies.
+### **Real-World Scenario Connection**
+- **Financial Systems:** A transfer from Account A to B must **either** debit A and credit B **together** or do neither. Similarly, for multiple related bird updates, you don’t want partial changes.
 
-**Common Pitfalls and Mistakes:**
-- **Forgetting to Commit:** Without a `COMMIT`, the changes won’t be saved permanently, leaving the database unchanged despite executing the operations.
-- **Not Using Transactions for Related Operations:** Related updates should be grouped in a transaction to maintain atomicity and consistency, reducing the risk of partial updates leading to inconsistencies.
+### **Edge Cases / “What If?”**
+- **What if** the second statement fails? If you **haven’t** committed, you can `ROLLBACK` to revert the first insert as well.
 
-**Important Points to Remember:**
-- Transactions are essential for maintaining data integrity, especially in scenarios where multiple related operations must either all succeed or none be applied.
-- Use `START TRANSACTION`, `COMMIT`, and `ROLLBACK` to control the flow of related operations and safeguard against partial failures.
+### **DIY Exploration**
+- **Try** intentionally causing an error in the middle of a transaction to see how `ROLLBACK` works.
 
-**Key Takeaways:**
-- Transactions help safeguard against partial updates, ensuring that either all changes are applied or none are, keeping the database consistent, a critical requirement in many business applications.
+### **Key Terms**
+- **Transaction:** A group of one or more SQL statements treated as a single unit.  
+- **ACID properties:** Atomicity, Consistency, Isolation, Durability.
+
+### **Common Pitfalls**
+- **Forgetting `COMMIT`:** Leaves changes uncommitted, so they might roll back automatically or remain invisible to other sessions.
+
+### **Key Takeaways**
+- Transactions are **essential** when multiple data manipulations must succeed or fail together, protecting data consistency.
 
 ---
 
-### **Question 3: Exploring Music Encoding with MEI and Linked Data Models**
+# **Question 3: Exploring Music Encoding with MEI and Linked Data Models**
+
+## **3(a)**
+
+### **Question**
+Look at the MEI (Music Encoding Initiative) code. **List all the element types** visible in the snippet.
+
+### **Correct Answer**
+1. `<measure>`  
+2. `<staff>`  
+3. `<layer>`  
+4. `<chord>`  
+5. `<note>`
 
 ---
 
-**(a) List all the element types you can see in this code.** [2]
+### **Detailed Explanation**
+- **MEI Hierarchy:** Each `<measure>` can contain multiple `<staff>` elements. Each `<staff>` can have one or more `<layer>` elements, which in turn contain `<chord>` or `<note>`.  
+- **Chord vs. Note:** A `<chord>` can hold multiple `<note>` elements simultaneously sounding, whereas a `<note>` is usually a single pitch event.
 
-- **Answer:**
-  1. `<measure>`
-  2. `<staff>`
-  3. `<layer>`
-  4. `<chord>`
-  5. `<note>`
+### **Real-World Scenario Connection**
+- **Digital Sheet Music:** Programs like MuseScore or Verovio may use MEI-like structures to represent measures, staves, layers, and chords.
 
-**Detailed Explanation:**
+### **Edge Cases / “What If?”**
+- **What if** some music passages only have single notes (no chords)? Then `<chord>` might be absent, and `<note>` stands alone.
 
-- **Understanding MEI Structure:** The Music Encoding Initiative (MEI) is an XML-based format specifically designed for representing music notation. Each element in this code represents a distinct component of musical structure, with `<measure>`, `<staff>`, `<layer>`, `<chord>`, and `<note>` being the key building blocks.
-- **Element Hierarchy in MEI:** The hierarchy of elements shows how music is layered and structured. For example, `<staff>` represents different musical lines (instruments or voices), and within each staff, `<layer>` represents rhythmic layers. Chords and notes are contained within layers, capturing the pitch and rhythm details.
+### **DIY Exploration**
+- **Try** finding or creating a small MEI file with multi-staff music. Observe how `<staff>` and `<layer>` nest.
 
-**Real-World Scenario Connection:**
-- In digital music archiving or sheet music software, these elements are used to encode complex music scores that can be rendered visually or played back by music notation software. Understanding these elements is crucial for applications that involve digital sheet music storage and retrieval.
+### **Key Terms**
+- **MEI:** Music Encoding Initiative, an XML schema for musical scores.  
+- **Measure, Staff, Layer:** Reflect standard musical concepts.
 
-**Common Pitfalls and Mistakes:**
-- **Misinterpreting Elements:** Ensure each element is correctly understood within its hierarchical context (e.g., recognizing that notes belong within chords, which are within layers).
-- **Omitting Important Elements:** Be thorough when listing element types; overlooking even a single tag can lead to incomplete or incorrect data modeling.
+### **Common Pitfalls**
+- **Missing Opening/Closing Tags:** In MEI, each container must properly nest elements.
 
-**Important Points to Remember:**
-- MEI provides a structured, XML-based format for representing music notation, which is essential for archiving, analysis, and digital music display.
-- Understanding the hierarchy and role of each element is key to properly encoding and manipulating music data.
-
-**Key Takeaways:**
-- MEI’s element types are fundamental to representing structured music data, allowing for accurate encoding of compositions in digital formats, which are widely used in music production and archival systems.
+### **Key Takeaways**
+- Understanding these elements is crucial for manipulating or querying digital music notation.
 
 ---
 
-**(b) I am trying to retrieve all chords in the staff with `n="2"` (that is, they are in the right hand) but I only want chords that contain notes with a `pname` of `f`, but my XPath is incorrect. My attempt is: `/staff[n="2"]/layer/chord[note/@pname="c"]`. Give an XPath expression that would work.** [3]
+## **3(b)**
 
-- **Answer:**
+### **Question**
+You want **all chords** in the staff `n="2"` (right hand) that **contain notes** with `pname="f"`. Your initial XPath was incorrect. **Give a correct XPath**.
 
+### **Correct Answer**
 ```xpath
 //staff[@n="2"]/layer/chord[note[@pname="f"]]
 ```
 
-**Detailed Explanation:**
+---
 
-- **Understanding XPath:** XPath is a language used to navigate and query XML documents. In this context, it’s used to filter specific music elements (chords) within a particular staff.
-- **Correcting the Expression:** The original attempt failed because it used `n="2"` as a positional predicate instead of correctly targeting the `@n` attribute. The revised XPath expression properly selects the `<staff>` element where `@n="2"` and then looks for `<chord>` elements containing a `<note>` with `@pname="f"`.
-- **Using Predicates Effectively:** The `[ ]` predicates allow filtering based on attributes like `@n` and `@pname`, enabling precise selection of the desired chords.
+### **Detailed Explanation**
+- **Selecting Staff with `@n="2"`:** `[ @n="2" ]` is an **attribute** filter, not a positional predicate.  
+- **Filtering Chords with a Note** `@pname="f"`: Inside `chord`, you look for `note[@pname="f"]`.
 
-**Real-World Scenario Connection:**
-- XPath is widely used in XML-based systems, including those for digital music encoding, where it’s crucial for extracting specific elements based on complex criteria (e.g., filtering notes by pitch within a specific part of a score). This is particularly important in music software that processes or visualizes digital scores.
+### **Real-World Scenario Connection**
+- **XML Queries in Music Apps:** In a complex score, you might want to isolate chords that contain specific pitches in specific staves (like right-hand piano staff).
 
-**Common Pitfalls and Mistakes:**
-- **Misusing Attribute Predicates:** Ensure that attributes are correctly referenced using `@` in XPath. Forgetting this can lead to incorrect queries.
-- **Confusing Positional Indexing with Attribute Filtering:** Positional predicates like `[2]` target element order, while attribute filtering targets specific properties (e.g., `@n="2"`).
+### **Edge Cases / “What If?”**
+- **What if** you wanted chords with *all* notes = f? You’d need a different expression or logic. This expression finds *any* chord that has at least one note with `pname="f"`.
 
-**Important Points to Remember:**
-- In XPath, `@` is used to filter based on attributes, while predicates in `[ ]` help refine selections based on conditions.
-- Ensure attribute-based filters are correctly placed when targeting specific elements in XML, as incorrect placement can drastically change query results.
+### **DIY Exploration**
+- **Try** modifying your XPath to find chords with `pname="c"` or to locate notes in staff `n="1"` (left hand).
 
-**Key Takeaways:**
-- XPath is a powerful tool for querying XML documents, but understanding the difference between positional and attribute predicates is key to accurate results, a critical skill in fields that involve complex document structures like digital music or textual analysis.
+### **Key Terms**
+- **XPath:** A language to navigate XML trees.  
+- **Attribute Selector:** `[@attrName="value"]`.
+
+### **Common Pitfalls**
+- **Confusing** `[n="2"]` (positional index) with `[ @n="2" ]` (attribute filter).  
+- **Missing the `//staff`** slash patterns can lose scope or produce empty results.
+
+### **Key Takeaways**
+- Correctly filtering by **attributes** in XPath is crucial for precisely retrieving elements in structured XML documents.
 
 ---
 
-**(c) A group of developers have decided to evaluate a MongoDB implementation of the MEI model.**
+## **3(c)**
 
-**i. Translate the first chord element in the XML into JSON as effectively as you can.** [5]
+### **Question**
+A group is moving the MEI data into MongoDB.  
 
-- **Answer:**
+**(i) Translate** the **first chord** element into **JSON**.  
+**(ii)** Given the **whole data** as an array of chords, write a **MongoDB find** that returns chords with an **“up” stem** containing **f** in at least one note.
 
+---
+
+### **(i) Correct Answer (JSON Translation)**
 ```json
 {
   "chord": {
@@ -291,107 +362,102 @@ COMMIT;
 }
 ```
 
-**Detailed Explanation:**
+#### **Detailed Explanation (for JSON)**
+- **Hierarchical to JSON:** The `<chord>` attributes become key-value pairs (e.g. `"dur": 8`).  
+- **Notes as Array:** Each `<note>` is an object in the `notes` array, preserving multiple pitches.
 
-- **Converting XML to JSON:** JSON is a more lightweight format compared to XML, and it is often used in NoSQL databases like MongoDB. The XML-to-JSON conversion maintains the structure while adapting it to JSON syntax.
-- **Array for Notes:** The `<note>` elements are translated into an array of JSON objects, each representing a note with properties like `pname` (pitch name) and `oct` (octave).
-- **Hierarchical Structure:** The chord is represented as a nested object, capturing its attributes (e.g., `dur`, `stem.dir`) and its associated notes.
+#### **Real-World Scenario Connection**
+- Many **NoSQL** or modern web applications store nested data in JSON format (e.g., music apps, e-commerce catalogs).
 
-**Real-World Scenario Connection:**
-- Converting XML to JSON is common in scenarios where legacy systems need to interface with modern NoSQL databases. For example, music notation software that originally stored data in XML might migrate to MongoDB for better scalability and flexibility, requiring such conversions.
+#### **Edge Cases**
+- **What if** a chord has no notes? Then `"notes": []`.
 
-**Common Pitfalls and Mistakes:**
-- **Incorrect Nesting:** Ensure that hierarchical relationships in the XML (e.g., chords containing notes) are preserved in the JSON structure. Flattening the structure incorrectly could lead to data loss or misinterpretation.
-- **Omitting Key Properties:** Double-check that all important attributes are included in the JSON representation to avoid incomplete data storage.
+#### **DIY Exploration**
+- **Try** adding extra chord attributes or note attributes (like `stem.dir`, `accid` for accidentals).
 
-**Important Points to Remember:**
-- JSON’s flexible and lightweight format is well-suited for NoSQL databases like MongoDB, but preserving the hierarchical relationships from XML is crucial for data integrity.
-- Array structures in JSON are ideal for representing collections of elements like notes within a chord, mirroring the hierarchical nature of the original data.
+#### **Key Terms**
+- **JSON:** JavaScript Object Notation, flexible for nested data.
 
-**Key Takeaways:**
-- Converting XML to JSON requires careful mapping of hierarchical structures to maintain data integrity while adapting to a different format, a key skill for developers working with data migrations
+#### **Common Pitfalls**
+- **Missing Quotes** around object keys or values can break JSON parsing.
 
- or modernizing legacy systems.
+#### **Key Takeaways**
+- Properly preserving hierarchical structure in JSON ensures data is **intact** when transitioning from XML to NoSQL.
 
 ---
 
-**(ii) Imagining the whole data structure was an array of chord objects, give a MongoDB find command that would return only chords with upward stems that have `f` in one of their notes.** [5]
-
-- **Answer:**
-
-```json
+### **(ii) Correct Answer (MongoDB Find)**
+```js
 db.chords.find({
   "stem.dir": "up",
-  "notes": { 
-    "$elemMatch": { "pname": "f" } 
+  "notes": {
+    "$elemMatch": { "pname": "f" }
   }
 })
 ```
 
-**Detailed Explanation:**
+#### **Detailed Explanation (for MongoDB Query)**
+- **Filtering on “stem.dir”:** Only chords whose `stem.dir` = `"up"`.  
+- **Array Condition:** `"$elemMatch": { "pname": "f" }` means at least one element in `notes` has `"pname": "f"`.
 
-- **Using `$elemMatch`:** MongoDB’s `$elemMatch` operator is crucial when working with arrays, allowing you to match documents where at least one element in the array meets specific criteria. Here, it’s used to find chords that have notes with the pitch name (`pname`) set to `"f"`. The `$elemMatch` ensures that any chord with at least one `f` note is selected.
-  
-- **Filtering with Nested Fields:** The query also includes a filter for `stem.dir` being `"up"`, which selects only those chords where the stem direction is upward. This condition is applied at the top level of the document, while the `$elemMatch` is applied within the array of notes.
+#### **Real-World Scenario Connection**
+- **Music Information Retrieval:** Searching for chords with upward stems that contain a particular pitch is straightforward in MongoDB’s document model.
 
-- **Why MongoDB is Suitable:** MongoDB’s document-oriented structure makes it highly effective for storing and querying hierarchical and nested data, such as music notation. By representing each chord as a document with an array of notes, you can efficiently query specific patterns like upward stems with a particular pitch.
+#### **Edge Cases**
+- **What if** you only want chords where *all* notes have `pname="f"`? You’d need a different query, e.g. `"$all"` approach or `$elemMatch` with more constraints.
 
-**Real-World Scenario Connection:**
-- In digital music libraries or applications that store musical scores, this type of query allows developers to search for specific musical features, like finding chords with particular pitches in a specific part of a composition. It’s particularly useful in applications that analyze or visualize sheet music, enabling quick retrieval of relevant musical elements.
+#### **DIY Exploration**
+- **Try** adding more filters, like `dur: 8`, or searching for chords with multiple pitch names.
 
-**Common Pitfalls and Mistakes:**
-- **Misusing `$elemMatch`:** A common mistake is applying `$elemMatch` incorrectly when filtering arrays. Ensure that it is used when you need to check multiple criteria within a single array element, not across different elements.
-- **Incorrectly Specifying Conditions:** Ensure that conditions are correctly nested and placed within the document structure, especially when combining array filters with other top-level criteria.
+#### **Key Terms**
+- **$elemMatch**: MongoDB operator that finds array elements matching specific criteria.
 
-**Important Points to Remember:**
-- MongoDB’s `$elemMatch` is essential for filtering arrays based on multiple conditions, making it highly effective for querying complex, nested data structures.
-- When filtering with both top-level and nested conditions, it’s important to understand how MongoDB processes each level of the document to avoid logical errors.
+#### **Common Pitfalls**
+- **Forgetting** `$elemMatch` when you need to match array contents.
 
-**Key Takeaways:**
-- MongoDB’s flexible query language allows for sophisticated filtering of nested and hierarchical data, making it well-suited for applications that manage structured yet dynamic datasets, such as musical notation or complex document collections.
-
---- 
-
-**(d) A different group of developers has mapped the MEI model into linked data. The following SPARQL query finds all chords with at least one `F` in them:**
-
-```sparql
-SELECT DISTINCT ?chord
-WHERE {
-  ?chord rdfs:member ?note .
-  ?note mei:pitchClass mei:FPitchName .
-}
-```
-
-**i. `rdfs:member` is defined by the W3C ontology RDF Schema. Why are we using it here instead of a new `mei:hasNotes` property?** [3]
-
-- **Answer:** 
-
-Using `rdfs:member` instead of defining a new property like `mei:hasNotes` leverages existing, standardized RDF properties, promoting interoperability and reuse. Since `rdfs:member` is well-established, using it allows for easier integration with other linked data sources that adhere to RDF standards, reducing redundancy and ensuring compatibility across datasets.
-
-**Detailed Explanation:**
-
-- **Interoperability in Linked Data:** RDF encourages the use of shared vocabularies and properties (like `rdfs:member`) to maximize compatibility and reuse across datasets. Introducing new properties should be done sparingly to avoid fragmentation and maintain consistency in the semantic web.
-- **Reduced Redundancy:** By using `rdfs:member`, we avoid defining custom properties that may be redundant and less interoperable. Standardized properties improve the ability to link data from different sources and make the dataset more widely understandable.
-
-**Real-World Scenario Connection:**
-- In linked data projects, using standardized properties like `rdfs:member` allows for seamless integration with other datasets. For example, in a digital library system, leveraging existing vocabularies ensures that music notation data can be combined with other related datasets, such as those containing performer information or recording metadata.
-
-**Common Pitfalls and Mistakes:**
-- **Overdefining Properties:** Avoid creating new properties unnecessarily when standardized ones exist that serve the same purpose.
-- **Incompatibility Issues:** Using custom properties without considering existing standards can lead to fragmented data models and hinder interoperability.
-
-**Important Points to Remember:**
-- Standardization is key in RDF and linked data systems to ensure interoperability and seamless integration with external datasets.
-- Always consider existing vocabularies before defining new properties in your RDF model to promote compatibility and data reuse.
-
-**Key Takeaways:**
-- Leveraging standardized properties in RDF promotes compatibility and prevents fragmentation within the linked data ecosystem, ensuring that your data can be easily linked and reused across different platforms.
+#### **Key Takeaways**
+- MongoDB’s array operators enable **flexible** queries for data that’s naturally nested (like chords/notes).
 
 ---
 
-**ii. Give some RDF (in whichever serialization you are most comfortable with) for the first chord element. Invent any new concepts you need in the `mei` namespace.** [5]
+## **3(d): Linked Data SPARQL Query**
 
-- **Answer (Turtle Syntax):**
+### **Question**
+We have a SPARQL query to find chords containing an `F`.  
+
+**(i)** Why use `rdfs:member` instead of a custom property like `mei:hasNotes`?  
+**(ii)** Provide some RDF for the first chord element (in any serialization).
+
+---
+
+### **(i) Correct Answer**
+Using **`rdfs:member`** leverages **existing** W3C standards, **maximizing interoperability** with other linked data. We avoid defining a **new** property like `mei:hasNotes` that may duplicate a standard concept.
+
+#### **Detailed Explanation**
+- **Interoperability:** Reusing a property like `rdfs:member` means other linked-data tools and vocabularies can understand it right away.  
+- **Less Redundancy:** If `rdfs:member` serves the same semantic function (“this chord has these notes”), no need for a custom property.
+
+#### **Real-World Scenario Connection**
+- **Semantic Web**: Reusing established vocabularies (like RDF Schema, OWL) helps data from different domains mesh more easily.
+
+#### **Edge Cases**
+- **What if** we need more specialized relationships? We might define a specialized property only if no standard property fits.
+
+#### **DIY Exploration**
+- **Try** exploring other RDF vocabularies (e.g. `schema.org`, `foaf`) to see how they can also reduce custom definitions.
+
+#### **Key Terms**
+- **`rdfs:member`:** A generic property for membership relationships in RDF.
+
+#### **Common Pitfalls**
+- **Overdefining** new properties leads to “ontology bloat” and hinders data reuse.
+
+#### **Key Takeaways**
+- Always check existing vocabularies before inventing new properties, to remain consistent and interoperable.
+
+---
+
+### **(ii) Correct Answer (Turtle Example)**
 
 ```turtle
 @prefix mei: <http://example.org/mei#> .
@@ -401,8 +467,8 @@ Using `rdfs:member` instead of defining a new property like `mei:hasNotes` lever
   mei:duration "8" ;
   mei:durationPpq "12" ;
   mei:stemDirection "up" ;
-  rdfs:member <http://example.org/note/d1e101> ,
-              <http://example.org/note/d1e118> ,
+  rdfs:member <http://example.org/note/d1e101>,
+              <http://example.org/note/d1e118>,
               <http://example.org/note/d1e136> .
 
 <http://example.org/note/d1e101> a mei:Note ;
@@ -418,79 +484,90 @@ Using `rdfs:member` instead of defining a new property like `mei:hasNotes` lever
   mei:octave "4" .
 ```
 
-**Detailed Explanation:**
+#### **Detailed Explanation**
+- **RDF Resources:** Each chord and note is given a unique URI.  
+- **Using `rdfs:member`:** Indicates that the chord “contains” those notes.  
+- **mei:* Terms:** Custom namespace for music concepts (e.g., `mei:Note`, `mei:duration`).
 
-- **RDF Structure:** The Turtle syntax is used to represent RDF data in a concise, readable format. The chord and its notes are represented as resources with properties such as `mei:duration` and `mei:pitchName`.
-- **Using Namespaces:** The `mei:` namespace is custom-defined to cover musical concepts (like `mei:Chord`, `mei:Note`) while `rdfs:member` is reused for associating the notes with the chord. This combination ensures compatibility while allowing for domain-specific customization.
-- **Resource Identifiers:** Each chord and note is uniquely identified by a URI, enabling them to be referenced across different datasets.
+#### **Real-World Scenario Connection**
+- **Linked Data**: By providing URIs, your data can link to other resources—like a universal pitch class or a DBpedia entry for “B♭ Clarinet.”
 
-**Real-World Scenario Connection:**
-- RDF is commonly used in linked data applications where data needs to be structured in a flexible, interconnected manner. The ability to define custom namespaces while reusing existing vocabularies is a key advantage, particularly in fields like digital humanities, where interdisciplinary datasets need to be integrated.
+#### **Edge Cases**
+- **What if** you want to add chord inversions or key signatures? You’d define more properties or link to existing vocabularies.
 
-**Common Pitfalls and Mistakes:**
-- **Misusing Namespaces:** Ensure that each custom namespace is clearly defined and doesn’t conflict with existing ones.
-- **Incorrect RDF Syntax:** Be mindful of RDF syntax rules to avoid errors when parsing or querying the data. Mistakes in the syntax can lead to parsing errors and hinder data integration.
+#### **DIY Exploration**
+- **Try** adding or reusing `schema:MusicComposition` or `schema:MusicEvent` from `schema.org` to see how standard vocabularies can integrate.
 
-**Important Points to Remember:**
-- RDF allows for a flexible, graph-based representation of data, with clear distinctions between resources, properties, and relationships.
-- Custom namespaces can be introduced for domain-specific concepts, while existing vocabularies should be reused wherever possible to maintain consistency and interoperability.
+#### **Key Terms**
+- **Turtle:** A compact RDF serialization format.  
+- **URIs:** Global unique identifiers for RDF resources.
 
-**Key Takeaways:**
-- Understanding RDF and Turtle syntax is essential for modeling linked data and creating interoperable, reusable datasets, a critical skill in the semantic web and knowledge management fields.
+#### **Common Pitfalls**
+- **Malformed RDF** (missing semicolons or periods) leads to parse errors.
 
----
-
-### **Question 4: Designing a Zoo Database System**
-
----
-
-**(a) List the tables and their fields for an SQL implementation of this design. Indicate primary keys for each table.** [4]
-
-- **Answer:**
-
-1. **Zoo Table**
-   - **Primary Key:** `ZooName`
-   - **Attributes:** `Country`, `Location`
-
-2. **Enclosure Table**
-   - **Primary Key:** `EnclosureName`
-   - **Attributes:** `ZooName`, `Location`
-   - **Foreign Key:** `ZooName` references `Zoo(ZooName)`
-
-3. **Animal Table**
-   - **Primary Key:** `AnimalID`
-   - **Attributes:** `Species`, `ConservationStatus`, `DateOfBirth`, `EnclosureName`
-   - **Foreign Key:** `EnclosureName` references `Enclosure(EnclosureName)`
-
-4. **Species Table**
-   - **Primary Key:** `SpeciesName`
-   - **Attributes:** `LatinName`, `ConservationStatus`
-
-**Detailed Explanation:**
-
-- **Entity Relationships:** The Zoo contains multiple Enclosures, and each Enclosure can house multiple Animals. The Species information is maintained separately to avoid redundancy and ensure consistency.
-- **Primary and Foreign Keys:** Each table has a clearly defined primary key to uniquely identify records. Foreign keys maintain the relationships between entities, ensuring data integrity.
-
-**Real-World Scenario Connection:**
-- This kind of database structure is commonly used in systems managing large collections of related entities, such as zoos, museums, or botanical gardens. Ensuring the correct relationships between tables allows for efficient querying, reporting, and data management.
-
-**Common Pitfalls and Mistakes:**
-- **Overlooking Foreign Key Relationships:** Ensure that all relevant relationships between tables are captured using foreign keys to maintain data consistency and avoid orphaned records.
-- **Choosing Non-Unique Primary Keys:** Always choose attributes that uniquely identify each record when defining primary keys to avoid duplication and ensure accurate identification.
-
-**Important Points to Remember:**
-- Properly structuring entities and relationships in a database model is key to maintaining data integrity and consistency across different operations.
-- Foreign keys link related entities, ensuring that relationships between data are enforced at the database level, a critical aspect of relational database design.
-
-**Key Takeaways:**
-- Designing a relational database with clear entity relationships and primary/foreign keys is fundamental to building scalable and maintainable systems, a skill widely used in enterprise data management.
+#### **Key Takeaways**
+- **RDF** in Turtle syntax elegantly captures structured relationships. Reusing standard properties (`rdfs:member`) fosters data integration.
 
 ---
 
-**(b) Give SQL `CREATE TABLE` commands for any TWO of your tables, including any foreign keys.** [6]
+# **Question 4: Designing a Zoo Database System**
 
-- **Answer:**
+## **4(a)**
 
+### **Question**
+**List the tables and their fields** for an SQL zoo design. **Indicate primary keys**.
+
+### **Correct Answer (Example)**
+1. **Zoo**  
+   - PK: `ZooName`  
+   - Fields: `Country`, `Location`
+
+2. **Enclosure**  
+   - PK: `EnclosureName`  
+   - Fields: `ZooName` (FK → `Zoo.ZooName`), `Location`
+
+3. **Animal**  
+   - PK: `AnimalID`  
+   - Fields: `Species`, `ConservationStatus`, `DateOfBirth`, `EnclosureName` (FK → `Enclosure.EnclosureName`)
+
+4. **Species**  
+   - PK: `SpeciesName`  
+   - Fields: `LatinName`, `ConservationStatus`
+
+---
+
+### **Detailed Explanation**
+- **Zoo ↔ Enclosure:** 1 zoo can have multiple enclosures.  
+- **Enclosure ↔ Animal:** 1 enclosure can house multiple animals.  
+- **Species Table**: Avoid duplicating species details among many animals.
+
+### **Real-World Scenario Connection**
+- **Scalable Zoo Management:** Each enclosure references a zoo, ensuring no enclosure can exist without a corresponding zoo. This structure is typical in any hierarchical entity system (e.g., warehouses & sections).
+
+### **Edge Cases**
+- **What if** an enclosure has no animals currently? The table design still accommodates that (the enclosure record just has 0 animals referencing it).
+
+### **DIY Exploration**
+- **Try** adding a `Keeper` table for staff who manage certain animals or enclosures, introducing more foreign keys.
+
+### **Key Terms**
+- **Primary Key (PK):** Unique identifier for each row.  
+- **Foreign Key (FK):** A reference to another table’s PK to maintain relationships.
+
+### **Common Pitfalls**
+- **Omitting** foreign keys, which can lead to orphan records or lost references.
+
+### **Key Takeaways**
+- Proper **entity-relationship** modeling ensures a logical, consistent, and scalable database.
+
+---
+
+## **4(b)**
+
+### **Question**
+Give **SQL `CREATE TABLE` commands** for **any TWO** of your tables, including foreign keys.
+
+### **Correct Answer (Example)**
 ```sql
 CREATE TABLE Zoo (
   ZooName VARCHAR(255) PRIMARY KEY,
@@ -506,33 +583,38 @@ CREATE TABLE Enclosure (
 );
 ```
 
-**Detailed Explanation:**
+---
 
-- **Primary Key and Foreign Key Constraints:** The `Zoo` table has a primary key on `ZooName`, while the `Enclosure` table has a foreign key referencing the `Zoo` table. This ensures that each enclosure is correctly linked to a zoo, maintaining the integrity of the relationships between entities.
-- **Data Types:** The `VARCHAR(255)` data type is used for text fields, which is standard for names, locations, and similar attributes, allowing flexibility in data storage.
+### **Detailed Explanation**
+- **Defining PK:** `PRIMARY KEY` on `ZooName` or `EnclosureName`.  
+- **Foreign Key Constraint:** `FOREIGN KEY (ZooName) REFERENCES Zoo(ZooName)` ensures each enclosure references a valid zoo.
 
-**Real-World Scenario Connection:**
-- Creating SQL tables with properly defined keys is crucial for enforcing relationships and preventing orphaned records in real-world database systems. For instance, this approach is commonly used in inventory management systems where products are linked to specific categories or suppliers.
+### **Real-World Scenario Connection**
+- **Data Integrity:** If an admin tries to insert an enclosure for a non-existent zoo, this statement would reject it, preserving referential integrity.
 
-**Common Pitfalls and Mistakes:**
-- **Incorrect Foreign Key References:** Always double-check that foreign keys correctly reference primary keys in related tables, as incorrect references can lead to data inconsistencies.
-- **Neglecting Data Types:** Be consistent with data types, ensuring they match across related tables to avoid compatibility issues when performing joins or updates.
+### **Edge Cases**
+- **What if** you want cascading deletes (removing a zoo removes all enclosures)? Then add `ON DELETE CASCADE`.
 
-**Important Points to Remember:**
-- `CREATE TABLE` statements should always include primary and foreign keys to maintain relational integrity, a foundational principle in SQL-based database management.
-- Properly defining
+### **DIY Exploration**
+- **Try** creating the `Animal` or `Species` tables yourself with a similar structure.
 
- relationships at the database level reduces the likelihood of data inconsistencies and simplifies query design.
+### **Key Terms**
+- **Referential Integrity:** Ensures linked data remains consistent.
 
-**Key Takeaways:**
-- Defining primary and foreign keys in SQL is fundamental to relational database design, ensuring that relationships between entities are correctly enforced and maintained in enterprise systems.
+### **Common Pitfalls**
+- **Mismatch** in data types between foreign key and primary key columns (e.g., `VARCHAR(255)` vs. `INT`).
+
+### **Key Takeaways**
+- Correct usage of **PK** and **FK** in `CREATE TABLE` statements is crucial for relational databases.
 
 ---
 
-**(c) Give a single SQL query to find out how many species are housed in the zoo which has the name ‘Singapore Zoo’.** [5]
+## **4(c)**
 
-- **Answer:**
+### **Question**
+Write a single SQL query to find **how many species** are housed in the **zoo named ‘Singapore Zoo’**.
 
+### **Correct Answer**
 ```sql
 SELECT COUNT(DISTINCT s.SpeciesName) AS SpeciesCount
 FROM Animal a
@@ -542,32 +624,42 @@ JOIN Species s ON a.Species = s.SpeciesName
 WHERE z.ZooName = 'Singapore Zoo';
 ```
 
-**Detailed Explanation:**
+---
 
-- **Joining Tables:** The query joins the `Animal`, `Enclosure`, `Zoo`, and `Species` tables to gather all relevant information, reflecting the relationships between zoos, enclosures, and species.
-- **Filtering by Zoo Name:** The `WHERE` clause ensures the query only counts species in the ‘Singapore Zoo’, narrowing the results to the relevant context.
-- **Counting Distinct Species:** The `COUNT(DISTINCT s.SpeciesName)` ensures that each species is only counted once, regardless of how many animals belong to that species, providing an accurate species count.
+### **Detailed Explanation**
+- **Table Joins:**  
+  1. `Animal` → `Enclosure` on `EnclosureName`.  
+  2. `Enclosure` → `Zoo` on `ZooName`.  
+  3. `Animal` → `Species` on `SpeciesName`.  
+- **Filtering by Zoo:** `WHERE z.ZooName = 'Singapore Zoo'`.  
+- **Counting Distinct Species:** `COUNT(DISTINCT …)` ensures each species is only counted once.
 
-**Real-World Scenario Connection:**
-- This type of query is typical in inventory systems, where it’s necessary to calculate distinct counts based on complex relationships, such as counting unique products in specific warehouses or tracking unique customer orders across different branches.
+### **Real-World Scenario Connection**
+- **Inventory / Catalog Counting:** This pattern is common in **any** scenario where you count unique items in a specific location.
 
-**Common Pitfalls and Mistakes:**
-- **Overlooking the `DISTINCT` Keyword:** Without `DISTINCT`, the count might include duplicates, leading to inaccurate results and misleading statistics.
-- **Incorrect Table Joins:** Ensure that all joins are correctly linking related tables based on primary and foreign keys, as incorrect joins can result in missing or duplicated data.
+### **Edge Cases**
+- **What if** the zoo has no animals? Then the query returns `0`.
 
-**Important Points to Remember:**
-- Counting distinct items in a database requires combining `COUNT()` with `DISTINCT`, a common approach in SQL queries.
-- Understanding how to join multiple tables is critical for extracting complex information from relational databases, a skill widely applicable in data analysis and reporting.
+### **DIY Exploration**
+- **Try** grouping by `z.ZooName` to see how many species are in **each** zoo, if your DB has multiple zoos.
 
-**Key Takeaways:**
-- Mastering SQL joins and aggregate functions is crucial for querying related data across multiple tables and obtaining meaningful insights, particularly in environments with complex relational models.
+### **Key Terms**
+- **Aggregate Functions (COUNT) + DISTINCT**: Summarize or count unique items.
+
+### **Common Pitfalls**
+- **Forgetting `DISTINCT`:** Could overcount species if multiple animals in the same species exist.
+
+### **Key Takeaways**
+- Combining **JOIN** + `COUNT(DISTINCT...)` is a staple pattern in relational SQL queries for unique item counts.
 
 ---
 
-**(d) Give a single SQL query to find out the date of birth of the oldest animal of the species called ‘Buceros bicornis’ in each zoo.** [5]
+## **4(d)**
 
-- **Answer:**
+### **Question**
+Write a single SQL query to find the **date of birth** of the **oldest animal** of the species called `'Buceros bicornis'` in **each zoo**.
 
+### **Correct Answer**
 ```sql
 SELECT z.ZooName, MIN(a.DateOfBirth) AS OldestDateOfBirth
 FROM Animal a
@@ -577,59 +669,68 @@ WHERE a.Species = 'Buceros bicornis'
 GROUP BY z.ZooName;
 ```
 
-**Detailed Explanation:**
+---
 
-- **Grouping by Zoo:** The query groups the results by `ZooName`, ensuring that we get one result per zoo, showing the oldest animal for each location.
-- **Finding the Oldest Date:** The `MIN(a.DateOfBirth)` function returns the earliest date of birth for each group, identifying the oldest animal in each zoo, which is particularly useful for zoological records and population management.
-- **Filtering by Species:** The `WHERE` clause restricts the query to only include animals of the species ‘Buceros bicornis’, ensuring the results are species-specific.
+### **Detailed Explanation**
+- **Filtering by Species:** `'Buceros bicornis'`.  
+- **Grouping by Zoo:** One row per zoo.  
+- **Using `MIN(DateOfBirth)`:** Retrieves the **earliest** birth date (i.e., the oldest animal).
 
-**Real-World Scenario Connection:**
-- Grouped queries like this are often used in applications where metrics need to be calculated across different categories, such as finding the oldest records or most recent transactions in different branches of a company, supporting decision-making and analysis.
+### **Real-World Scenario Connection**
+- **Aggregation by Location:** In business or research, you often want the oldest, newest, or average among each group/branch.
 
-**Common Pitfalls and Mistakes:**
-- **Forgetting to Group Results:** Always use `GROUP BY` when you want results grouped by a specific attribute, like zoo name, to ensure accurate aggregation.
-- **Incorrect Use of Aggregate Functions:** Be sure that aggregate functions like `MIN()` are correctly paired with `GROUP BY` to avoid logical errors in the query.
+### **Edge Cases**
+- **What if** a zoo has no `'Buceros bicornis'` animals? That zoo might not appear in the result.
 
-**Important Points to Remember:**
-- Grouping and aggregation are powerful tools in SQL that allow you to analyze data across different categories or entities, which is essential in business intelligence and data analysis scenarios.
-- When using `GROUP BY`, ensure that your SELECT statement includes the correct grouping columns and aggregate functions to avoid data inconsistencies.
+### **DIY Exploration**
+- **Try** using `MAX` to find the **youngest** animal, or `COUNT` to see how many exist.
 
-**Key Takeaways:**
-- Understanding how to group and aggregate data in SQL is essential for performing advanced queries and extracting meaningful statistics, particularly in large datasets.
+### **Key Terms**
+- **GROUP BY:** Aggregates data by categories or groups (here, by zoo).
+
+### **Common Pitfalls**
+- **Forgetting `GROUP BY`:** SQL error or unintended results.
+
+### **Key Takeaways**
+- Aggregation functions (`MIN`, `MAX`, etc.) with `GROUP BY` allow analyzing data **within groups**.
 
 ---
 
-**(e) Choose ONE of XML or RDF and:**
+## **4(e)**
 
-**i. BRIEFLY assess the suitability of this model for your chosen technology (i.e., XML or RDF graph).** [3]
-
-- **Answer (RDF Chosen):** RDF is well-suited for representing the relationships between entities like Zoos, Enclosures, and Animals because it inherently models data as a graph, allowing for flexible and dynamic relationships. RDF’s ability to link entities using URIs makes it ideal for data that needs to be interconnected across various contexts, such as linking species information with global conservation databases.
-
-**Detailed Explanation:**
-
-- **Graph-Based Representation:** RDF’s graph model allows for a natural representation of relationships between zoos, enclosures, animals, and species. Unlike relational models, RDF easily handles many-to-many relationships and data that needs to be linked across different datasets.
-- **Interoperability:** RDF supports standardized vocabularies (like FOAF, SKOS) that facilitate data sharing and integration with external linked data resources, enhancing the richness of the data model.
-
-**Real-World Scenario Connection:**
-- RDF is commonly used in applications that require data interoperability and the ability to integrate with other semantic web resources, such as biodiversity databases and global species registries. This makes it highly applicable in fields like conservation, where data sharing across organizations is critical.
-
-**Common Pitfalls and Mistakes:**
-- **Overcomplicating Relationships:** While RDF is flexible, unnecessary complexity in defining relationships can lead to difficult-to-maintain models, so simplicity and clarity should be prioritized.
-- **Misusing URIs:** Ensure that all resources are uniquely and meaningfully identified using proper URIs to maintain consistency and avoid confusion across datasets.
-
-**Important Points to Remember:**
-- RDF excels in scenarios where data needs to be interconnected and shared across multiple systems, leveraging standardized vocabularies for compatibility and integration.
-- Graph databases and RDF models provide flexibility in handling complex relationships that are difficult to manage in traditional relational databases, particularly when working with linked data.
-
-**Key Takeaways:**
-- RDF’s strengths lie in its flexibility and ability to represent complex, interlinked relationships, making it ideal for semantic web applications and linked data projects, particularly in knowledge representation and data integration.
+### **Question**
+Choose **ONE** of **XML** or **RDF** and:  
+1. Assess the suitability of this zoo model for that technology.  
+2. Give **instance data** covering most entities/attributes in that technology’s format.
 
 ---
 
-**ii. Give some instance data for the database in your chosen technology. You should aim to cover all or nearly all the entities and attributes in the E/R diagram.** [7]
+### **(i) Correct Answer (Choosing RDF)**  
+**Suitability:**  
+- RDF is well-suited for describing **entities** (Zoo, Enclosure, Animal, Species) as **interlinked resources**.  
+- Each resource can be assigned a **URI**, and relationships like “enclosure belongs to zoo” or “animal has species” can be expressed via **RDF properties**.  
+- This approach **enhances interoperability**, allowing you to link out to other data sources (e.g., external conservation databases).
 
-- **Answer (Turtle Syntax for RDF):**
+#### **Detailed Explanation**
+- **Graph Nature:** The many-to-one or one-to-many relationships in the zoo scenario map nicely onto RDF’s subject–predicate–object triples.  
+- **Integration:** If a zoo wants to link “Buceros bicornis” to an external ontology, RDF’s linked data approach is perfect.
 
+#### **Real-World Scenario Connection**
+- **Global Biodiversity Data:** Zoos might link their species to external conservation status resources (like the IUCN Red List) via URIs.
+
+#### **Key Terms**
+- **RDF:** Resource Description Framework, designed for the semantic web.  
+- **URI:** Unique identifier for a resource.
+
+#### **Common Pitfalls**
+- **Reinventing properties** rather than using established ontologies (like `schema.org`, `FOAF`, etc.).
+
+#### **Key Takeaways**
+- RDF fosters an **open, interconnected** data ecosystem, ideal for knowledge sharing and integration.
+
+---
+
+### **(ii) Correct Answer (Turtle Example for Zoo Data)**
 ```turtle
 @prefix zoo: <http://example.org/zoo#> .
 @prefix schema: <http://schema.org/> .
@@ -648,28 +749,31 @@ zoo:Animal1 a schema:Animal ;
   schema:enclosure zoo:Enclosure1 .
 
 zoo:BucerosBicornis a schema:Species ;
-  schema:conservationStatus "Vulnerable" ;
-  schema:latinName "Buceros bicornis" .
+  schema:latinName "Buceros bicornis" ;
+  schema:conservationStatus "Vulnerable" .
 ```
 
-**Detailed Explanation:**
+#### **Detailed Explanation**
+- **Assigning URIs:** `zoo:SingaporeZoo` references the zoo resource.  
+- **Linking**: `schema:zoo zoo:SingaporeZoo` ties the enclosure to the Singapore Zoo.  
+- **Reusing `schema:`** Instead of making new terms for “Animal” or “Species,” we leverage `schema.org` to keep it standard.
 
-- **RDF Structure:** The instance data uses RDF Turtle syntax to represent the relationships between zoos, enclosures, animals, and species. Each entity is linked using properties like `schema:zoo`, `schema:species`, and `schema:enclosure`, reflecting the hierarchical relationships described in the relational model.
-- **Namespace Usage:** The custom `zoo:` namespace is defined for resources related to the specific zoo dataset, while the standard `schema:` namespace is used for general properties and types, ensuring that the data is both extensible and interoperable.
-- **Flexible Linking:** RDF’s graph model allows for flexible connections between entities, capturing the relationships defined in the relational model while allowing for future extensions, such as integrating with external datasets or adding new attributes.
+#### **Real-World Scenario Connection**
+- **Semantic Web**: Allows for easy linking to other data sets or expansions (like adding caretaker info, global species references).
 
-**Real-World Scenario Connection:**
-- RDF is widely used in semantic web and linked data projects where resources from different domains need to be interconnected, such as linking zoo databases with global conservation data or integrating species information with broader biodiversity networks.
+#### **Edge Cases**
+- **What if** some animals are unknown species? You can still create an RDF resource with minimal info.
 
-**Common Pitfalls and Mistakes:**
-- **Incorrect URI Structure:** Ensure that URIs are unique, descriptive, and consistently applied across the dataset to maintain clarity and avoid data conflicts.
-- **Overcomplicating Vocabulary Definitions:** When using RDF, always prefer established vocabularies like `schema.org` over defining new ones unless absolutely necessary, as this enhances compatibility and data sharing.
+#### **DIY Exploration**
+- **Try** referencing `dbpedia.org` or `wikidata.org` URIs for more official connections (like `foaf:Person` for zookeepers).
 
-**Important Points to Remember:**
-- RDF provides a flexible and interoperable model for linking diverse datasets using standardized vocabularies and URIs, making it a powerful tool in knowledge management and semantic web applications.
-- When creating instance data, be mindful of maintaining clear and consistent relationships between entities using RDF properties, ensuring the model remains both scalable and extensible.
+#### **Key Terms**
+- **Turtle:** A concise, human-readable RDF serialization format.
 
-**Key Takeaways:**
-- RDF’s graph-based approach is ideal for modeling complex relationships and integrating with external datasets, making it an essential tool for semantic data representation, particularly in fields like digital humanities, conservation, and linked open data initiatives.
+#### **Common Pitfalls**
+- **Forgetting** to maintain consistent URIs (leading to data fragmentation).
+
+#### **Key Takeaways**
+- By encoding zoo data in RDF, you create a flexible graph that can easily plug into broader **linked data** contexts.
 
 ---
