@@ -568,8 +568,6 @@ Which statements about **types of SQL joins** are correct?
 
 ---
 
----
-
 ## **Quick Reference / “Cheat Sheet”**
 
 ### **E/R and Relational Modeling**
