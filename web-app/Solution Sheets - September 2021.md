@@ -90,23 +90,23 @@ Yes, it **is** in 1NF.
    - **PK:** `SpeciesName`  
    - Attributes: `ConservationStatus`
 
-2. **Location**  
-   - **PK:** `LocationID`  
-   - Attributes: `NatureReserve`, `Latitude`, `Longitude`
+2. **NatureReserves**  
+   - **PK:** `NatureReserave`  
+   - Attributes: `Location`
 
 3. **Sightings**  
-   - **PK:** `SightingID`  
-   - Attributes: `SpeciesName`, `Date`, `NumberSighted`, `LocationID`  
+   - **PK:** (`SpeciesName`, `NatureReserve`, `Date`)  
+   - Attributes: `NumberSighted`  
    - **Foreign Keys:**  
      - `SpeciesName` → **references** Species(`SpeciesName`)  
-     - `LocationID` → **references** Location(`LocationID`)
+     - `NatureReserve` → **references** NatureReserves(`NatureReserve`)
 
 ---
 
 ### **Detailed Explanation**
 - **Breaking Out Species:** Repeated fields about conservation status belong in a separate `Species` table.  
-- **Handling Locations:** Repeated location data (nature reserve names, lat/long) belong in a `Location` table.  
-- **Sightings Table:** Links `Species` and `Location` via FKs and stores date and number sighted.
+- **Handling Locations:** Repeated location data (nature reserve names, lat/long) belong in a `NatureReserves` table.  
+- **Sightings Table:** Links `Species` and `NatureReserve` via FKs and stores date and number sighted.
 
 ### **Real-World Scenario Connection**
 - **Database Efficiency:** By **removing redundancy**, updates become easier. If a species’ conservation status changes, you only update one table, not every sightings row.
@@ -218,8 +218,8 @@ Yes. **Transactions** ensure data integrity for multiple statements. For example
 ```sql
 START TRANSACTION;
 
-INSERT INTO Sightings (SpeciesName, Date, NumberSighted, LocationID)
-VALUES ('Wood pigeon', '2021-09-07', 5, 2);
+INSERT INTO Sightings (SpeciesName, Date, NumberSighted, NatureReserve)
+VALUES ('Wood pigeon', '2021-09-07', 5, 'Epping Forest');
 
 UPDATE Species
 SET ConservationStatus = 'Endangered'
