@@ -349,14 +349,14 @@ A group is moving the MEI data into MongoDB.
 ```json
 {
   "chord": {
-    "xml:id": "d13e1",
+    "xml_id": "d13e1",
     "dur": 8,
-    "dur.ppq": 12,
-    "stem.dir": "up",
+    "dur_ppq": 12,
+    "stem_dir": "up",
     "notes": [
-      { "xml:id": "d1e101", "pname": "c", "oct": 5 },
-      { "xml:id": "d1e118", "pname": "a", "oct": 4 },
-      { "xml:id": "d1e136", "pname": "c", "oct": 4 }
+      { "xml_id": "d1e101", "pname": "c", "oct": 5 },
+      { "xml_id": "d1e118", "pname": "a", "oct": 4 },
+      { "xml_id": "d1e136", "pname": "c", "oct": 4 }
     ]
   }
 }
@@ -389,14 +389,14 @@ A group is moving the MEI data into MongoDB.
 ### **(ii) Correct Answer (MongoDB Find)**
 ```js
 db.chords.find({
-  "stem.dir": "up",
+  "stem_dir": "up",
   "notes.pname": "f"
 })
 ```
 or
 ```js
 db.chords.find({
-  "stem.dir": "up",
+  "stem_dir": "up",
   "notes": {
     "$elemMatch": { "pname": "f" }
   }
@@ -410,7 +410,7 @@ Here is an updated explanation to cover **both** approaches—matching array ele
 #### **Detailed Explanation (MongoDB Query)**
 
 1. **Filtering on “stem.dir”:**  
-   We include `{"stem.dir": "up"}` to return only chords whose field `stem.dir` is exactly `"up"`.
+   We include `{"stem_dir": "up"}` to return only chords whose field `stem.dir` is exactly `"up"`.
 
 2. **Matching Notes Containing `"pname":"f"`**  
    MongoDB offers **two** common ways to match array sub-documents:
@@ -418,7 +418,7 @@ Here is an updated explanation to cover **both** approaches—matching array ele
    - **Dot-Notation Match**  
      ```js
      db.chords.find({
-       "stem.dir": "up",
+       "stem_dir": "up",
        "notes.pname": "f"
      })
      ```
@@ -427,7 +427,7 @@ Here is an updated explanation to cover **both** approaches—matching array ele
    - **`$elemMatch`**  
      ```js
      db.chords.find({
-       "stem.dir": "up",
+       "stem_dir": "up",
        "notes": {
          "$elemMatch": { "pname": "f" }
        }
@@ -438,13 +438,6 @@ Here is an updated explanation to cover **both** approaches—matching array ele
    **When to Use Which**  
    - For a **single** condition, either style works fine.  
    - If you have **multiple** conditions that must apply **to the same element** in the array, `$elemMatch` is necessary. For example, `"$elemMatch": { "pname": "f", "oct": "3" }` ensures both conditions refer to the same array entry.
-
-These queries find **chords** with:
-
-- `stem.dir` = `"up"`  
-- **At least one** note whose `"pname"` is `"f"`.
-
-Either **dot notation** or **`$elemMatch`** achieves the “notes contain a sub-document with `pname: 'f'`” logic.
 
 #### **Real-World Scenario Connection**
 - **Music Information Retrieval:** Searching for chords with upward stems that contain a particular pitch is straightforward in MongoDB’s document model.
