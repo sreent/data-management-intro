@@ -390,15 +390,61 @@ A group is moving the MEI data into MongoDB.
 ```js
 db.chords.find({
   "stem.dir": "up",
+  "notes.pname": "f"
+})
+```
+or
+```js
+db.chords.find({
+  "stem.dir": "up",
   "notes": {
     "$elemMatch": { "pname": "f" }
   }
 })
 ```
 
-#### **Detailed Explanation (for MongoDB Query)**
-- **Filtering on “stem.dir”:** Only chords whose `stem.dir` = `"up"`.  
-- **Array Condition:** `"$elemMatch": { "pname": "f" }` means at least one element in `notes` has `"pname": "f"`.
+Here is an updated explanation to cover **both** approaches—matching array elements via **dot notation** (`"notes.pname": "f"`) or **`$elemMatch`**:
+
+---
+
+#### **Detailed Explanation (MongoDB Query)**
+
+1. **Filtering on “stem.dir”:**  
+   We include `{"stem.dir": "up"}` to return only chords whose field `stem.dir` is exactly `"up"`.
+
+2. **Matching Notes Containing `"pname":"f"`**  
+   MongoDB offers **two** common ways to match array sub-documents:
+
+   - **Dot-Notation Match**  
+     ```js
+     db.chords.find({
+       "stem.dir": "up",
+       "notes.pname": "f"
+     })
+     ```
+     Using `"notes.pname": "f"` tells Mongo to look in the `notes` array for at least one sub-document where `pname` equals `"f"`. This implicitly does an “array contains an object with that key-value pair” check.
+
+   - **`$elemMatch`**  
+     ```js
+     db.chords.find({
+       "stem.dir": "up",
+       "notes": {
+         "$elemMatch": { "pname": "f" }
+       }
+     })
+     ```
+     Here, `$elemMatch` explicitly says: “Return documents where **at least one** array element in `notes` meets the condition `pname` = `"f"`.”  
+
+   **When to Use Which**  
+   - For a **single** condition, either style works fine.  
+   - If you have **multiple** conditions that must apply **to the same element** in the array, `$elemMatch` is necessary. For example, `"$elemMatch": { "pname": "f", "oct": "3" }` ensures both conditions refer to the same array entry.
+
+These queries find **chords** with:
+
+- `stem.dir` = `"up"`  
+- **At least one** note whose `"pname"` is `"f"`.
+
+Either **dot notation** or **`$elemMatch`** achieves the “notes contain a sub-document with `pname: 'f'`” logic.
 
 #### **Real-World Scenario Connection**
 - **Music Information Retrieval:** Searching for chords with upward stems that contain a particular pitch is straightforward in MongoDB’s document model.
