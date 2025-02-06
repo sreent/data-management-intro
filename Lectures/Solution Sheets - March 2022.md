@@ -1,306 +1,273 @@
 
+# **Question 2**
+
 ## **Question 2(a)**
-**Give two examples of element names and two examples of attribute names from the provided code.**  
-**[2 marks]**
+**Context**: The genealogical XML snippet includes `<royal>`, `<title>`, attributes like `rank="king"`, etc. We want two examples of element names and two examples of attribute names.
 
-### **Answer**
-
-- **Element Names**  
+### **Answer**  
+- **Element Names:**  
   1. `<royal>`  
-  2. `<title>`
+  2. `<title>`  
 
-- **Attribute Names**  
+- **Attribute Names:**  
   1. `rank`  
-  2. `territory`
+  2. `territory`  
 
-### **Detailed Explanation**
+### **Detailed Explanation & Real-World Scenario**  
+- **Elements** are the fundamental containers in XML, defined by opening and closing tags. For example, `<royal>` might represent a person in the lineage.  
+- **Attributes** appear in the start tag of an element (e.g., `<title rank="king" territory="England">`). They provide metadata, such as the `rank` or `territory` associated with a title.
 
-- **Elements**  
-  - Elements are the primary building blocks of XML, defined by opening and closing tags (e.g., `<royal>` … `</royal>`). They can contain text, other elements (children), or attributes.  
-  - In the sample code, `<royal>` and `<title>` are clearly visible elements.
+**Common Pitfalls**  
+- Mixing up elements and attributes. Elements are tags that can contain data or child elements, while attributes are key-value pairs inside an element’s start tag.
 
-- **Attributes**  
-  - Attributes appear within the start-tag of an element (e.g., `<title rank="king" territory="England">`). They provide additional details or properties about the element.
-  - In the sample, `rank="king"` and `territory="England"` are examples of attributes.
-
-#### **Key Points**
-- Elements represent **data nodes** in the XML hierarchy.  
-- Attributes store **metadata** or small bits of data describing elements.
+### **Exam Tip (Key Points Summary)**  
+- **Elements**: `<royal>`, `<title>`  
+- **Attributes**: `rank="..."`, `territory="..."`  
+- Always distinguish **data** in elements vs. **metadata** in attributes.
 
 ---
 
 ## **Question 2(b)**
-**What will be the result of the XPath query**  
-```
+**Context**: An XPath query:
+```xpath
 //title[@rank="king" and @regnal="VIII"]/../royal[@name="Henry"]
 ```
-**?**  
-**[3 marks]**
+We need to identify **which node** it selects in the genealogical XML.
 
-### **Answer**
+### **Answer**  
+It selects `<royal name="Henry" ...>` (often `<royal name="Henry" xml:id="HenryVIII">`) that is **sibling** to a `<title>` with `rank="king"` and `regnal="VIII"` (same parent).
 
-This query selects the `<royal>` element with `name="Henry"` **if** it shares the same parent as a `<title>` whose `rank="king"` **and** `regnal="VIII"`. Specifically, it matches:
+### **Detailed Explanation & Real-World Scenario**  
+- `//title[@rank="king" and @regnal="VIII"]` picks `<title>` elements that match both attributes.  
+- `/..` moves up to the parent node (likely a `<royal>`).  
+- Then `/royal[@name="Henry"]` selects a sibling `<royal>` with `name="Henry"`.  
 
-```xml
-<royal name="Henry" xml:id="HenryVIII">
-  ...
-</royal>
-```
+**Practical Use**: In a family tree or genealogical data, you might look for a particular “Henry” associated with a specific title.
 
-### **Detailed Explanation**
+**Common Pitfalls**  
+- Forgetting `..` in XPath can lead to selecting child or descendant nodes instead of siblings.
 
-- **XPath Breakdown**  
-  - `//title[@rank="king" and @regnal="VIII"]` finds all `<title>` elements with those attributes.  
-  - `/..` moves *up* to their parent.  
-  - `/royal[@name="Henry"]` then finds a child `<royal>` of that same parent whose `name="Henry"`.
-
-- **Real-World Use**  
-  - Perfect for genealogical or historical XML data where you want “the `<royal>` named Henry who is sibling to a `<title>` with specific attributes.”
-
-#### **Key Points**
-- `..` in XPath navigates to the **parent** element.  
-- Combining conditions `[ @rank="king" and @regnal="VIII" ]` refines the search precisely.
+### **Exam Tip (Key Points Summary)**  
+- **Logic**: Find `<title>` with `rank="king"` & `regnal="VIII"`, then go to parent, then to sibling `<royal name="Henry">`.  
+- It effectively filters for Henry VIII in the same context as that specific title.
 
 ---
 
 ## **Question 2(c)**
-**What (in general) is returned by the XPath**  
+**Context**: Another XPath:
+```xpath
+//title[@rank="king" or @rank="queen"]/../relationship/children/royal/relationship/children/royal/
 ```
- //title[@rank="king" or @rank="queen"]/../relationship/children/royal/relationship/children/royal/
-```
-**?**  
-**[3 marks]**
+We want to describe **which nodes** are returned.
 
-### **Answer**
+### **Answer**  
+It returns **descendant `<royal>` elements** that are accessed two levels down (`relationship -> children -> royal -> relationship -> children -> royal`) from any `<title>` with `rank="king"` or `rank="queen"`.
 
-It returns all `<royal>` elements (at the end of the path) that descend from any `<title>` with `rank="king"` or `rank="queen"`, navigating through `<relationship>`, `<children>`, `<royal>`, etc. Essentially, **descendants** of royals who are kings or queens, two relationships deep.
+### **Detailed Explanation & Real-World Scenario**  
+- `[ @rank="king" or @rank="queen" ]` means the title can be *either* king or queen.  
+- `/../relationship/children/royal` steps from `<title>` up to the `<royal>` parent, then down through `<relationship>` and `<children>`.  
+- You eventually reach `<royal>` nodes that might represent **descendants or further relationships** of those royals who are kings or queens.
 
-### **Detailed Explanation**
+**Common Pitfalls**  
+- Using `or` in the XPath condition can broaden your selection unexpectedly if not intended.  
+- The nested path is quite deep—any mismatch in the hierarchy (e.g., `<relationship>` spelled differently) leads to no matches.
 
-- **Logical OR**  
-  - `[ @rank="king" or @rank="queen" ]` means **any** `<title>` with `rank` set to king **or** queen.
-- **Deep Navigation**  
-  - `/..` moves to the parent `<royal>` (the one that has the `<title>`).  
-  - Then `/relationship/children/royal/relationship/children/royal` moves down multiple levels, retrieving grandchildren or further descendants.
-
-#### **Key Points**
-- Using `or` in XPath filters broadens which `<title>` elements qualify.  
-- Multiple steps (`relationship/children/royal`) can skip multiple levels to find deeply nested `<royal>` nodes.
+### **Exam Tip (Key Points Summary)**  
+- Returns **deeply nested** `<royal>` nodes for those with an ancestor `<title>` whose rank is `king` or `queen`.  
+- Good for multi-generation or extended family queries.
 
 ---
 
 ## **Question 2(d)**
-**Mary I of England was also queen consort of Spain from 16 January 1556 until her death. Give an XML fragment that would record this and say where you’d add it.**  
-**[4 marks]**
+**Context**: We add Mary I’s Spanish consort info. Where to place it?
 
-### **Answer**
-
-Add the following under the `<royal name="Mary">` element:
+### **Answer**  
+Under `<royal name="Mary">`, add:
 
 ```xml
 <relationship type="marriage" spouse="#PhilipOfSpain" from="1556-01-16">
-  <title rank="queen" territory="Spain" regnal="consort" 
+  <title rank="queen" territory="Spain" regnal="consort"
          from="1556-01-16" to="1558-11-17"/>
 </relationship>
 ```
 
-### **Detailed Explanation**
+### **Detailed Explanation & Real-World Scenario**  
+- This snippet shows Mary’s marriage relationship to Philip of Spain, with a nested `<title>` for her role as queen consort, including relevant dates.  
+- **spouse="#PhilipOfSpain"** might reference another `<royal xml:id="PhilipOfSpain">` node, thus linking them.
 
-- **Modeling Marriage & Title**  
-  - The new `<relationship>` includes `type="marriage"` and `spouse="#PhilipOfSpain"`.
-  - A nested `<title>` indicates Mary’s rank as queen in Spain, with dates `from="1556-01-16"` to `to="1558-11-17"`.
+**Common Pitfalls**  
+- Placing it under the wrong `<royal>` would incorrectly associate that relationship.  
+- Failing to close tags or set correct attributes (e.g., from date, to date).
 
-- **Location in Code**  
-  - Place it inside `<royal name="Mary">` so it is clear it pertains to Mary’s additional title and marriage period.
-
-#### **Key Points**
-- You can expand the same XML structure to capture additional roles or titles (like queen consort).  
-- Always keep new data in the **logical** place in the hierarchy (under Mary in this case).
+### **Exam Tip (Key Points Summary)**  
+- **Location**: Inside `<royal name="Mary">`.  
+- **Structure**: `<relationship>` element plus nested `<title>` describing the consort rank & timeline.
 
 ---
 
 ## **Question 2(e)**
-**The historian argues about the strengths/weaknesses of using XML. What are they?**  
-**[7 marks]**
+**Context**: Strengths/weaknesses of using **XML** for genealogical/historical data.
 
-### **Answer**
-
+### **Answer**  
 **Strengths**  
-1. **Natural Hierarchy for Family Trees**: XML organizes data in nested elements, mirroring genealogical structures.  
-2. **Flexibility & Extensibility**: Easy to add new attributes or child elements for more information.  
-3. **Self-Describing / Readable**: Tags like `<royal>`, `<relationship>` are intuitive.
+1. **Natural Hierarchy** – Genealogies have parent-child structures that align well with XML nesting.  
+2. **Flexible & Self‐Descriptive** – Easy to insert new attributes, elements; `<relationship>`, `<children>` are intuitive.  
+3. **Readable** – XML is relatively human‐readable.
 
 **Weaknesses**  
-1. **Verbosity & Repetition**: Repeated tags can bloat large genealogical data.  
-2. **Complex Queries**: Deep nesting can make queries slow or cumbersome compared to relational databases.  
-3. **Scalability Issues**: Handling large, multi-branch genealogies can become difficult.
+1. **Verbosity** – Repeated tags can cause large file sizes.  
+2. **Complex Queries** – Deeply nested data can be slow or cumbersome to query with XPath.  
+3. **Scalability** – Maintaining huge genealogical data can get unwieldy.
 
-### **Detailed Explanation**
+### **Detailed Explanation & Real-World Scenario**  
+- For smaller genealogical datasets, XML’s hierarchy is a good fit. But if the dataset is large or has many cross‐branch relationships, the file size and nested queries become a burden.  
+- Historians might appreciate the self-describing tags but could struggle with performance on massive lineages.
 
-- **Hierarchy vs. Complexity**  
-  - While XML suits hierarchical data well, genealogical data can become extremely large and complex, making maintenance or advanced queries tricky.
-- **Performance Trade-offs**  
-  - XML queries use XPath/XQuery, which can be less optimized for certain large-scale or cross-branch queries than a relational or graph-based system.
+**Common Pitfalls**  
+- Over-nesting or duplicating data (like repeating `<title>` blocks all over).  
+- Assuming XML can easily handle many-to-many relationships (it’s more complicated than in relational or graph models).
 
-#### **Key Points**
-- XML is **great** for hierarchical data with a well-defined parent-child structure.  
-- Big genealogies might be better served by a **relational** or **graph** approach if complexity or performance is crucial.
+### **Exam Tip (Key Points Summary)**  
+- **Strengths**: Great for hierarchical structure, self-explanatory.  
+- **Weaknesses**: Verbose, potentially slow for large genealogical data, not ideal for many-to-many relations.
 
 ---
 
 ## **Question 2(f)**
-**One colleague suggests Linked Data (RDF). Another suggests a relational DB. Who’s right?**  
-**[1 mark]**
+**Context**: One colleague suggests **RDF**; another suggests **relational**. Who is right?
 
-### **Answer**
+### **Answer**  
+Both have valid points. 
 
-Both approaches can be valid. 
+- **RDF**: More flexible for graph-like data (multiple marriages, cross links).  
+- **Relational**: Good if you can structure genealogical data in tables, with well-defined foreign keys.  
 
-- **RDF** is ideal for *graph-like* data and many-to-many relationships typical in genealogies.  
-- **Relational** is good if data can be structured into tables, with standard queries and well-defined relationships.
+### **Detailed Explanation & Real-World Scenario**  
+- **RDF** is ideal when the data is a web/graph of relationships: e.g., multiple spouses, alliances, lineage branches.  
+- **Relational** is simpler if each person, title, or relationship can be turned into a table row and you want fast, tabular SQL queries.
 
-### **Detailed Explanation**
+**Common Pitfalls**  
+- Choosing relational for extremely graph-like data can lead to complicated join tables. Conversely, forcing RDF where tabular data is enough might be overkill.
 
-- **RDF (Linked Data)**  
-  - Better for flexible, cross-branch relationships. Each person, title, marriage can be a resource with edges linking them.
-- **Relational DB**  
-  - Works if you can break genealogical data into tables (e.g., `Persons`, `Marriages`, etc.) with foreign keys.
-
-#### **Key Points**
-- The choice depends on how *web-like* (graphy) the data is versus how *tabular* and structured it is.
+### **Exam Tip (Key Points Summary)**  
+- Both approaches are “correct,” depending on complexity:  
+  - **Graph-like** genealogies → RDF.  
+  - **Tabular** genealogies → RDB.
 
 ---
 
 ## **Question 2(g)**
-**Choose RDF or relational. How might it address the strengths/weaknesses from (e)?**  
-**[10 marks]**
+**Context**: Choose one approach (RDF or relational) and show how it addresses (e)’s strengths/weaknesses.
 
 ### **Answer** (Example: **Relational** Approach)
 
-- **Addresses XML Verbosity**: Data stored in tables is less verbose.  
-- **Efficient Queries**: SQL joins can handle complex relationships if well-designed.  
-- **Normalization** helps avoid duplication (resolving XML’s repetitiveness).
+1. **Addresses Verbosity** by normalizing data in tables—no repeated tags.  
+2. **Handles Complexity** with standard SQL relationships/joins.  
+3. **Scalability** is improved due to RDB indexes & query optimizers.
 
-**Detailed Explanation**
+### **Detailed Explanation & Real-World Scenario**  
+- In a relational system, you might have tables like `Person`, `Marriage`, `Title`. This **reduces duplication** and allows strong performance for queries (like “Who are the children of Henry VIII?”).  
+- Large genealogical data sets often run faster in a relational DB than in a huge nested XML.
 
-1. **Relational Strengths**  
-   - Use tables (e.g., `Royal`, `Relationship`, `Title`) with foreign keys for clarity.  
-   - Achieves the same hierarchical ideas using *one-to-many* or *many-to-many* structures.
-2. **Handling Large Data**  
-   - Databases handle indexing and optimization, often outperforming XML on big genealogical sets.
+**Common Pitfalls**  
+- If relationships are extremely multi-branch or dynamic, some might prefer a graph database (like RDF triple store). But many genealogical use cases still do fine in relational.
 
-#### **Key Points**
-- By normalizing genealogical data (e.g., separate `Marriage` table), you reduce duplication.  
-- SQL is widely used and optimized for large queries.
-
-*(Alternatively, you could highlight how **RDF** addresses these same issues with flexible triple stores and SPARQL.)*
+### **Exam Tip (Key Points Summary)**  
+- A relational DB can solve the **weaknesses** of XML by reducing **redundancy** & **improving** performance on large genealogical sets.
 
 ---
 
+# **Question 3**
+
 ## **Question 3(a)**
-**What does this SPARQL query return?**  
-```
+**Context**: A SPARQL query for Wikidata:
+
+```sparql
 SELECT DISTINCT ?person
 WHERE {
   ?person wdt:P31 wd:Q5;
           wdt:P19 wd:Q60.
 }
 ```
-**[2 marks]**
+Meaning?
 
-### **Answer**
+### **Answer**  
+It returns **distinct** individuals (`?person`) who are **instance of** (`wdt:P31`) a **human** (`wd:Q5`) and have **place of birth** (`wdt:P19`) in **New York City** (`wd:Q60`).
 
-It returns all distinct individuals (`?person`) who are **instance of** (`wdt:P31`) a human (`wd:Q5`) and whose **place of birth** (`wdt:P19`) is **New York City** (`wd:Q60`).
+### **Detailed Explanation & Real-World Scenario**  
+- `wd:Q5` = “human” in Wikidata; `wd:Q60` = “New York City.”  
+- For instance, it might list persons like “Robert Downey Jr.” or “Jennifer Lopez” if their Wikidata entries have placeOfBirth = Q60.
 
-### **Detailed Explanation**
+**Common Pitfalls**  
+- If the data is incomplete (someone lacks a P19 statement), they’re missed.
 
-- **Wikidata**  
-  - `wd:Q5` is the entity ID for “human”.  
-  - `wd:Q60` is the entity ID for “New York City”.
-- **SPARQL**  
-  - `?person wdt:P31 wd:Q5` → “?person is instance of human”  
-  - `?person wdt:P19 wd:Q60` → “?person's place of birth is New York City.”
-
-#### **Key Points**
-- This query only returns IRIs (like `http://www.wikidata.org/entity/Q...`) unless you fetch labels.  
-- The `DISTINCT` ensures each person is returned once.
+### **Exam Tip (Key Points Summary)**  
+- The query yields IRIs of humans born in NYC.  
+- Must have `wdt:P31 wd:Q5` and `wdt:P19 wd:Q60` set in Wikidata.
 
 ---
 
 ## **Question 3(b)**
-**What assumptions does this query make? What data must be present?**  
-**[2 marks]**
+**Context**: The question: “What assumptions does it make? What data must be present?”
 
-### **Answer**
+### **Answer**  
+1. **Assumption**: Each matching person’s data must have `wdt:P31 wd:Q5` (human) and `wdt:P19 wd:Q60` (placeOfBirth = NYC).  
+2. **Needed**: The correct properties (P31, P19) and standard entity IDs (Q5, Q60) in the dataset.
 
-1. **Assumption**: Each person has `wdt:P31 wd:Q5` (instance of human) and `wdt:P19 wd:Q60` (place of birth is explicitly New York City).  
-2. **Data Must Be Present**: The relevant properties in Wikidata (P31, P19) must be defined for each entity. Also, New York City must specifically be identified by `wd:Q60`.
+### **Detailed Explanation & Key Points**  
+- If someone is “human” but placeOfBirth uses a different code for “New York City,” the query misses them.  
+- RDF queries require consistent property usage.
 
-### **Detailed Explanation**
-
-- If some humans in Wikidata have incomplete property definitions (e.g., no `wdt:P19`), they’re omitted.  
-- If the place of birth uses a different ID or label for NYC, they won’t match.
-
-#### **Key Points**
-- SPARQL queries rely on consistent data modeling: the correct property URIs must be present.  
-- If place of birth is only recorded as “Queens,” it might not appear if that’s not recognized as `Q60`.
+### **Exam Tip (Key Points Summary)**  
+- **Completeness**: The query depends on P31, P19 being correctly assigned.  
+- **ID consistency**: Must be `wd:Q60` for NYC.
 
 ---
 
 ## **Question 3(c)**
-**How does this query differ? Does it resolve assumptions from (b)?**  
-```
+**Context**: The next query uses a location path:
+```sparql
 SELECT DISTINCT ?person
 WHERE {
   ?person wdt:P31 wd:Q5;
           wdt:P19/wdt:P131* wd:Q60.
 }
 ```
-**[4 marks]**
+Does it fix assumptions from (b)?
 
-### **Answer**
+### **Answer**  
+**Yes**, it broadens the place-of-birth check to nested territories. Now “Queens” or “Brooklyn” (with `wdt:P131*` linking them to NYC) are included.
 
-- **Difference**: It uses a path expression `wdt:P19/wdt:P131* wd:Q60` to allow multiple admin divisions leading to NYC.  
-- **Resolves**: This helps if the place of birth is not directly `Q60` but nested (e.g., “Queens” within NYC).
+### **Detailed Explanation & Key Points**  
+- `wdt:P19/wdt:P131*` means “placeOfBirth” then zero or more `locatedIn` steps until eventually `Q60` (NYC).  
+- This resolves the direct match assumption, capturing sub-entities of NYC.
 
-### **Detailed Explanation**
-
-- **wdt:P131*:** Zero or more steps of administrative territory.  
-- This captures people whose birth location is a sub-entity of NYC.
-
-#### **Key Points**
-- This query is more **flexible** for hierarchical location data.  
-- Overcomes the assumption that P19 must be *exactly* `Q60`.
+### **Exam Tip (Key Points Summary)**  
+- **Path expression** lets you match “X is inside Y which is inside New York City.”  
+- More flexible than a direct `wdt:P19 wd:Q60`.
 
 ---
 
 ## **Question 3(d)**
-**Why aren’t the results human-readable?**  
-**[1 mark]**
+**Context**: The results aren’t human‐readable. Why not?
 
-### **Answer**
+### **Answer**  
+Because SPARQL returns entity IRIs (e.g., `http://www.wikidata.org/entity/Q...`) by default, not plain English labels.
 
-They return entity URIs (like `http://www.wikidata.org/entity/Q12345`) instead of labels. Without pulling `rdfs:label` or `?label`, you see IDs, not real names.
+### **Detailed Explanation & Key Points**  
+- Linked data typically references everything by URIs.  
+- You must fetch `rdfs:label` or use `wikibase:label` to get user-friendly names.
 
-### **Detailed Explanation**
-
-- SPARQL returns the IRIs for each matching resource by default.  
-- You must explicitly request labels from the triple store or a label service to see something like “John Smith” instead of `wd:Q9876`.
-
-#### **Key Points**
-- Linked data often uses IRIs internally.  
-- Always fetch labels for user-friendly output.
+### **Exam Tip (Key Points Summary)**  
+- If you want “John Smith” instead of `wd:Q98765`, query the label property or use the label service.
 
 ---
 
 ## **Question 3(e)**
-**How to rewrite (c) for more readable output?**  
-**[5 marks]**
+**Context**: Rewriting the query in (c) to get more readable labels.
 
-### **Answer**
-
-Use label retrieval. For generic RDF:
-
+### **Answer**  
+**Generic RDF**:
 ```sparql
 SELECT DISTINCT ?person ?personLabel
 WHERE {
@@ -311,8 +278,7 @@ WHERE {
 }
 ```
 
-For **Wikidata** specifically, you can do:
-
+**Wikidata** approach:
 ```sparql
 SELECT DISTINCT ?person ?personLabel
 WHERE {
@@ -322,71 +288,55 @@ WHERE {
 }
 ```
 
-### **Detailed Explanation**
+### **Detailed Explanation & Key Points**  
+- `rdfs:label` is standard in RDF.  
+- In Wikidata, `SERVICE wikibase:label` automatically retrieves labels in the requested language.
 
-- **rdfs:label** is the standard RDF property for readable names.  
-- **Wikibase** has a built-in label service.
-
-#### **Key Points**
-- Using labels is crucial for user-friendly results.  
-- The `SERVICE` block for Wikidata automates label fetching.
+### **Exam Tip (Key Points Summary)**  
+- By retrieving labels, results become user-friendly (“Jennifer Lopez” vs. QID).  
+- The `SERVICE` block is unique to Wikidata.
 
 ---
 
 ## **Question 3(f)**
-**Compare IMDB’s approach vs. Wikidata’s approach for place-of-birth queries.**  
-**[6 marks]**
+**Context**: Compare how IMDB does place-of-birth vs. Wikidata approach.
 
-### **Answer**
+### **Answer**  
+- **IMDB**: specialized in movies, typically offers a web interface but not a robust public SPARQL-like endpoint.  
+- **Wikidata**: broad linked data, open SPARQL endpoint, easy to query place-of-birth for any entity.
 
-- **IMDB**: Specialized in movies/actors. However, place-of-birth–based queries are not always exposed in an open API, so it’s less flexible for programmatic use.  
-- **Wikidata**: A broad knowledge graph offering open SPARQL endpoints. Place-of-birth queries are straightforward with no domain-specific limitations.
+### **Detailed Explanation & Key Points**  
+- IMDB is proprietary; you can look up “Born in New York City” but not as flexible if you want a large, custom query.  
+- Wikidata is open, flexible, but may be less detailed on certain film/TV data.
 
-### **Detailed Explanation**
-
-- **IMDB** is great for detailed film/TV data. But if their web interface or limited API doesn’t provide direct place-of-birth queries, you’re restricted.  
-- **Wikidata** is open, with a flexible SPARQL interface for arbitrary queries (including place of birth, date, etc.).
-
-#### **Key Points**
-- IMDB → specialized domain, but closed.  
-- Wikidata → broad domain, open SPARQL for complex cross-domain queries.
+### **Exam Tip (Key Points Summary)**  
+- IMDB → domain-specific, partial or no open API for advanced queries.  
+- Wikidata → open, general knowledge with full SPARQL.
 
 ---
 
 ## **Question 3(g)**
-**IMDB has specialized movie data not in Wikidata. How to combine strengths?**  
-**[4 marks]**
+**Context**: IMDB specialized data + Wikidata approach. How to combine?
 
-### **Answer**
+### **Answer**  
+Use **cross‐references**: IMDB IDs in Wikidata link the same entity (actor/film). Possibly do a **federated** approach: gather general facts from Wikidata, then fetch specialized movie info from IMDB.
 
-- **Link Entities**: Use IMDB IDs (often stored in Wikidata) to cross-reference actors or films.  
-- **Federated Queries**: Possibly do a two-step approach: fetch general info from Wikidata, then fetch specialized data from IMDB’s (partial) API or scraping.
+### **Detailed Explanation & Key Points**  
+- Many Wikidata entries store `P345` (IMDB ID).  
+- This bridging yields deeper info than either source alone.  
+- E.g., for an actor, get birth info from Wikidata, filmography from IMDB.
 
-### **Detailed Explanation**
-
-- If a film or actor has an IMDB ID in Wikidata, you can match them.  
-- Then you can gather extra details from IMDB (like box office, crew roles) that Wikidata may lack.
-
-#### **Key Points**
-- Data integration → synergy between broad linked data (Wikidata) and specialized DB (IMDB).  
-- Must handle differences in data formats and coverage.
+### **Exam Tip (Key Points Summary)**  
+- Link across both platforms using shared IDs.  
+- Gains breadth (Wikidata) + depth (IMDB).
 
 ---
 
 ## **Question 3(h)**
-**How to represent query (b) in a relational model?**  
-**[2 marks]**
+**Context**: The query in (b) but using a **relational** model.
 
-### **Answer**
-
-Use a **triple table** design:
-
-| Subject     | Predicate       | Object        |
-|-------------|-----------------|---------------|
-| Person123   | instanceOf      | Human         |
-| Person123   | placeOfBirth    | New York City |
-
-**Comparable SQL**:
+### **Answer**  
+Use a **triple table** (Subject, Predicate, Object) and do:
 
 ```sql
 SELECT DISTINCT t1.Subject
@@ -398,194 +348,185 @@ WHERE t1.Predicate = 'instanceOf'
   AND t2.Object = 'New York City';
 ```
 
-### **Detailed Explanation**
+### **Detailed Explanation & Key Points**  
+- **Subject** is like `?person`, `Predicate` is `wdt:P31`, and `Object` is `wd:Q5` if storing string equivalents.  
+- The join ensures the same Subject satisfies both conditions.
 
-- The triple table has 3 columns: (Subject, Predicate, Object).  
-- We do a self-join to ensure *both* conditions match for the same Subject.
-
-#### **Key Points**
-- This approach mimics RDF in a relational DB.  
-- Not as direct as SPARQL but fully feasible.
+### **Exam Tip (Key Points Summary)**  
+- “Triple table” method replicates RDF in an RDB.  
+- Self‐join to find entries that satisfy two conditions.
 
 ---
 
 ## **Question 3(i)**
-**How to approach the version in (c) in SQL?**  
-**[4 marks]**
+**Context**: The version in (c) used a property path. In SQL, we might replicate that with more joins or recursion.
 
-### **Answer**
-
-Similarly, we’d rely on storing hierarchical place data in multiple triples. Then:
+### **Answer**  
+You’d store each location step in the triple table, then do multiple self-joins or a recursive CTE to track the path from sub-location up to NYC.
 
 ```sql
 SELECT DISTINCT t1.Subject
 FROM TripleTable t1
 JOIN TripleTable t2 ON t1.Subject = t2.Subject
 JOIN TripleTable t3 ON t2.Object = t3.Subject
-WHERE t1.Predicate = 'instanceOf'
-  AND t1.Object = 'Human'
-  AND t2.Predicate = 'placeOfBirth'
-  AND t3.Predicate = 'locatedIn'
-  AND t3.Object = 'New York City';
+...
 ```
+(etc.)
 
-*(One possible approach—exact structure depends on how “P131*” is modeled.)*
+### **Explanation & Key Points**  
+- The `P131*` path means indefinite administrative territory steps. In SQL, you’d do repeated or recursive queries to handle multiple “locatedIn” relationships.  
+- More complex than a direct match.
 
-### **Detailed Explanation**
-
-- We simulate the path `P19/wdt:P131*` by linking place-of-birth to a chain of “locatedIn” relationships leading to “New York City.”
-
-#### **Key Points**
-- More complicated joins if we have multiple layers of location.  
-- Could require recursion or repeated self-joins for deeper hierarchies.
+### **Exam Tip (Key Points Summary)**  
+- It’s doable in SQL but more complex than SPARQL’s built-in `*` operator.  
+- Potentially a “recursive CTE” approach for indefinite depth.
 
 ---
 
+# **Question 4**
+
 ## **Question 4(a)**
-**Which queries from i–vi can be answered by the given model?**  
-**[3 marks]**
+**Context**: We have a hospital/hospitality E/R diagram. Which of the six subquestions can we answer?
 
-### **Answer**
+### **Answer**  
+Likely these three:
 
-Likely these can be answered:
+1. **Which building did Neha Ahuja stay in?**  
+2. **Which hospital was responsible for Neha’s stay?**  
+3. **In which wards are Orthopedics patients housed?**
 
-1. *Which building did Neha Ahuja stay in?*  
-2. *Which hospital was responsible for Neha’s stay?*  
-3. *In which wards are Orthopedics patients housed?*
+### **Detailed Explanation & Key Points**  
+- Because the model shows Patient–Ward–Building–Hospital relationships, we can trace a patient to a building/hospital.  
+- If Orthopedics is a department linked to wards, we can see which wards they occupy.
 
-### **Detailed Explanation**
-
-- The E/R shows Patient–Ward–Building–Hospital relationships, so you can track which building a ward is in, and which hospital runs that building.  
-- The model includes Departments for Orthopedics.
-
-#### **Key Points**
-- If we have “Doctor–Patient” or “Ward–Department” links, we can find wards for certain departments.  
-- Questions about which doctor treated whom might need extra relationships.
+### **Exam Tip (Key Points Summary)**  
+- The other subquestions might need extra links (like “Which doctor treated Neha?”) if not present in the model.
 
 ---
 
 ## **Question 4(b)**
-**Which part cannot be implemented in the relational model? How to resolve?**  
-**[3 marks]**
+**Context**: Part of the model that can’t be done directly in relational form. Typically the many-to-many.
 
-### **Answer**
+### **Answer**  
+- The many-to-many **Doctor ↔ Department** must be resolved via a **junction table** (e.g., `Doctor_Department`).  
+- The **StayIn** relationship with arrival/departure dates might be simplified to a single table or bridging table.
 
-- The many-to-many link between **Doctor** and **Department** requires an **associative table**.  
-- For **StayIn** (arrived/departed), we might move those attributes to the bridging entity linking Patient and Ward.
+### **Detailed Explanation & Key Points**  
+- Relational DBs require an **associative entity** for M:N. E.g., `Doctor_Department(DoctorID, DeptID)`.  
+- If “StayIn” had extra attributes (arrivalDate, departureDate), place them in a bridging table like `PatientWardStay`.
 
-### **Detailed Explanation**
-
-- Many-to-many relationships in a relational DB demand an intermediary table (e.g., `Doctor_Department`).  
-- For one-to-many with extra attributes (like arrival/departure dates), you put them in the “join” or “association” table.
-
-#### **Key Points**
-- Always handle M:N in RDB with an intersection table.  
-- Extra attributes on a relationship usually go in that intersection table or in a direct “is-staying” table.
+### **Exam Tip (Key Points Summary)**  
+- M:N = bridging table.  
+- Relationship attributes → store them in that bridging table.
 
 ---
 
 ## **Question 4(c)**
-**Adapt the model so that (a) and (b) are resolved, with cardinalities.**  
-**[10 marks]**
+**Context**: Adapt the model so everything is resolved, plus cardinalities.
 
-### **Answer**
+### **Answer**  
+A typical revised design:
 
-1. **Create a “Doctor_Department”** table for the M:N link.  
-2. **Include** arrival/departure dates in “PatientWardStay” if needed.
+1. **Hospital**(HospitalID PK)  
+2. **Building**(BuildingID PK, HospitalID FK)  
+3. **Ward**(WardID PK, BuildingID FK)  
+4. **Department**(DeptID PK)  
+5. **Doctor**(DoctorID PK)  
+6. **Doctor_Department**(DoctorID, DeptID) for M:N  
+7. **Patient**(PatientID PK, …)  
+8. **PatientWardStay**(PatientID, WardID, ArrivalDate, DepartureDate)
 
-**Mermaid Example**:
+**Cardinality**:  
+- Hospital 1–M Building, Building 1–M Ward, Ward 1–M PatientWardStay, etc.  
+- Doctor M–N Department.
 
-```mermaid
-erDiagram
-    Patient ||--|{ PatientWardStay : "staysIn"
-    Ward ||--|{ PatientWardStay : "holds"
-    Ward }|--|{ Department : "?"
-    Department }|--|{ Doctor : "worksIn"
-    Ward }|--|| Building : "locatedIn"
-    Building }|--|| Hospital : "runBy"
-```
-
-### **Detailed Explanation**
-
-- **One-to-many**: Hospital has many Buildings; Building has many Wards; Ward has many Patients (via PatientWardStay).  
-- **Many-to-Many**: Doctor ↔ Department.  
+### **Exam Tip (Key Points Summary)**  
+- Clear PK/FK links, bridging tables for M:N, plus a stay table for arrival/departure.
 
 ---
 
 ## **Question 4(d)**
-**List the tables and keys for an SQL implementation.**  
-**[5 marks]**
+**Context**: List the tables + keys in the SQL. No need for full fields.
 
-### **Answer**
+### **Answer**  
+1. **Hospital**(HospitalID PK)  
+2. **Building**(BuildingID PK, HospitalID FK)  
+3. **Ward**(WardID PK, BuildingID FK)  
+4. **Department**(DeptID PK)  
+5. **Doctor**(DoctorID PK)  
+6. **Doctor_Department**(DoctorID, DeptID) composite PK  
+7. **Patient**(PatientID PK)  
+8. **PatientWardStay**(PatientID, WardID) + Arrival/Departure (composite PK or separate PK)
 
-1. **Patient**(PatientID PK, Name, DOB, …)  
-2. **Ward**(WardID PK, BuildingID FK, …)  
-3. **Building**(BuildingID PK, HospitalID FK, …)  
-4. **Hospital**(HospitalID PK, Name, …)  
-5. **Department**(DeptID PK, Name, …)  
-6. **Doctor**(DoctorID PK, Name, …)  
-7. **Doctor_Department**(DoctorID FK, DeptID FK, (composite PK))  
-8. **PatientWardStay**(PatientID FK, WardID FK, ArrivalDate, DepartureDate, composite PK)
+### **Explanation & Key Points**  
+- Each table has a numeric or string PK.  
+- Associative table `Doctor_Department` handles many-to-many.  
+- `PatientWardStay` handles the “Patient stayed in which ward, from date X to date Y.”
 
-### **Detailed Explanation**
-
-- Primary keys might be numeric IDs for clarity.  
-- **Junction tables**: `Doctor_Department` for M:N, `PatientWardStay` if storing arrival/departure.
+### **Exam Tip (Key Points Summary)**  
+- Outline each table’s name and key. That’s all that’s needed here.
 
 ---
 
 ## **Question 4(e)**
-**Provide a MySQL query for each question in (a).**  
-**[6 marks]**
+**Context**: Provide MySQL queries for the subquestions in (a).
 
-### **Answer**
+### **Answer** (Samples)
 
-**1. Which building did Neha Ahuja stay in?**
-```sql
-SELECT b.Name
-FROM Patient p
-JOIN PatientWardStay pws ON p.PatientID = pws.PatientID
-JOIN Ward w ON pws.WardID = w.WardID
-JOIN Building b ON w.BuildingID = b.BuildingID
-WHERE p.Name = 'Neha Ahuja';
-```
+1. **Which building did Neha Ahuja stay in?**
+   ```sql
+   SELECT b.Name
+   FROM Patient p
+   JOIN PatientWardStay pws ON p.PatientID = pws.PatientID
+   JOIN Ward w ON pws.WardID = w.WardID
+   JOIN Building b ON w.BuildingID = b.BuildingID
+   WHERE p.Name = 'Neha Ahuja';
+   ```
 
-**2. Which hospital was responsible for Neha Ahuja’s stay?**
-```sql
-SELECT h.Name
-FROM Patient p
-JOIN PatientWardStay pws ON p.PatientID = pws.PatientID
-JOIN Ward w ON pws.WardID = w.WardID
-JOIN Building b ON w.BuildingID = b.BuildingID
-JOIN Hospital h ON b.HospitalID = h.HospitalID
-WHERE p.Name = 'Neha Ahuja';
-```
+2. **Which hospital was responsible for Neha’s stay?**
+   ```sql
+   SELECT h.Name
+   FROM Patient p
+   JOIN PatientWardStay pws ON p.PatientID = pws.PatientID
+   JOIN Ward w ON pws.WardID = w.WardID
+   JOIN Building b ON w.BuildingID = b.BuildingID
+   JOIN Hospital h ON b.HospitalID = h.HospitalID
+   WHERE p.Name = 'Neha Ahuja';
+   ```
 
-**3. In which wards are Orthopedics patients housed?**
-```sql
-SELECT DISTINCT w.Name AS WardName
-FROM Department d
-JOIN Doctor_Department dd ON d.DeptID = dd.DeptID
-JOIN Doctor doc ON dd.DoctorID = doc.DoctorID
-JOIN PatientWardStay pws ON doc.DoctorID = pws.DoctorID /* if such link exists */
-JOIN Ward w ON pws.WardID = w.WardID
-WHERE d.Name = 'Orthopedics';
-```
+3. **In which wards are Orthopedics patients housed?**
+   ```sql
+   SELECT DISTINCT w.Name AS WardName
+   FROM Department d
+   JOIN Doctor_Department dd ON d.DeptID = dd.DeptID
+   JOIN Doctor doc ON dd.DoctorID = doc.DoctorID
+   -- Possibly a link to which wards the doc visits or the doc's patients
+   ...
+   WHERE d.Name = 'Orthopedics';
+   ```
 
-*(Exact joins depend on how we link doctors to patients or wards in the schema.)*
+*(Exact logic depends on how doctors/departments tie to wards or patients in your schema.)*
+
+### **Explanation & Key Points**  
+- We rely on **multi-table** joins. Each relationship (Patient → Ward, Ward → Building, Building → Hospital) is a foreign key chain.  
+- For Orthopedics wards, you may need additional relationships that connect doctors or departments to wards.
+
+### **Exam Tip (Key Points Summary)**  
+- The key technique is **JOIN** on foreign keys.  
+- Filter by patient name or department name as needed.
 
 ---
 
 ## **Question 4(f)**
-**Would this data structure work better in a tree model (XML)? Why or why not?**  
-**[3 marks]**
+**Context**: Could a tree-based (XML) model be better than the relational approach?
 
-### **Answer**
+### **Answer**  
+Generally, **no**. Healthcare data often has many cross-links (doctor to many departments, wards to buildings, etc.). An XML tree is less suitable for these many-to-many relationships.
 
-**No**, because there are many **many-to-many** relationships (doctors ↔ departments) and frequent cross-links (one building to one hospital, multiple wards, etc.). XML’s strictly hierarchical nature is less ideal for such complex interconnections. A relational or graph approach is better.
+### **Detailed Explanation & Key Points**  
+- XML is good for hierarchical data but struggles with repeating or cross-linked relationships.  
+- A relational or graph-based model handles such complexity more gracefully.
 
-### **Detailed Explanation**
-
-- **XML** thrives with **strict** parent-child data. But healthcare data often has cross-cutting relationships (e.g., a doctor belongs to multiple departments, a ward is in a building that belongs to a hospital, etc.).  
-- **Relational** or **Graph**: They handle these cross-links more naturally.
+### **Exam Tip (Key Points Summary)**  
+- For multi-relationship hospital data, relational is often more efficient and simpler than a purely hierarchical XML approach.
 
