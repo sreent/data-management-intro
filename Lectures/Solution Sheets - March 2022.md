@@ -1,6 +1,3 @@
-Below is a **revised and polished** version of the solution set for the **attached exam questions**, covering **Questions 2, 3, and 4**. Each answer is paired with **Detailed Explanations**, **Key Points**, and **Practical Use Cases**, making it more readable and aligned with best practices.
-
----
 
 ## **Question 2(a)**
 **Give two examples of element names and two examples of attribute names from the provided code.**  
@@ -592,8 +589,3 @@ WHERE d.Name = 'Orthopedics';
 - **XML** thrives with **strict** parent-child data. But healthcare data often has cross-cutting relationships (e.g., a doctor belongs to multiple departments, a ward is in a building that belongs to a hospital, etc.).  
 - **Relational** or **Graph**: They handle these cross-links more naturally.
 
----
-
-## **End of Revised Solution Set**
-
-Each **answer** includes an explanation of **why** it is correct, references to real-world usage, potential pitfalls, and key takeaways—making the material clearer and more instructive. Feel free to adapt lengths or details to match the desired exam or assignment style.
