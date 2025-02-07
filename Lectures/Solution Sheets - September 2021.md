@@ -655,12 +655,10 @@ Write a single SQL query to find **how many species** are housed in the **zoo na
 
 ### **Correct Answer**
 ```sql
-SELECT COUNT(DISTINCT s.SpeciesName) AS SpeciesCount
+SELECT COUNT(DISTINCT a.SpeciesName) AS SpeciesCount
 FROM Animal a
 JOIN Enclosure e ON a.EnclosureName = e.EnclosureName
-JOIN Zoo z ON e.ZooName = z.ZooName
-JOIN Species s ON a.Species = s.SpeciesName
-WHERE z.ZooName = 'Singapore Zoo';
+WHERE e.ZooName = 'Singapore Zoo';
 ```
 
 ---
@@ -670,7 +668,7 @@ WHERE z.ZooName = 'Singapore Zoo';
   1. `Animal` → `Enclosure` on `EnclosureName`.  
   2. `Enclosure` → `Zoo` on `ZooName`.  
   3. `Animal` → `Species` on `SpeciesName`.  
-- **Filtering by Zoo:** `WHERE z.ZooName = 'Singapore Zoo'`.  
+- **Filtering by Zoo:** `WHERE e.ZooName = 'Singapore Zoo'`.  
 - **Counting Distinct Species:** `COUNT(DISTINCT …)` ensures each species is only counted once.
 
 ### **Real-World Scenario Connection**
@@ -700,12 +698,11 @@ Write a single SQL query to find the **date of birth** of the **oldest animal** 
 
 ### **Correct Answer**
 ```sql
-SELECT z.ZooName, MIN(a.DateOfBirth) AS OldestDateOfBirth
+SELECT e.ZooName, MIN(a.DateOfBirth) AS OldestDateOfBirth
 FROM Animal a
 JOIN Enclosure e ON a.EnclosureName = e.EnclosureName
-JOIN Zoo z ON e.ZooName = z.ZooName
 WHERE a.Species = 'Buceros bicornis'
-GROUP BY z.ZooName;
+GROUP BY e.ZooName;
 ```
 
 ---
