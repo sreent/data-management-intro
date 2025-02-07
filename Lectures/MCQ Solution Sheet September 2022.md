@@ -266,6 +266,32 @@ In a film/TV database, queries by birth date must use **Mongo’s `$lt`** operat
 ### **Short Answer Summary**
 - Use `$lt` with `ISODate(...)` for date comparisons in MongoDB.
 
+### Why `findOne` is also correct?
+
+Because **the exam question focuses on *syntax* correctness and using the right comparison operator** rather than on retrieving *all* matching documents, `findOne` is still considered **“correct”** as a MongoDB query. In other words, **it successfully searches** for an actor born before 1957 (and returns the first match).
+
+- **Syntactically**:  
+  ```js
+  db.actors.findOne({
+    "dateOfBirth": { $lt: ISODate("1957-01-01") }
+  });
+  ```
+  is perfectly valid MongoDB syntax—no errors, `$lt` is used properly, and `ISODate` is in the right format.
+
+- **Semantically**:  
+  - `findOne(...)` returns only the first document that meets the condition, whereas `find(...)` returns all matching documents.  
+  - Even though you only get one actor (instead of all), it is still a **successful search** in that it correctly applies the `$lt: ISODate(…)` condition.  
+
+**Hence,** for the purposes of the exam question (which asked “Which query is *likely* to represent a successful MongoDB search for actors born before 1957?”), **both**:
+```js
+db.actors.findOne({ "dateOfBirth": { $lt: ISODate("1957-01-01") } })
+```
+and
+```js
+db.actors.find({ "dateOfBirth": { $lt: ISODate("1957-01-01") } })
+```
+are considered “correct” *syntax* for searching before 1957. The difference is purely **how many matches** they return—**one** versus **many**—but **both** queries *“work”* in the sense of using proper operators/format and retrieving actors with `dateOfBirth < 1957-01-01`.
+
 ---
 
 # **Question 1(j)**
