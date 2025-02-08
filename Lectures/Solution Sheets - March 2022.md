@@ -534,7 +534,6 @@ erDiagram
     Doctor_Department {
         string doctorName
         string departmentName
-        string hospitalName
     }
 
     %% Relationships
