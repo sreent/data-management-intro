@@ -578,7 +578,7 @@ Assuming we rely on existing *natural* attributes (Name, etc.) as PKs:
    - Address, etc.  
 
 3. **Ward**  
-   - **(Name, BuildingName, HospitalName)** (composite PK)  
+   - **(Name, BuildingName)** (composite PK)  
    - Possibly a “DeptName” if it belongs to one department, or bridging if multiple.  
 
 4. **Patient**  
@@ -586,7 +586,7 @@ Assuming we rely on existing *natural* attributes (Name, etc.) as PKs:
    - Name, DoB  
 
 5. **PatientWardStay** (handles “staysIn” plus arrival/departure)  
-   - **(PatientID, WardName, BuildingName, HospitalName)** (composite PK)  
+   - **(PatientID, WardName)** (composite PK)  
    - arrived, departed  
    - FKs referencing Patient, Ward’s composite key  
 
@@ -597,8 +597,8 @@ Assuming we rely on existing *natural* attributes (Name, etc.) as PKs:
    - **Name** (PK)  
 
 8. **Doctor_Department** (for the m..n “worksAt”)  
-   - **(DoctorName, NameOfDept, HospitalName)** as composite PK  
-   - FKs to Doctor(Name) and Department(Name, HospitalName)  
+   - **(DoctorName, NameOfDept)** as composite PK  
+   - FKs to Doctor(Name) and Department(Name)  
 
 *(If each **Ward** is assigned a single department, you can store `DeptName, HospitalName` as an FK in **Ward**. If wards can have multiple, add a bridging `Ward_Department`.)*
 
@@ -608,28 +608,21 @@ Assuming we rely on existing *natural* attributes (Name, etc.) as PKs:
 
 **(i) Which building did the patient named Neha Ahuja stay in?**
 ```sql
-SELECT b.Name
+SELECT w.BuildingName
 FROM Patient p
 JOIN PatientWardStay pws ON p.ID = pws.PatientID
-JOIN Ward w ON (w.Name = pws.WardName
-                AND w.BuildingName = pws.BuildingName
-                AND w.HospitalName = pws.HospitalName)
-JOIN Building b ON (b.Name = w.BuildingName
-                    AND b.HospitalName = w.HospitalName)
+JOIN Ward w ON w.Name = pws.WardName
 WHERE p.Name = 'Neha Ahuja';
 ```
 
 **(ii) Which hospital was responsible for Neha Ahuja’s stay?**
 ```sql
-SELECT h.Name
+SELECT b.HospitalName
 FROM Patient p
 JOIN PatientWardStay pws ON p.ID = pws.PatientID
 JOIN Ward w ON (w.Name = pws.WardName
-                AND w.BuildingName = pws.BuildingName
-                AND w.HospitalName = pws.HospitalName)
-JOIN Building b ON (b.Name = w.BuildingName
-                    AND b.HospitalName = w.HospitalName)
-JOIN Hospital h ON h.Name = b.HospitalName
+                AND w.BuildingName = pws.BuildingName)
+JOIN Building b ON b.Name = w.BuildingName
 WHERE p.Name = 'Neha Ahuja';
 ```
 
@@ -646,14 +639,12 @@ WHERE d.Name = 'Orthopedics';
 
 **(iv) Which hospitals does the doctor Song Ci work in?**
 ```sql
-SELECT DISTINCT h.Name
+SELECT DISTINCT d.HospitalName
 FROM Doctor doc
 JOIN Doctor_Department dd 
    ON doc.Name = dd.doctorName
 JOIN Department d 
-   ON (d.Name = dd.departmentName AND d.HospitalName = dd.hospitalName)
-JOIN Hospital h 
-   ON h.Name = d.HospitalName
+   ON d.Name = dd.departmentName
 WHERE doc.Name = 'Song Ci';
 ```
 
@@ -667,20 +658,4 @@ WHERE b.Name = 'The Alexander Fleming Building';
 ```
 
 **(vi) Which doctor treated Neha Ahuja?**
-- Possibly if doctors are assigned to wards (or a bridging `Ward_Doctor`). Then:
-```sql
-SELECT doc.Name
-FROM Patient p
-JOIN PatientWardStay pws ON p.ID = pws.PatientID
-JOIN Ward w ON (pws.WardName = w.Name 
-                AND pws.BuildingName = w.BuildingName
-                AND pws.HospitalName = w.HospitalName)
-JOIN Ward_Doctor wd 
-   ON (wd.WardName = w.Name AND wd.BuildingName = w.BuildingName 
-       AND wd.HospitalName = w.HospitalName)
-JOIN Doctor doc 
-   ON doc.Name = wd.DoctorName
-WHERE p.Name = 'Neha Ahuja';
-```
-*(Or if “treatment” is a separate bridging entirely, it would be similar logic.)*
-
+- We will need to establish a M:N relationship between doctors and patients.
