@@ -441,10 +441,6 @@ WHERE t1.Predicate = 'instanceOf'
 
 ---
 
-Below is a **fully revised solution** for **Question 4**, including an **ER diagram in Mermaid** (showing how we resolve the “staysIn” attributes and many-to-many doctor–department relationships) **without inventing new attributes** beyond those in the original diagram.
-
----
-
 # **Question 4: Hospital Database Model**
 
 A health organization is designing a database to keep track of **doctors**, **hospitals**, and **patients**. Each **patient** stays in a **ward** (with arrival/departure dates), each ward is in a **building**, and each building is run by a **hospital**. Also, **departments** belong to a hospital, and doctors can work in multiple departments. We want to cover the sub-questions (a)–(e):
@@ -531,8 +527,6 @@ erDiagram
     PatientWardStay {
         int patientID
         string wardName
-        string buildingName
-        string hospitalName
         date arrived
         date departed
     }
