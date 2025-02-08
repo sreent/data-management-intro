@@ -441,151 +441,253 @@ WHERE t1.Predicate = 'instanceOf'
 
 ---
 
-## **Question 4(a)**
-**Which queries from i–vi can be answered by the given model?**  
-**[3 marks]**
-
-### **Answer**
-
-Likely these can be answered:
-
-1. *Which building did Neha Ahuja stay in?*  
-2. *Which hospital was responsible for Neha’s stay?*  
-3. *In which wards are Orthopedics patients housed?*
-
-### **Detailed Explanation**
-
-- The E/R shows Patient–Ward–Building–Hospital relationships, so you can track which building a ward is in, and which hospital runs that building.  
-- The model includes Departments for Orthopedics.
-
-#### **Key Points**
-- If we have “Doctor–Patient” or “Ward–Department” links, we can find wards for certain departments.  
-- Questions about which doctor treated whom might need extra relationships.
+Below is a **fully revised solution** for **Question 4**, including an **ER diagram in Mermaid** (showing how we resolve the “staysIn” attributes and many-to-many doctor–department relationships) **without inventing new attributes** beyond those in the original diagram.
 
 ---
 
-## **Question 4(b)**
-**Which part cannot be implemented in the relational model? How to resolve?**  
-**[3 marks]**
+# **Question 4: Hospital Database Model**
 
-### **Answer**
-
-- The many-to-many link between **Doctor** and **Department** requires an **associative table**.  
-- For **StayIn** (arrived/departed), we might move those attributes to the bridging entity linking Patient and Ward.
-
-### **Detailed Explanation**
-
-- Many-to-many relationships in a relational DB demand an intermediary table (e.g., `Doctor_Department`).  
-- For one-to-many with extra attributes (like arrival/departure dates), you put them in the “join” or “association” table.
-
-#### **Key Points**
-- Always handle M:N in RDB with an intersection table.  
-- Extra attributes on a relationship usually go in that intersection table or in a direct “is-staying” table.
+A health organization is designing a database to keep track of **doctors**, **hospitals**, and **patients**. Each **patient** stays in a **ward** (with arrival/departure dates), each ward is in a **building**, and each building is run by a **hospital**. Also, **departments** belong to a hospital, and doctors can work in multiple departments. We want to cover the sub-questions (a)–(e):
 
 ---
 
-## **Question 4(c)**
-**Adapt the model so that (a) and (b) are resolved, with cardinalities.**  
-**[10 marks]**
+## **(a) Which questions could be answered by this model?**
 
-### **Answer**
+1. **(i)** Which building did the patient named Neha Ahuja stay in?  
+   - Path: **Patient** → “staysIn” → **Ward** → **Building**  
 
-1. **Create a “Doctor_Department”** table for the M:N link.  
-2. **Include** arrival/departure dates in “PatientWardStay” if needed.
+2. **(ii)** Which hospital was responsible for Neha Ahuja’s stay?  
+   - Then further: **Ward** → **Building** → **Hospital**  
 
-**Mermaid Example**:
+3. **(iii)** In which wards are Orthopedics patients housed?  
+   - Must link **Ward** ↔ **Department** or have some departmental concept for the ward (see adapted model).
+
+4. **(iv)** Which hospitals does the doctor Song Ci work in?  
+   - Must handle the many–many from **Doctor** to **Department** and link **Department** → **Hospital**.
+
+5. **(v)** What departments does the hospital have that contains a building called ‘The Alexander Fleming Building’?  
+   - After linking **Building** → **Hospital**, we check **Department** (which belongs to that same hospital).
+
+6. **(vi)** Which doctor treated Neha Ahuja?  
+   - Not trivially shown in the original diagram; we might define how doctors and patients link. Possibly by a bridging table or by a “Ward→Doctor” link if the doctor in that ward treats the patients in it.
+
+Hence the original model must be *slightly adapted* to store relationship attributes (arrival/departure) and handle many–many or “treatedBy” relationships.
+
+---
+
+## **(b) The part that cannot be straightforwardly implemented**
+
+Two main issues in the original E/R for a standard relational approach:
+
+1. **Attributes (arrived, departed) on the “staysIn” relationship**  
+   - A relationship with attributes is best turned into a bridging entity (`PatientWardStay`).
+
+2. **Many–Many** from Doctor to Department  
+   - The original E/R shows `worksAt` with cardinality m..n. In a relational model, that also requires a bridging table.
+
+We fix them by introducing associative/bridge tables—**no brand-new random attributes** needed.
+
+---
+
+## **(c) Adapted Model (with Cardinalities) in an ER Diagram**
+
+Below is a **Mermaid** diagram reflecting the final structure. We keep the existing attributes (like `Name` for building/hospital/doctor, `ID` for patient) and avoid new ID fields for other entities. We do bridging for “staysIn” (with arrived/departed) and “worksAt” many–many:
 
 ```mermaid
 erDiagram
+
+    Patient {
+        int ID
+        string Name
+        date DoB
+    }
+
+    Ward {
+        string Name
+        string BuildingName
+        string HospitalName
+    }
+
+    Building {
+        string Name
+        string Address
+        string HospitalName
+    }
+
+    Hospital {
+        string Name
+        string Address
+    }
+
+    Department {
+        string Name
+        string HospitalName
+    }
+
+    Doctor {
+        string Name
+    }
+
+    PatientWardStay {
+        int patientID
+        string wardName
+        string buildingName
+        string hospitalName
+        date arrived
+        date departed
+    }
+
+    Doctor_Department {
+        string doctorName
+        string departmentName
+        string hospitalName
+    }
+
+    %% Relationships
+
     Patient ||--|{ PatientWardStay : "staysIn"
-    Ward ||--|{ PatientWardStay : "holds"
-    Ward }|--|{ Department : "?"
-    Department }|--|{ Doctor : "worksIn"
+    PatientWardStay }|--|| Ward : "isFor"
+
     Ward }|--|| Building : "locatedIn"
     Building }|--|| Hospital : "runBy"
+
+    Department }|--|| Hospital : "partOf" 
+    Doctor ||--|{ Doctor_Department : "worksAt"
+    Doctor_Department }|--|| Department : "belongsTo"
+
 ```
 
-### **Detailed Explanation**
+### Explanation of the Diagram
 
-- **One-to-many**: Hospital has many Buildings; Building has many Wards; Ward has many Patients (via PatientWardStay).  
-- **Many-to-Many**: Doctor ↔ Department.  
+- **PatientWardStay** bridges `Patient` ↔ `Ward`, storing `arrived` and `departed`.  
+- **Doctor_Department** bridges `Doctor` ↔ `Department`.  
+- **Ward** references **Building** plus **Hospital** by name.  
+- **Building** references a single **Hospital**.  
+- **Department** references a single **Hospital**.  
 
----
+Now we can handle:
 
-## **Question 4(d)**
-**List the tables and keys for an SQL implementation.**  
-**[5 marks]**
-
-### **Answer**
-
-1. **Patient**(PatientID PK, Name, DOB, …)  
-2. **Ward**(WardID PK, BuildingID FK, …)  
-3. **Building**(BuildingID PK, HospitalID FK, …)  
-4. **Hospital**(HospitalID PK, Name, …)  
-5. **Department**(DeptID PK, Name, …)  
-6. **Doctor**(DoctorID PK, Name, …)  
-7. **Doctor_Department**(DoctorID FK, DeptID FK, (composite PK))  
-8. **PatientWardStay**(PatientID FK, WardID FK, ArrivalDate, DepartureDate, composite PK)
-
-### **Detailed Explanation**
-
-- Primary keys might be numeric IDs for clarity.  
-- **Junction tables**: `Doctor_Department` for M:N, `PatientWardStay` if storing arrival/departure.
+- (iii) Orthopedics wards, if each **Ward** references exactly one **Department** (or you do a bridging Ward_Department if multiple).  
+- (vi) “treatedBy” if a doctor is assigned to that ward or a separate bridging table.
 
 ---
 
-## **Question 4(e)**
-**Provide a MySQL query for each question in (a).**  
-**[6 marks]**
+## **(d) Tables & Keys (SQL Implementation)**
 
-### **Answer**
+Assuming we rely on existing *natural* attributes (Name, etc.) as PKs:
 
-**1. Which building did Neha Ahuja stay in?**
+1. **Hospital**  
+   - **Name** (PK)  
+   - Address, etc.  
+
+2. **Building**  
+   - **(Name, HospitalName)** (composite PK)  
+   - Address, etc.  
+
+3. **Ward**  
+   - **(Name, BuildingName, HospitalName)** (composite PK)  
+   - Possibly a “DeptName” if it belongs to one department, or bridging if multiple.  
+
+4. **Patient**  
+   - **ID** (PK)  
+   - Name, DoB  
+
+5. **PatientWardStay** (handles “staysIn” plus arrival/departure)  
+   - **(PatientID, WardName, BuildingName, HospitalName)** (composite PK)  
+   - arrived, departed  
+   - FKs referencing Patient, Ward’s composite key  
+
+6. **Department**  
+   - **(Name, HospitalName)** (composite PK)  
+
+7. **Doctor**  
+   - **Name** (PK)  
+
+8. **Doctor_Department** (for the m..n “worksAt”)  
+   - **(DoctorName, NameOfDept, HospitalName)** as composite PK  
+   - FKs to Doctor(Name) and Department(Name, HospitalName)  
+
+*(If each **Ward** is assigned a single department, you can store `DeptName, HospitalName` as an FK in **Ward**. If wards can have multiple, add a bridging `Ward_Department`.)*
+
+---
+
+## **(e) Sample MySQL Queries**
+
+**(i) Which building did the patient named Neha Ahuja stay in?**
 ```sql
 SELECT b.Name
 FROM Patient p
-JOIN PatientWardStay pws ON p.PatientID = pws.PatientID
-JOIN Ward w ON pws.WardID = w.WardID
-JOIN Building b ON w.BuildingID = b.BuildingID
+JOIN PatientWardStay pws ON p.ID = pws.PatientID
+JOIN Ward w ON (w.Name = pws.WardName
+                AND w.BuildingName = pws.BuildingName
+                AND w.HospitalName = pws.HospitalName)
+JOIN Building b ON (b.Name = w.BuildingName
+                    AND b.HospitalName = w.HospitalName)
 WHERE p.Name = 'Neha Ahuja';
 ```
 
-**2. Which hospital was responsible for Neha Ahuja’s stay?**
+**(ii) Which hospital was responsible for Neha Ahuja’s stay?**
 ```sql
 SELECT h.Name
 FROM Patient p
-JOIN PatientWardStay pws ON p.PatientID = pws.PatientID
-JOIN Ward w ON pws.WardID = w.WardID
-JOIN Building b ON w.BuildingID = b.BuildingID
-JOIN Hospital h ON b.HospitalID = h.HospitalID
+JOIN PatientWardStay pws ON p.ID = pws.PatientID
+JOIN Ward w ON (w.Name = pws.WardName
+                AND w.BuildingName = pws.BuildingName
+                AND w.HospitalName = pws.HospitalName)
+JOIN Building b ON (b.Name = w.BuildingName
+                    AND b.HospitalName = w.HospitalName)
+JOIN Hospital h ON h.Name = b.HospitalName
 WHERE p.Name = 'Neha Ahuja';
 ```
 
-**3. In which wards are Orthopedics patients housed?**
+**(iii) In which wards are Orthopedics patients housed?**
+- If each ward is dedicated to one department:
 ```sql
-SELECT DISTINCT w.Name AS WardName
-FROM Department d
-JOIN Doctor_Department dd ON d.DeptID = dd.DeptID
-JOIN Doctor doc ON dd.DoctorID = doc.DoctorID
-JOIN PatientWardStay pws ON doc.DoctorID = pws.DoctorID /* if such link exists */
-JOIN Ward w ON pws.WardID = w.WardID
+SELECT w.Name AS WardName
+FROM Ward w
+JOIN Department d 
+  ON (w.DeptName = d.Name AND w.HospitalName = d.HospitalName)
 WHERE d.Name = 'Orthopedics';
 ```
+- Or if bridging `Ward_Department`, adapt similarly.
 
-*(Exact joins depend on how we link doctors to patients or wards in the schema.)*
+**(iv) Which hospitals does the doctor Song Ci work in?**
+```sql
+SELECT DISTINCT h.Name
+FROM Doctor doc
+JOIN Doctor_Department dd 
+   ON doc.Name = dd.doctorName
+JOIN Department d 
+   ON (d.Name = dd.departmentName AND d.HospitalName = dd.hospitalName)
+JOIN Hospital h 
+   ON h.Name = d.HospitalName
+WHERE doc.Name = 'Song Ci';
+```
 
----
+**(v) Which departments does the hospital have that contains a building called ‘The Alexander Fleming Building’?**
+```sql
+SELECT d.Name
+FROM Building b
+JOIN Hospital h ON (b.HospitalName = h.Name)
+JOIN Department d ON (d.HospitalName = h.Name)
+WHERE b.Name = 'The Alexander Fleming Building';
+```
 
-## **Question 4(f)**
-**Would this data structure work better in a tree model (XML)? Why or why not?**  
-**[3 marks]**
-
-### **Answer**
-
-**No**, because there are many **many-to-many** relationships (doctors ↔ departments) and frequent cross-links (one building to one hospital, multiple wards, etc.). XML’s strictly hierarchical nature is less ideal for such complex interconnections. A relational or graph approach is better.
-
-### **Detailed Explanation**
-
-- **XML** thrives with **strict** parent-child data. But healthcare data often has cross-cutting relationships (e.g., a doctor belongs to multiple departments, a ward is in a building that belongs to a hospital, etc.).  
-- **Relational** or **Graph**: They handle these cross-links more naturally.
+**(vi) Which doctor treated Neha Ahuja?**
+- Possibly if doctors are assigned to wards (or a bridging `Ward_Doctor`). Then:
+```sql
+SELECT doc.Name
+FROM Patient p
+JOIN PatientWardStay pws ON p.ID = pws.PatientID
+JOIN Ward w ON (pws.WardName = w.Name 
+                AND pws.BuildingName = w.BuildingName
+                AND pws.HospitalName = w.HospitalName)
+JOIN Ward_Doctor wd 
+   ON (wd.WardName = w.Name AND wd.BuildingName = w.BuildingName 
+       AND wd.HospitalName = w.HospitalName)
+JOIN Doctor doc 
+   ON doc.Name = wd.DoctorName
+WHERE p.Name = 'Neha Ahuja';
+```
+*(Or if “treatment” is a separate bridging entirely, it would be similar logic.)*
 
