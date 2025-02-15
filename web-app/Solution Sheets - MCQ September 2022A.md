@@ -312,7 +312,7 @@ In CRM systems, querying interactions between clients and staff members is commo
 
 **Which of these queries is likely to represent a successful MongoDB search for actors born before 1957?**
 
-**Answer: i, vii**
+**Answer: vii**
 
 **Detailed Explanation and Working:**
 
