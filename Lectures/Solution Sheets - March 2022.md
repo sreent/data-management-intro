@@ -485,206 +485,298 @@ We fix them by introducing associative/bridge tables—**no brand-new random att
 
 ---
 
-## **(c) Adapted Model (with Cardinalities) in an ER Diagram**
-Below is a **comprehensive revision** of section (c), incorporating the requested **Doctor–Patient** and **Ward–Department** links, and clarifying the relationships and their cardinalities.
+## (c) Adapted Model (ER Diagram)
 
-1. A **Ward ↔ Department** relationship.  
-2. A **Doctor ↔ Patient** bridging table (*Doctor_Patient*) to capture that doctors can treat multiple patients and patients can be treated by multiple doctors.
+Using **Mermaid** notation, here is an ER diagram reflecting the actual tables and columns.  Notice especially that:
+
+- **wards** is operated by a **department** (not a hospital).  
+- **departments** in turn belong to (i.e., `part_of`) a **hospital**.  
+- **stay_in** uses `(patient, ward, arrived)` as its composite primary key.  
+- **patients** has a single foreign key `treated_by` referencing a **doctor**.  
 
 ```mermaid
 erDiagram
 
-    Patient {
-        int ID
-        string Name
-        date DoB
+    patients {
+        int id PK
+        string name
+        date dob
+        string treated_by FK --> doctors.name
     }
 
-    Ward {
-        string Name
-        string BuildingName
-        string HospitalName
-        string DepartmentName
+    doctors {
+        string name PK
     }
 
-    Building {
-        string Name
-        string Address
-        string HospitalName
-    }
-
-    Hospital {
-        string Name
-        string Address
-    }
-
-    Department {
-        string Name
-        string HospitalName
-    }
-
-    Doctor {
-        string Name
-    }
-
-    PatientWardStay {
-        int patientID
-        string wardName
-        date arrived
+    stay_in {
+        int patient PK, FK --> patients.id
+        string ward PK, FK --> wards.name
+        date arrived PK
         date departed
     }
 
-    Doctor_Department {
-        string doctorName
-        string departmentName
+    wards {
+        string name PK
+        string located_in FK --> buildings.name
+        string operated_by FK --> departments.name
     }
 
-    Doctor_Patient {
-        string doctorName
-        int patientID
+    buildings {
+        string name PK
+        string address
+        string run_by FK --> hospitals.name
     }
 
-    %% Relationships
+    hospitals {
+        string name PK
+    }
 
-    Patient ||--|{ PatientWardStay : "staysIn"
-    PatientWardStay }|--|| Ward : "isFor"
+    departments {
+        string name PK
+        string part_of FK --> hospitals.name
+        string specialisation
+    }
 
-    Ward }|--|| Building : "locatedIn"
-    Building }|--|| Hospital : "runBy"
+    works_at {
+        string doctor PK, FK --> doctors.name
+        string department PK, FK --> departments.name
+    }
 
-    Department }|--|| Hospital : "partOf" 
-    Doctor ||--|{ Doctor_Department : "worksAt"
-    Doctor_Department }|--|| Department : "belongsTo"
+    %% Now express the relationships:
 
-    %% New direct link: Ward ↔ Department
-    Ward }|--|| Department : "belongsTo"
+    %% 1) A doctor can treat many patients:
+    doctors ||--|{ patients : "treated_by"
 
-    %% New bridging for Doctor ↔ Patient
-    Doctor ||--|{ Doctor_Patient : "treats"
-    Doctor_Patient }|--|| Patient : "isTreatedBy"
+    %% 2) A patient can have many ward-stays, each ward can appear in many stays:
+    patients ||--|{ stay_in : "patient"
+    stay_in }|--|| wards : "ward"
+
+    %% 3) Each ward is physically in one building, but each building can have many wards:
+    buildings ||--|{ wards : "located_in"
+
+    %% 4) Each building is run by one hospital, but a hospital can run many buildings:
+    hospitals ||--|{ buildings : "run_by"
+
+    %% 5) Each ward is operated by one department, but one department can operate many wards:
+    departments ||--|{ wards : "operated_by"
+
+    %% 6) Each department is part_of one hospital, but a hospital can have many departments:
+    hospitals ||--|{ departments : "part_of"
+
+    %% 7) Many-to-many for doctors working in multiple departments:
+    doctors ||--|{ works_at }|--|| departments : "doctor & department"
+```
+
+### Key Observations
+
+- **patients** → **doctors** is **1 to many** (each `patient.treated_by` references exactly one **doctor**, while one **doctor** can treat many patients).  
+- **stay_in** is a bridging table from **patients** to **wards**, with the composite PK of `(patient, ward, arrived)`.  
+- **works_at** is a bridging table from **doctors** to **departments** (many‐to‐many).  
+- **wards** → **departments** is **many to one**, and **departments** → **hospitals** is also **many to one**.  
+
+---
+
+## (d) Tables & Keys (SQL Implementation)
+
+Below is a schematic outline of each table’s **primary** and **foreign** keys and the relevant columns. Field types (e.g., `VARCHAR`, `INT`) can be adjusted as appropriate.
+
+1. **hospitals**
+```sql
+CREATE TABLE hospitals (
+  name VARCHAR(100) PRIMARY KEY
+);
+```
+
+2. **buildings**
+```sql
+CREATE TABLE buildings (
+  name   VARCHAR(100),
+  address VARCHAR(255),
+  run_by VARCHAR(100) NOT NULL,  -- FK to hospitals
+  PRIMARY KEY (name),
+  FOREIGN KEY (run_by) REFERENCES hospitals(name)
+);
+```
+
+3. **departments**
+```sql
+CREATE TABLE departments (
+  name           VARCHAR(100),
+  part_of        VARCHAR(100) NOT NULL, -- FK to hospitals
+  specialisation VARCHAR(100),
+  PRIMARY KEY (name),
+  FOREIGN KEY (part_of) REFERENCES hospitals(name)
+);
+```
+
+4. **wards**
+```sql
+CREATE TABLE wards (
+  name        VARCHAR(100),
+  located_in  VARCHAR(100) NOT NULL, -- FK to buildings
+  operated_by VARCHAR(100) NOT NULL, -- FK to departments
+  PRIMARY KEY (name),
+  FOREIGN KEY (located_in)  REFERENCES buildings(name),
+  FOREIGN KEY (operated_by) REFERENCES departments(name)
+);
+```
+
+5. **doctors**
+```sql
+CREATE TABLE doctors (
+  name VARCHAR(100),
+  PRIMARY KEY (name)
+  -- other attributes as needed
+);
+```
+
+6. **patients**
+```sql
+CREATE TABLE patients (
+  id         INT,
+  name       VARCHAR(100),
+  dob        DATE,
+  treated_by VARCHAR(100) NOT NULL, -- FK to doctors
+  PRIMARY KEY (id),
+  FOREIGN KEY (treated_by) REFERENCES doctors(name)
+);
+```
+
+7. **stay_in**  
+   - Composite PK `(patient, ward, arrived)`.  
+   - References **patients.id** and **wards.name**.
+
+```sql
+CREATE TABLE stay_in (
+  patient  INT,          -- part of PK, references patients.id
+  ward     VARCHAR(100), -- part of PK, references wards.name
+  arrived  DATE NOT NULL, -- part of PK
+  departed DATE,
+  PRIMARY KEY (patient, ward, arrived),
+  FOREIGN KEY (patient) REFERENCES patients(id),
+  FOREIGN KEY (ward)    REFERENCES wards(name)
+);
+```
+
+8. **works_at**  
+   - Composite PK `(doctor, department)`.  
+   - Bridges many‐to‐many: a doctor can work in multiple departments, a department can have multiple doctors.
+
+```sql
+CREATE TABLE works_at (
+  doctor     VARCHAR(100), -- PK, references doctors.name
+  department VARCHAR(100), -- PK, references departments.name
+  PRIMARY KEY (doctor, department),
+  FOREIGN KEY (doctor)     REFERENCES doctors(name),
+  FOREIGN KEY (department) REFERENCES departments(name)
+);
 ```
 
 ---
 
-### Explanation of the Diagram
+## (e) Sample Queries
 
-1. **Patient ↔ Ward**  
-   - The table **PatientWardStay** bridges a many-to-many relationship and stores the attributes `arrived` and `departed`.  
-   - **Patient** “staysIn” zero or more Wards, and a Ward “isFor” zero or more Patients over time.
+Below are example queries that match **exactly** the columns shown above. Adjust or extend as needed.
 
-2. **Ward ↔ Building ↔ Hospital**  
-   - Each **Ward** references exactly one **Building** (via `BuildingName`) and also references the **Hospital** (via `HospitalName`), implying that each Ward is physically located in a Building, which is itself part of a particular Hospital.  
-   - **Building** references a single **Hospital**.  
+1. **Which building did patient “Neha Ahuja” stay in?**
 
-3. **Department ↔ Hospital**  
-   - Each **Department** is “partOf” exactly one **Hospital**. This is again shown by storing `HospitalName` in **Department**.  
+```sql
+SELECT b.name AS building_name
+FROM   patients p
+JOIN   stay_in s
+       ON p.id = s.patient
+JOIN   wards w
+       ON w.name = s.ward
+JOIN   buildings b
+       ON b.name = w.located_in
+WHERE  p.name = 'Neha Ahuja';
+```
 
-4. **Ward ↔ Department**  
-   - If you know each Ward belongs under exactly one Department (e.g., Orthopedics, Pediatrics, etc.), you can store `DepartmentName` in **Ward**, as shown in the diagram with a 1–N relationship (one Department can have many Wards, but each Ward only belongs to one Department).  
-   - If a Ward could belong to multiple Departments, you would introduce another bridging table (similar to *Doctor_Department*).
-
-5. **Doctor ↔ Department**  
-   - The bridging table **Doctor_Department** captures a many-to-many relationship. A Doctor can work for multiple Departments, and a Department can have multiple Doctors.
-
-6. **Doctor ↔ Patient**  
-   - The new bridging table **Doctor_Patient** (or “treatedBy”) captures that a single Doctor can treat multiple Patients, and a Patient can be treated by multiple Doctors.  
-   - Additional attributes like `treatmentStart`, `treatmentEnd`, or `treatmentType` could be included here if needed.
-
-By adding the **Ward ↔ Department** link and the **Doctor–Patient** bridging table, this revised ER diagram handles both direct and many-to-many relationships required for typical hospital management scenarios.
+Explanation:  
+- We find the patient by `p.name`, follow their stays in **stay_in**, see which **ward** each stay was in, and from there join to the **buildings** that the ward is located in.
 
 ---
 
-## **(d) Tables & Keys (SQL Implementation)**
+2. **Which department (and hospital) was responsible for Neha Ahuja’s ward?**  
+   Since each **ward** is operated by a **department**, we can join from wards to departments—and then from departments to hospitals:
 
-Assuming we rely on existing *natural* attributes (Name, etc.) as PKs:
-
-1. **Hospital**  
-   - **Name** (PK)  
-   - Address, etc.  
-
-2. **Building**  
-   - **(Name, HospitalName)** (composite PK)  
-   - Address, etc.  
-
-3. **Ward**  
-   - **(Name, BuildingName)** (composite PK)  
-   - Possibly a “DeptName” if it belongs to one department, or bridging if multiple.  
-
-4. **Patient**  
-   - **ID** (PK)  
-   - Name, DoB  
-
-5. **PatientWardStay** (handles “staysIn” plus arrival/departure)  
-   - **(PatientID, WardName)** (composite PK)  
-   - arrived, departed  
-   - FKs referencing Patient, Ward’s composite key  
-
-6. **Department**  
-   - **(Name, HospitalName)** (composite PK)  
-
-7. **Doctor**  
-   - **Name** (PK)  
-
-8. **Doctor_Department** (for the m..n “worksAt”)  
-   - **(DoctorName, NameOfDept)** as composite PK  
-   - FKs to Doctor(Name) and Department(Name)  
-
-*(If each **Ward** is assigned a single department, you can store `DeptName, HospitalName` as an FK in **Ward**. If wards can have multiple, add a bridging `Ward_Department`.)*
+```sql
+SELECT d.name       AS department_name,
+       h.name       AS hospital_name
+FROM   patients p
+JOIN   stay_in s
+       ON p.id = s.patient
+JOIN   wards w
+       ON w.name = s.ward
+JOIN   departments d
+       ON d.name = w.operated_by
+JOIN   hospitals h
+       ON h.name = d.part_of
+WHERE  p.name = 'Neha Ahuja';
+```
 
 ---
 
-## **(e) Sample MySQL Queries**
+3. **Which wards are used by Orthopedics patients?**  
+   Suppose “Orthopedics patients” means patients whose ward is operated by the “Orthopedics” department, or whose `operated_by` references a department with `specialisation = 'Orthopedics'`.  
 
-**(i) Which building did the patient named Neha Ahuja stay in?**
 ```sql
-SELECT w.BuildingName
-FROM Patient p
-JOIN PatientWardStay pws ON p.ID = pws.PatientID
-JOIN Ward w ON w.Name = pws.WardName
-WHERE p.Name = 'Neha Ahuja';
+SELECT DISTINCT w.name AS ward_name
+FROM wards w
+JOIN departments d 
+   ON w.operated_by = d.name
+WHERE d.specialisation = 'Orthopedics';
 ```
 
-**(ii) Which hospital was responsible for Neha Ahuja’s stay?**
+If you specifically want **patients** who were treated in wards run by Orthopedics, include **stay_in**:
+
 ```sql
-SELECT b.HospitalName
-FROM Patient p
-JOIN PatientWardStay pws ON p.ID = pws.PatientID
-JOIN Ward w ON (w.Name = pws.WardName
-                AND w.BuildingName = pws.BuildingName)
-JOIN Building b ON b.Name = w.BuildingName
-WHERE p.Name = 'Neha Ahuja';
+SELECT DISTINCT w.name AS ward_name
+FROM stay_in s
+JOIN wards w
+   ON s.ward = w.name
+JOIN departments d
+   ON w.operated_by = d.name
+WHERE d.specialisation = 'Orthopedics';
 ```
 
-**(iii) In which wards are Orthopedics patients housed?**
-- If each ward is dedicated to one department:
-```sql
-SELECT w.Name AS WardName
-FROM Ward w
-JOIN Department d 
-  ON (w.DeptName = d.Name AND w.HospitalName = d.HospitalName)
-WHERE d.Name = 'Orthopedics';
-```
-- Or if bridging `Ward_Department`, adapt similarly.
+---
 
-**(iv) Which hospitals does the doctor Song Ci work in?**
+4. **Which hospitals does the doctor “Song Ci” work in?**  
+   We use **works_at** to find the doctor’s departments, then see which hospital those departments are part of:
+
 ```sql
-SELECT DISTINCT d.HospitalName
-FROM Doctor doc
-JOIN Doctor_Department dd 
-   ON doc.Name = dd.doctorName
-JOIN Department d 
-   ON d.Name = dd.departmentName
-WHERE doc.Name = 'Song Ci';
+SELECT DISTINCT h.name AS hospital_name
+FROM doctors doc
+JOIN works_at wa 
+   ON doc.name = wa.doctor
+JOIN departments d
+   ON d.name = wa.department
+JOIN hospitals h
+   ON h.name = d.part_of
+WHERE doc.name = 'Song Ci';
 ```
 
-**(v) Which departments does the hospital have that contains a building called ‘The Alexander Fleming Building’?**
+---
+
+5. **Which hospital runs the building called “The Alexander Fleming Building”?**
+
 ```sql
-SELECT d.Name
-FROM Building b
-JOIN Hospital h ON (b.HospitalName = h.Name)
-JOIN Department d ON (d.HospitalName = h.Name)
-WHERE b.Name = 'The Alexander Fleming Building';
+SELECT h.name AS hospital_name
+FROM buildings b
+JOIN hospitals h
+   ON b.run_by = h.name
+WHERE b.name = 'The Alexander Fleming Building';
 ```
 
-**(vi) Which doctor treated Neha Ahuja?**
-- We will need to establish a M:N relationship between doctors and patients.
+---
+
+6. **Which doctor treated Neha Ahuja?**  
+   Since each patient record has a single `treated_by` column:
+
+```sql
+SELECT p.treated_by AS doctor_name
+FROM patients p
+WHERE p.name = 'Neha Ahuja';
+```
+
