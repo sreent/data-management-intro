@@ -497,74 +497,77 @@ Using **Mermaid** notation, here is an ER diagram reflecting the actual tables a
 ```mermaid
 erDiagram
 
-    patients {
+    PATIENTS {
         int id PK
         string name
         date dob
-        string treated_by FK --> doctors.name
+        string treated_by
     }
 
-    doctors {
+    DOCTORS {
         string name PK
     }
 
-    stay_in {
-        int patient PK, FK --> patients.id
-        string ward PK, FK --> wards.name
+    STAY_IN {
+        int patient PK
+        string ward PK
         date arrived PK
         date departed
     }
 
-    wards {
+    WARDS {
         string name PK
-        string located_in FK --> buildings.name
-        string operated_by FK --> departments.name
+        string located_in
+        string operated_by
     }
 
-    buildings {
+    BUILDINGS {
         string name PK
         string address
-        string run_by FK --> hospitals.name
+        string run_by
     }
 
-    hospitals {
+    HOSPITALS {
         string name PK
     }
 
-    departments {
+    DEPARTMENTS {
         string name PK
-        string part_of FK --> hospitals.name
+        string part_of
         string specialisation
     }
 
-    works_at {
-        string doctor PK, FK --> doctors.name
-        string department PK, FK --> departments.name
+    WORKS_AT {
+        string doctor PK
+        string department PK
     }
 
-    %% Now express the relationships:
+    %% Relationships (cardinality approximations follow your schema):
+    %% 1) Patients → Doctors (treated_by):
+    %%    many patients can reference one doctor
+    PATIENTS }o--|| DOCTORS : "treated_by"
 
-    %% 1) A doctor can treat many patients:
-    doctors ||--|{ patients : "treated_by"
+    %% 2) stay_in bridging Patients ↔ Wards:
+    %%    one patient can stay in many wards; one ward can have many patient stays
+    PATIENTS ||--|{ STAY_IN : "patient"
+    STAY_IN }|--|| WARDS : "ward"
 
-    %% 2) A patient can have many ward-stays, each ward can appear in many stays:
-    patients ||--|{ stay_in : "patient"
-    stay_in }|--|| wards : "ward"
+    %% 3) Wards → Buildings (located_in):
+    WARDS }|--|| BUILDINGS : "located_in"
 
-    %% 3) Each ward is physically in one building, but each building can have many wards:
-    buildings ||--|{ wards : "located_in"
+    %% 4) Buildings → Hospitals (run_by):
+    BUILDINGS }|--|| HOSPITALS : "run_by"
 
-    %% 4) Each building is run by one hospital, but a hospital can run many buildings:
-    hospitals ||--|{ buildings : "run_by"
+    %% 5) Wards → Departments (operated_by):
+    WARDS }|--|| DEPARTMENTS : "operated_by"
 
-    %% 5) Each ward is operated by one department, but one department can operate many wards:
-    departments ||--|{ wards : "operated_by"
+    %% 6) Departments → Hospitals (part_of):
+    DEPARTMENTS }|--|| HOSPITALS : "part_of"
 
-    %% 6) Each department is part_of one hospital, but a hospital can have many departments:
-    hospitals ||--|{ departments : "part_of"
-
-    %% 7) Many-to-many for doctors working in multiple departments:
-    doctors ||--|{ works_at }|--|| departments : "doctor & department"
+    %% 7) works_at bridging Doctors ↔ Departments:
+    %%    many doctors in many departments
+    DOCTORS ||--|{ WORKS_AT : "doctor"
+    WORKS_AT }|--|| DEPARTMENTS : "department"
 ```
 
 ### Key Observations
