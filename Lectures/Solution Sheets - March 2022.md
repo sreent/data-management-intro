@@ -684,15 +684,13 @@ Below are example queries that match **exactly** the columns shown above. Adjust
 1. **Which building did patient “Neha Ahuja” stay in?**
 
 ```sql
-SELECT b.name AS building_name
-FROM   patients p
-JOIN   stay_in s
+SELECT w.located_in AS building_name
+FROM patients p
+INNER JOIN stay_in s
        ON p.id = s.patient
-JOIN   wards w
+INNER JOIN wards w
        ON w.name = s.ward
-JOIN   buildings b
-       ON b.name = w.located_in
-WHERE  p.name = 'Neha Ahuja';
+WHERE p.name = 'Neha Ahuja';
 ```
 
 Explanation:  
@@ -705,16 +703,14 @@ Explanation:
 
 ```sql
 SELECT d.name       AS department_name,
-       h.name       AS hospital_name
+       d.part_of       AS hospital_name
 FROM   patients p
-JOIN   stay_in s
+INNER JOIN stay_in s
        ON p.id = s.patient
-JOIN   wards w
+INNER JOIN wards w
        ON w.name = s.ward
-JOIN   departments d
+INNER JOIN departments d
        ON d.name = w.operated_by
-JOIN   hospitals h
-       ON h.name = d.part_of
 WHERE  p.name = 'Neha Ahuja';
 ```
 
@@ -726,7 +722,7 @@ WHERE  p.name = 'Neha Ahuja';
 ```sql
 SELECT DISTINCT w.name AS ward_name
 FROM wards w
-JOIN departments d 
+INNER JOIN departments d 
    ON w.operated_by = d.name
 WHERE d.specialisation = 'Orthopedics';
 ```
@@ -736,9 +732,9 @@ If you specifically want **patients** who were treated in wards run by Orthopedi
 ```sql
 SELECT DISTINCT w.name AS ward_name
 FROM stay_in s
-JOIN wards w
+INNER JOIN wards w
    ON s.ward = w.name
-JOIN departments d
+INNER JOIN departments d
    ON w.operated_by = d.name
 WHERE d.specialisation = 'Orthopedics';
 ```
@@ -749,25 +745,25 @@ WHERE d.specialisation = 'Orthopedics';
    We use **works_at** to find the doctor’s departments, then see which hospital those departments are part of:
 
 ```sql
-SELECT DISTINCT h.name AS hospital_name
+SELECT DISTINCT d.part_of AS hospital_name
 FROM doctors doc
-JOIN works_at wa 
+INNER JOIN works_at wa 
    ON doc.name = wa.doctor
-JOIN departments d
+INNER JOIN departments d
    ON d.name = wa.department
-JOIN hospitals h
-   ON h.name = d.part_of
 WHERE doc.name = 'Song Ci';
 ```
 
 ---
 
-5. **Which hospital runs the building called “The Alexander Fleming Building”?**
+5. **Which department does the hospital have that contains a building called “The Alexander Fleming Building”?**
 
 ```sql
-SELECT h.name AS hospital_name
-FROM buildings b
-JOIN hospitals h
+SELECT d.name AS department_name
+FROM departments d
+INNER JOIN hospitals h
+   ON d.part_of = h.name
+INNER JOIN buildings b
    ON b.run_by = h.name
 WHERE b.name = 'The Alexander Fleming Building';
 ```
