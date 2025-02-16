@@ -486,8 +486,10 @@ We fix them by introducing associative/bridge tables—**no brand-new random att
 ---
 
 ## **(c) Adapted Model (with Cardinalities) in an ER Diagram**
+Below is a **comprehensive revision** of section (c), incorporating the requested **Doctor–Patient** and **Ward–Department** links, and clarifying the relationships and their cardinalities.
 
-Below is a **Mermaid** diagram reflecting the final structure. We keep the existing attributes (like `Name` for building/hospital/doctor, `ID` for patient) and avoid new ID fields for other entities. We do bridging for “staysIn” (with arrived/departed) and “worksAt” many–many:
+1. A **Ward ↔ Department** relationship.  
+2. A **Doctor ↔ Patient** bridging table (*Doctor_Patient*) to capture that doctors can treat multiple patients and patients can be treated by multiple doctors.
 
 ```mermaid
 erDiagram
@@ -502,6 +504,7 @@ erDiagram
         string Name
         string BuildingName
         string HospitalName
+        string DepartmentName
     }
 
     Building {
@@ -536,6 +539,11 @@ erDiagram
         string departmentName
     }
 
+    Doctor_Patient {
+        string doctorName
+        int patientID
+    }
+
     %% Relationships
 
     Patient ||--|{ PatientWardStay : "staysIn"
@@ -548,20 +556,41 @@ erDiagram
     Doctor ||--|{ Doctor_Department : "worksAt"
     Doctor_Department }|--|| Department : "belongsTo"
 
+    %% New direct link: Ward ↔ Department
+    Ward }|--|| Department : "belongsTo"
+
+    %% New bridging for Doctor ↔ Patient
+    Doctor ||--|{ Doctor_Patient : "treats"
+    Doctor_Patient }|--|| Patient : "isTreatedBy"
 ```
+
+---
 
 ### Explanation of the Diagram
 
-- **PatientWardStay** bridges `Patient` ↔ `Ward`, storing `arrived` and `departed`.  
-- **Doctor_Department** bridges `Doctor` ↔ `Department`.  
-- **Ward** references **Building** plus **Hospital** by name.  
-- **Building** references a single **Hospital**.  
-- **Department** references a single **Hospital**.  
+1. **Patient ↔ Ward**  
+   - The table **PatientWardStay** bridges a many-to-many relationship and stores the attributes `arrived` and `departed`.  
+   - **Patient** “staysIn” zero or more Wards, and a Ward “isFor” zero or more Patients over time.
 
-Now we can handle:
+2. **Ward ↔ Building ↔ Hospital**  
+   - Each **Ward** references exactly one **Building** (via `BuildingName`) and also references the **Hospital** (via `HospitalName`), implying that each Ward is physically located in a Building, which is itself part of a particular Hospital.  
+   - **Building** references a single **Hospital**.  
 
-- (iii) Orthopedics wards, if each **Ward** references exactly one **Department** (or you do a bridging Ward_Department if multiple).  
-- (vi) “treatedBy” if a doctor is assigned to that ward or a separate bridging table.
+3. **Department ↔ Hospital**  
+   - Each **Department** is “partOf” exactly one **Hospital**. This is again shown by storing `HospitalName` in **Department**.  
+
+4. **Ward ↔ Department**  
+   - If you know each Ward belongs under exactly one Department (e.g., Orthopedics, Pediatrics, etc.), you can store `DepartmentName` in **Ward**, as shown in the diagram with a 1–N relationship (one Department can have many Wards, but each Ward only belongs to one Department).  
+   - If a Ward could belong to multiple Departments, you would introduce another bridging table (similar to *Doctor_Department*).
+
+5. **Doctor ↔ Department**  
+   - The bridging table **Doctor_Department** captures a many-to-many relationship. A Doctor can work for multiple Departments, and a Department can have multiple Doctors.
+
+6. **Doctor ↔ Patient**  
+   - The new bridging table **Doctor_Patient** (or “treatedBy”) captures that a single Doctor can treat multiple Patients, and a Patient can be treated by multiple Doctors.  
+   - Additional attributes like `treatmentStart`, `treatmentEnd`, or `treatmentType` could be included here if needed.
+
+By adding the **Ward ↔ Department** link and the **Doctor–Patient** bridging table, this revised ER diagram handles both direct and many-to-many relationships required for typical hospital management scenarios.
 
 ---
 
