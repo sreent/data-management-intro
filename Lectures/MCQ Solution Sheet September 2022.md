@@ -152,8 +152,8 @@ In media catalogs, you might filter tracks by length (in seconds) and retrieve s
 
 1. **Option i: Just right of the center (80% precision, 90% recall):**
     - **Calculations:**
-      - False Negatives: $ (1 - 0.90) \times 30 = 3 $
-      - False Positives: $ \frac{30 \times (1 - 0.80)}{0.80} = 8 $
+      - False Negatives: $$(1 - 0.90) \times 30 = 3$$
+      - False Positives: $$\frac{30 \times (1 - 0.80)}{0.80} = 8$$
       - Total Time: 49 minutes.
 
 2. **Option ii: To the right (68% precision, 90% recall):**
