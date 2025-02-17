@@ -372,9 +372,7 @@ GROUP BY p.Title;
 
 ---
 
-## Mermaid ER Diagram for Question 4
-
-A **Mermaid diagram-as-code** that includes `Piece`, `Page`, `Region`, `InstrumentOrVoicePart`, and `Line` might look like this:
+An ER Diagram that includes `Piece`, `Page`, `Region`, `InstrumentOrVoicePart`, and `Line` might look like this:
 
 ```mermaid
 erDiagram
