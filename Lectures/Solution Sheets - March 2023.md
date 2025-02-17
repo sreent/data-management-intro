@@ -368,7 +368,7 @@ erDiagram
     Piece {
         string PieceID PK
         string Title
-        -- Additional piece attributes...
+        %% Additional piece attributes...
     }
 
     Page {
