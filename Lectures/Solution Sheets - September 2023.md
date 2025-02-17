@@ -184,6 +184,7 @@ Below is an **optional** Mermaid diagram showing some of these relationships:
 
 ```mermaid
 erDiagram
+    %% Entities and relationships (with minimal syntax):
     SELLER ||--|{ PROPERTY : "owns"
     ESTATE_AGENT ||--|{ PROPERTY : "assigned_to"
     PROPERTY ||--|{ OFFERS : "receives"
@@ -191,45 +192,66 @@ erDiagram
     BUYER ||--|{ OFFERS : "makes"
     BUYER }|--|{ VIEWINGS : "attends"
 
+    %% Now define attributes:
     SELLER {
-        PK SellerID
-        Name VARCHAR
-        PhoneNumber VARCHAR
-        ...
+        int SellerID
+        %% (Primary Key)
+        string Name
+        string PhoneNumber
+        string Address
     }
 
     ESTATE_AGENT {
-        PK AgentID
-        Name VARCHAR
-        ...
+        int AgentID
+        %% (Primary Key)
+        string Name
+        string PhoneNumber
     }
 
     PROPERTY {
-        PK PropertyID
-        type VARCHAR
-        bedrooms INT
-        askingPrice DECIMAL
-        ...
+        int PropertyID
+        %% (Primary Key)
+        int SellerID
+        %% (Foreign Key -> SELLER)
+        int AgentID
+        %% (Foreign Key -> ESTATE_AGENT)
+        string Type
+        int Bedrooms
+        decimal AskingPrice
+        string Address
     }
 
     OFFERS {
-        PK OfferID
-        offerValue DECIMAL
-        offerStatus VARCHAR
-        ...
+        int OfferID
+        %% (Primary Key)
+        int PropertyID
+        %% (Foreign Key -> PROPERTY)
+        int BuyerID
+        %% (Foreign Key -> BUYER)
+        string OfferStatus
+        decimal OfferValue
+        date OfferDate
     }
 
     VIEWINGS {
-        PK ViewingID
-        date DATE
-        ...
+        int ViewingID
+        %% (Primary Key)
+        int PropertyID
+        %% (Foreign Key -> PROPERTY)
+        int BuyerID
+        %% (Foreign Key -> BUYER)
+        date ViewingDate
+        %% In a real many-to-many, you might have a bridging table.
     }
 
     BUYER {
-        PK BuyerID
-        Name VARCHAR
-        ...
+        int BuyerID
+        %% (Primary Key)
+        string Name
+        string PhoneNumber
+        string Address
     }
+
 ```
 
 ---
