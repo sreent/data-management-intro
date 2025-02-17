@@ -210,7 +210,7 @@ erDiagram
 ```
 
 - **Artist**: holds both bands and individuals (differentiated by `Type`).
-- **Membership**: a **composite** primary key of \((\text{BandID}, \text{MemberID})\).  
+- **Membership**: a **composite** primary key of $$(\text{BandID}, \text{MemberID})$$.  
   - `BandID` references an **Artist** row with `Type='MusicGroup'`.  
   - `MemberID` references an **Artist** row with `Type='Person'`.  
   - Additional fields like `StartDate` and `RoleName` capture membership details (when someone joined, their role, etc.).
