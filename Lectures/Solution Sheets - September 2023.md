@@ -132,25 +132,29 @@ erDiagram
 
     %% Now define attributes (Mermaid must have type + name):
     LexicalEntry {
-        int LexicalEntryID     %% (Primary Key)
+        int LexicalEntryID
+        %% (Primary Key)
         string language
         string partOfSpeech
         %% Possibly more columns, e.g. lexicalEntryType, etc.
     }
 
     Form {
-        int FormID             %% (Primary Key)
+        int FormID             
+        %% (Primary Key)
         string writtenRep
         %% Foreign key link to LexicalEntry
     }
 
     LexicalSense {
-        int LexicalSenseID     %% (Primary Key)
+        int LexicalSenseID
+        %% (Primary Key)
         %% Foreign key link to LexicalEntry
     }
 
     SenseDefinition {
-        int SenseDefinitionID  %% (Primary Key)
+        int SenseDefinitionID
+        %% (Primary Key)
         string textValue
         %% Foreign key link to LexicalSense
     }
