@@ -125,32 +125,34 @@ Below is a **Mermaid ER diagram** in code.  It shows how you might map *LexicalE
 
 ```mermaid
 erDiagram
+    %% Entities:
     LexicalEntry ||--o{ Form : "has_form"
     LexicalEntry ||--|{ LexicalSense : "has_sense"
     LexicalSense ||--o{ SenseDefinition : "has_definition"
 
+    %% Now define attributes (Mermaid must have type + name):
     LexicalEntry {
-        PK LexicalEntryID
-        language VARCHAR
-        partOfSpeech VARCHAR
-        %% other attributes as needed
+        int LexicalEntryID     %% (Primary Key)
+        string language
+        string partOfSpeech
+        %% Possibly more columns, e.g. lexicalEntryType, etc.
     }
 
     Form {
-        PK FormID
-        writtenRep VARCHAR
-        %% link to LexicalEntry
+        int FormID             %% (Primary Key)
+        string writtenRep
+        %% Foreign key link to LexicalEntry
     }
 
     LexicalSense {
-        PK LexicalSenseID
-        %% link to LexicalEntry
+        int LexicalSenseID     %% (Primary Key)
+        %% Foreign key link to LexicalEntry
     }
 
     SenseDefinition {
-        PK SenseDefinitionID
-        textValue VARCHAR
-        %% link to LexicalSense
+        int SenseDefinitionID  %% (Primary Key)
+        string textValue
+        %% Foreign key link to LexicalSense
     }
 ```
 
