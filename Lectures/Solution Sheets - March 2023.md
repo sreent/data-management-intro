@@ -181,7 +181,7 @@ It returns pairs of `(?a, ?b)` where `?a` = **member name** and `?b` = **startDa
 
 ## (h) This data represents an export from a relational database. Construct an ER diagram that could accommodate the instance data above. [6]
 
-Below is a **Mermaid diagram-as-code** showing a possible **Artist**–**Membership** schema:
+Below is a **Mermaid diagram-as-code** showing a possible **Artist**–**Membership** schema **using a composite PK** in the `Membership` table:
 
 ```mermaid
 erDiagram
@@ -195,50 +195,62 @@ erDiagram
     }
 
     Membership {
-        int MembershipID PK
-        int BandID FK
-        int MemberID FK
+        int BandID PK, FK
+        int MemberID PK, FK
         date StartDate
         string RoleName
     }
+
+    %% Relationship lines:
+    %%  - "is_in" and "belongs_to" reflect that (BandID) and (MemberID)
+    %%    both reference rows in Artist (Type = 'MusicGroup' vs 'Person').
 
     Artist ||--o{ Membership : is_in
     Artist ||--o{ Membership : belongs_to
 ```
 
-- **Artist**: holds bands or individuals (differentiated by `Type`).  
-- **Membership**: join table referencing both the band (BandID) and member (MemberID), plus role details.
+- **Artist**: holds both bands and individuals (differentiated by `Type`).
+- **Membership**: a **composite** primary key of \((\text{BandID}, \text{MemberID})\).  
+  - `BandID` references an **Artist** row with `Type='MusicGroup'`.  
+  - `MemberID` references an **Artist** row with `Type='Person'`.  
+  - Additional fields like `StartDate` and `RoleName` capture membership details (when someone joined, their role, etc.).
 
 ---
 
 ## (i) Give the CREATE TABLE commands for two tables based on your ER diagram. [4]
 
-**Answer (Example):**
+**Answer (using composite PK):**
 
 ```sql
 CREATE TABLE Artist (
   ArtistID     INT PRIMARY KEY,
   Name         VARCHAR(100) NOT NULL,
-  Type         VARCHAR(20)  NOT NULL,   -- 'Person' or 'MusicGroup'
+  Type         VARCHAR(20)  NOT NULL,  -- 'Person' or 'MusicGroup'
   FoundingDate DATE
 );
 
 CREATE TABLE Membership (
-  MembershipID INT PRIMARY KEY,
-  BandID       INT NOT NULL,
-  MemberID     INT NOT NULL,
-  StartDate    DATE,
-  RoleName     VARCHAR(100),
-  FOREIGN KEY (BandID)  REFERENCES Artist(ArtistID),
+  BandID   INT NOT NULL,
+  MemberID INT NOT NULL,
+  StartDate DATE,
+  RoleName  VARCHAR(100),
+  PRIMARY KEY (BandID, MemberID),
+  FOREIGN KEY (BandID)   REFERENCES Artist(ArtistID),
   FOREIGN KEY (MemberID) REFERENCES Artist(ArtistID)
 );
 ```
+
+### Key Points
+
+- **PRIMARY KEY (BandID, MemberID)** enforces that there can be only **one** `Membership` record per `(band, person)` pair.  
+- If you might need multiple rows for the same `(BandID, MemberID)` (e.g., someone rejoins the band later), consider adding another field (like an auto-increment ID or `StartDate` in the PK).
 
 ---
 
 ## (j) Suggest a MySQL query to check whether any band member in the database is recorded as joining before the founding date of their band. [5]
 
-**Answer:**
+**Answer (unchanged):**
+
 ```sql
 SELECT aMember.Name AS MemberName,
        aBand.Name   AS BandName,
@@ -249,7 +261,6 @@ JOIN Artist aBand   ON m.BandID   = aBand.ArtistID
 JOIN Artist aMember ON m.MemberID = aMember.ArtistID
 WHERE m.StartDate < aBand.FoundingDate;
 ```
-- Identifies anomalies where someone’s start date precedes the band’s founding date.
 
 ---
 
