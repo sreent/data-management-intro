@@ -188,8 +188,8 @@ erDiagram
     Artist {
         int ArtistID PK
         string Name
-        string Type        -- 'Person' or 'MusicGroup'
-        date FoundingDate  -- relevant if Type='MusicGroup'
+        string Type        %% 'Person' or 'MusicGroup'
+        date FoundingDate  %% relevant if Type='MusicGroup'
     }
 
     Membership {
