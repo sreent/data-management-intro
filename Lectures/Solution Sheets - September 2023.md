@@ -133,24 +133,24 @@ erDiagram
         PK LexicalEntryID
         language VARCHAR
         partOfSpeech VARCHAR
-        -- other attributes as needed
+        %% other attributes as needed
     }
 
     Form {
         PK FormID
         writtenRep VARCHAR
-        -- link to LexicalEntry
+        %% link to LexicalEntry
     }
 
     LexicalSense {
         PK LexicalSenseID
-        -- link to LexicalEntry
+        %% link to LexicalEntry
     }
 
     SenseDefinition {
         PK SenseDefinitionID
         textValue VARCHAR
-        -- link to LexicalSense
+        %% link to LexicalSense
     }
 ```
 
