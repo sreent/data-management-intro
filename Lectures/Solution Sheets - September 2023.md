@@ -169,208 +169,203 @@ erDiagram
 
 # **Question 2: ER Question (Real‐Estate Agency)**
 
-The exam’s ER diagram has **Seller**, **Estate Agent**, **Property**, **Offers**, **Buyer**, **Views**, etc.
+An estate agency selling residential houses and flats is building a database to track its business. The ER diagram shows the main elements:
 
-### (a) Add cardinality indications  
-**Answer (3 marks):**  
-- **Seller–Property**: (1 : M) (one seller owns many properties)  
-- **Agent–Property**: (1 : M) (one agent can handle many properties, each property has exactly one agent)  
-- **Property–Offers**: (1 : M) (one property can have many offers)  
-- **Property–Views**: (1 : M) (one property can have many viewings)  
-- **Buyer–Offers**: (1 : M) (one buyer can make many offers)  
-- **Buyer–Views**: (M : N) if a buyer can view multiple properties, and a property can be viewed by multiple buyers.
+1. **Seller** (Name, Address, Phone Number)  
+2. **Estate Agent** (Name)  
+3. **Property** (Address, #bedrooms, Type, Asking price)  
+4. **Buyer** (Name, Address, Phone number)  
+5. **Offers** (Offer date, Offer status, Offer value)  
+6. **Views** (Date)
 
-Below is an **optional** Mermaid diagram showing some of these relationships:
+The relationships in the diagram:
+- A Seller **owns** Property.
+- An Estate Agent **sells** Property.
+- A Property **has** Offers and is also **viewed** by Buyers.
+- An Offer has (Offer date, status, value) and is associated with one Buyer and one Property.
+- A View has (Date) and associates a Buyer with a Property.
 
-```mermaid
-erDiagram
-    %% Entities and relationships (with minimal syntax):
-    SELLER ||--|{ PROPERTY : "owns"
-    ESTATE_AGENT ||--|{ PROPERTY : "assigned_to"
-    PROPERTY ||--|{ OFFERS : "receives"
-    PROPERTY ||--|{ VIEWINGS : "has"
-    BUYER ||--|{ OFFERS : "makes"
-    BUYER }|--|{ VIEWINGS : "attends"
+### (a) Add cardinality indications for this diagram  
+**(3 marks)**
 
-    %% Now define attributes:
-    SELLER {
-        int SellerID
-        %% (Primary Key)
-        string Name
-        string PhoneNumber
-        string Address
-    }
+From the attached ER diagram, we can interpret the following cardinalities:
 
-    ESTATE_AGENT {
-        int AgentID
-        %% (Primary Key)
-        string Name
-        string PhoneNumber
-    }
+1. **Seller–Property**: One seller can own **many** properties, but each property is owned by **exactly one** seller.  
+   - **(1 : M)**
+2. **Estate Agent–Property**: One estate agent is responsible for **many** properties, but each property is handled by **exactly one** agent.  
+   - **(1 : M)**
+3. **Property–Offers**: One property can receive **many** offers, but each offer refers to exactly one property.  
+   - **(1 : M)**
+4. **Property–Views**: One property can have **many** viewings, and a viewing is for exactly one property (in the diagram, the “Views” diamond connects property and buyer).  
+   - **(1 : M)**
+5. **Buyer–Offers**: One buyer can make **many** offers, and each offer is from exactly one buyer.  
+   - **(1 : M)**
+6. **Buyer–Views**: One buyer can have **many** viewings, and each viewing is for exactly one buyer.  
+   - **(1 : M)**  
 
-    PROPERTY {
-        int PropertyID
-        %% (Primary Key)
-        int SellerID
-        %% (Foreign Key -> SELLER)
-        int AgentID
-        %% (Foreign Key -> ESTATE_AGENT)
-        string Type
-        int Bedrooms
-        decimal AskingPrice
-        string Address
-    }
-
-    OFFERS {
-        int OfferID
-        %% (Primary Key)
-        int PropertyID
-        %% (Foreign Key -> PROPERTY)
-        int BuyerID
-        %% (Foreign Key -> BUYER)
-        string OfferStatus
-        decimal OfferValue
-        date OfferDate
-    }
-
-    VIEWINGS {
-        int ViewingID
-        %% (Primary Key)
-        int PropertyID
-        %% (Foreign Key -> PROPERTY)
-        int BuyerID
-        %% (Foreign Key -> BUYER)
-        date ViewingDate
-        %% In a real many-to-many, you might have a bridging table.
-    }
-
-    BUYER {
-        int BuyerID
-        %% (Primary Key)
-        string Name
-        string PhoneNumber
-        string Address
-    }
-
-```
+*(If the diagram allowed multiple buyers to attend one viewing, that would be a many‐to‐many. But as drawn—one “Views” diamond connecting one buyer and one property—this is effectively 1 : M from each side. In practice, you might interpret it differently, but we will stick to the diagram.)*
 
 ---
 
-### (b) How to adapt to a relational model  
-**Answer (5 marks)**
+### (b) How would you adapt this to a relational model?  
+**(5 marks)**
 
-**Main tables (example):**
+Following the diagram **as is**, **without extra ID attributes**, we can use the attributes from the boxes and ovals as columns. Below is one possible mapping:
 
-1. **Sellers**(SellerID PK, Name, PhoneNumber, Address, …)  
-2. **EstateAgents**(AgentID PK, Name, ContactDetails, …)  
-3. **Properties**(PropertyID PK, SellerID→Sellers, AgentID→EstateAgents, Type, Bedrooms, AskingPrice, …)  
-4. **Buyers**(BuyerID PK, Name, PhoneNumber, …)  
-5. **Offers**(OfferID PK, PropertyID→Properties, BuyerID→Buyers, OfferDate, OfferValue, OfferStatus, …)  
-6. **Viewings**(ViewingID PK, PropertyID→Properties, BuyerID→Buyers, ViewingDate, …)  
+1. **Seller**  
+   - **Primary key (PK)**: SellerName *(since the diagram does not show a separate ID)*  
+   - Other columns: Address, PhoneNumber
 
-If we allow multiple buyers per viewing in one row, you might need a bridging table, e.g. **`ViewingAttendees`(ViewingID, BuyerID)**.
+2. **EstateAgent**  
+   - **PK**: AgentName  
+   - *(No other attributes shown except “Name” in the diagram.)*
 
----
+3. **Property**  
+   - **PK**: Address *(the diagram shows an Address for the property; we assume it uniquely identifies it)*  
+   - #bedrooms, Type, AskingPrice  
+   - **Foreign Keys**:
+     - SellerName → references **Seller**(Name)  
+     - AgentName → references **EstateAgent**(Name)
 
-### (c) List the tables, primary and foreign keys  
-**Answer (6 marks):**
+4. **Buyer**  
+   - **PK**: BuyerName  
+   - Other columns: Address, PhoneNumber
 
-- **Sellers**:  
-  - **PK**: `SellerID`
+5. **Offers**  
+   - The diagram shows OfferDate, OfferStatus, OfferValue  
+   - **Composite PK**: (PropertyAddress, BuyerName, OfferDate) or a suitable combination  
+   - **FK**: PropertyAddress → references **Property**(Address)  
+   - **FK**: BuyerName → references **Buyer**(Name)
 
-- **EstateAgents**:  
-  - **PK**: `AgentID`
+6. **Views**  
+   - The diagram shows a date for the viewing  
+   - **Composite PK**: (PropertyAddress, BuyerName, ViewDate) or similarly chosen  
+   - **FK**: PropertyAddress → references **Property**(Address)  
+   - **FK**: BuyerName → references **Buyer**(Name)
 
-- **Properties**:  
-  - **PK**: `PropertyID`  
-  - **FK**: `SellerID` → `Sellers(SellerID)`  
-  - **FK**: `AgentID` → `EstateAgents(AgentID)`
-
-- **Buyers**:  
-  - **PK**: `BuyerID`
-
-- **Offers**:  
-  - **PK**: `OfferID`  
-  - **FK**: `PropertyID` → `Properties(PropertyID)`  
-  - **FK**: `BuyerID` → `Buyers(BuyerID)`
-
-- **Viewings**:  
-  - **PK**: `ViewingID`  
-  - **FK**: `PropertyID` → `Properties(PropertyID)`  
-  - **FK**: `BuyerID` → `Buyers(BuyerID)`  
-  - (Or use a many‐to‐many bridging table if needed.)
+In **real‐world** practice, we often introduce synthetic `PropertyID`, `SellerID`, etc. to avoid using addresses or names as PKs. But since your diagram has no explicit ID attributes, we stay as close as possible to it.
 
 ---
 
-### (d) MySQL command (example: `Properties` table)  
-**Answer (3 marks):**
+### (c) List the tables, primary keys, and foreign keys  
+**(6 marks)**
+
+Below is a concise list reflecting the diagram’s attributes:
+
+1. **Seller**  
+   - **Columns**: Name *(PK)*, Address, PhoneNumber  
+
+2. **EstateAgent**  
+   - **Columns**: Name *(PK)*  
+
+3. **Property**  
+   - **Columns**: Address *(PK)*, Type, Bedrooms, AskingPrice  
+   - **Foreign Keys**:
+     - SellerName → **Seller**(Name)  
+     - AgentName → **EstateAgent**(Name)
+
+4. **Buyer**  
+   - **Columns**: Name *(PK)*, Address, PhoneNumber
+
+5. **Offers**  
+   - **Columns**: OfferDate, OfferStatus, OfferValue, PropertyAddress, BuyerName  
+   - **Composite PK**: (PropertyAddress, BuyerName, OfferDate) (or similar)  
+   - **FKs**:
+     - PropertyAddress → **Property**(Address)  
+     - BuyerName → **Buyer**(Name)
+
+6. **Views**  
+   - **Columns**: ViewDate, PropertyAddress, BuyerName  
+   - **Composite PK**: (PropertyAddress, BuyerName, ViewDate)  
+   - **FKs**:
+     - PropertyAddress → **Property**(Address)  
+     - BuyerName → **Buyer**(Name)
+
+---
+
+### (d) Give the MySQL command for creating one of those tables  
+**(3 marks)**
+
+As an example, let’s create the **`Property`** table using the columns from the diagram (and references to Seller and Agent):
 
 ```sql
-CREATE TABLE Properties (
-  PropertyID INT PRIMARY KEY AUTO_INCREMENT,
-  SellerID INT NOT NULL,
-  AgentID INT NOT NULL,
-  Type VARCHAR(50),
-  Bedrooms INT,
-  AskingPrice DECIMAL(12, 2),
-  Address VARCHAR(100),
-  FOREIGN KEY (SellerID) REFERENCES Sellers(SellerID),
-  FOREIGN KEY (AgentID) REFERENCES EstateAgents(AgentID)
+CREATE TABLE Property (
+  Address       VARCHAR(100) NOT NULL,
+  Type          VARCHAR(50),
+  Bedrooms      INT,
+  AskingPrice   DECIMAL(12, 2),
+  SellerName    VARCHAR(100) NOT NULL,
+  AgentName     VARCHAR(100) NOT NULL,
+  PRIMARY KEY (Address),
+
+  FOREIGN KEY (SellerName)
+      REFERENCES Seller(Name),
+
+  FOREIGN KEY (AgentName)
+      REFERENCES EstateAgent(Name)
 );
 ```
 
+*(We assume 100 characters is enough for an address or name. Adjust as needed.)*
+
 ---
 
-### (e) Commission Query (1% of final sale price)
+### (e) Agents are paid a commission on property where the offer gets to ‘sale completed.’ The commission is 1% of **the sale price**.
 
-#### (i) Query: total commission per agent since 2023‐01‐01  
-**Answer (6 marks):**
+#### (i) Write a MySQL query to calculate and list the commission earned **since 1 January 2023** for each Estate Agent.  
+**(6 marks)**
+
+We assume the final accepted offer is indicated by `OfferStatus = 'sale completed'` and that the actual final sale price is in `OfferValue`.  Also assume `OfferDate` is the date the sale completed:
 
 ```sql
 SELECT 
-    p.AgentID,
+    p.AgentName AS EstateAgent,
     SUM(o.OfferValue * 0.01) AS TotalCommission
-FROM Properties p
+FROM Property p
 JOIN Offers o
-  ON p.PropertyID = o.PropertyID
+    ON p.Address = o.PropertyAddress
 WHERE o.OfferStatus = 'sale completed'
   AND o.OfferDate >= '2023-01-01'
-GROUP BY p.AgentID;
+GROUP BY p.AgentName;
 ```
-- Multiplies `OfferValue` by 0.01.
 
-#### (ii) Query: top‐earning agent  
-**Answer (2 marks):**
+- Multiplies each completed offer’s `OfferValue` by 0.01 (1%)  
+- Sums them per agent.
+
+#### (ii) Modify your query to list **just the top‐earning agent**  
+**(2 marks)**
 
 ```sql
 SELECT 
-    p.AgentID,
+    p.AgentName AS EstateAgent,
     SUM(o.OfferValue * 0.01) AS TotalCommission
-FROM Properties p
+FROM Property p
 JOIN Offers o
-  ON p.PropertyID = o.PropertyID
+    ON p.Address = o.PropertyAddress
 WHERE o.OfferStatus = 'sale completed'
   AND o.OfferDate >= '2023-01-01'
-GROUP BY p.AgentID
+GROUP BY p.AgentName
 ORDER BY TotalCommission DESC
 LIMIT 1;
 ```
 
 ---
 
-### (f) Using a document DB instead of a relational DB  
-**Answer (5 marks, real‐estate–specific):**
+### (f) The IT specialist is considering a document database  
+**(5 marks)**
 
-1. **Why it could be good**  
-   - Flexible schema for varied property attributes or embedded arrays for pictures/metadata.  
-   - Easier horizontal scaling if you store large unstructured listings or docs.
+We focus on **real‐estate–specific** reasons:
 
-2. **Why it could be bad**  
-   - The relationships between Sellers, Agents, Buyers, and Offers are highly relational and easier to handle in SQL.  
-   - Complex queries for commission, statuses, and cross‐table joins are simpler in a relational system.  
-   - Ensuring data consistency across offers, status changes, etc. can be more challenging in a NoSQL model.
+- **Potential advantages** of a document DB (e.g., MongoDB):
+  1. Storing variable or unstructured property details (photos, custom fields, long textual descriptions) is more flexible.  
+  2. If there is heavy reading of large unstructured property listings, a NoSQL solution can scale horizontally.
 
-Hence, a document DB might work well for very flexible listings or heavy unstructured data, but for transactional/structured aspects, a relational DB is usually more straightforward.
+- **Potential disadvantages**:
+  1. The data is actually quite relational (Seller, Agent, Buyer, Offers).  SQL queries for commissions or statuses are simpler in a relational schema.  
+  2. Ensuring transaction consistency (e.g., an offer changes from “made” to “sale completed”) is more straightforward in a relational DB.  
+  3. You might end up duplicating structured data across documents, raising consistency issues.
+
+Thus, for **highly relational** scenarios—offers, statuses, commission calculations—a relational DB is typically more suitable. Document DBs might be beneficial if you have highly variable or semi‐structured listing data.
 
 ---
 
