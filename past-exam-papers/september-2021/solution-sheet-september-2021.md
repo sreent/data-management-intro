@@ -106,12 +106,12 @@ erDiagram
 
 **Junction Table Example:**
 ```sql
-CREATE TABLE KeeperAnimal (
+CREATE TABLE keeper_animal (
     keeper_name VARCHAR(100),
     animal_id INT,
     PRIMARY KEY (keeper_name, animal_id),
-    FOREIGN KEY (keeper_name) REFERENCES Keeper(name),
-    FOREIGN KEY (animal_id) REFERENCES Animal(identifier)
+    FOREIGN KEY (keeper_name) REFERENCES keeper(name),
+    FOREIGN KEY (animal_id) REFERENCES animal(identifier)
 );
 ```
 
@@ -827,8 +827,8 @@ WHERE s.date >= '2021-01-01';
 
 ```sql
 SELECT DISTINCT s.species_name, sp.conservation_status  -- What we want
-FROM sightings s                                        -- Start with Sightings
-INNER JOIN species sp ON s.species_name = sp.species_name  -- Link to Species table
+FROM sightings s                                        -- Start with sightings
+INNER JOIN species sp ON s.species_name = sp.species_name  -- Link to species table
 WHERE s.date >= '2021-01-01';                           -- Filter by date
 ```
 
