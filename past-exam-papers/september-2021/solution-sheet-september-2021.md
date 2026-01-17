@@ -813,7 +813,7 @@ DeptName depends on DeptID, not directly on EmpID
 ```sql
 SELECT DISTINCT s.species_name, sp.conservation_status
 FROM sightings s
-JOIN species sp ON s.species_name = sp.species_name
+INNER JOIN species sp ON s.species_name = sp.species_name
 WHERE s.date >= '2021-01-01';
 ```
 
@@ -828,7 +828,7 @@ WHERE s.date >= '2021-01-01';
 ```sql
 SELECT DISTINCT s.species_name, sp.conservation_status  -- What we want
 FROM sightings s                                        -- Start with sightings
-JOIN species sp ON s.species_name = sp.species_name     -- Link to species table
+INNER JOIN species sp ON s.species_name = sp.species_name  -- Link to species table
 WHERE s.date >= '2021-01-01';                           -- Filter by date
 ```
 
@@ -836,10 +836,13 @@ WHERE s.date >= '2021-01-01';                           -- Filter by date
 
 | JOIN Type | Returns |
 |-----------|---------|
-| `INNER JOIN` (or just `JOIN`) | Only matching rows from both tables |
+| `INNER JOIN` | Only matching rows from both tables |
 | `LEFT JOIN` | All rows from left table + matches from right |
 | `RIGHT JOIN` | All rows from right table + matches from left |
 | `FULL OUTER JOIN` | All rows from both tables |
+| `CROSS JOIN` | Cartesian product (every combination) |
+
+> **Note:** `JOIN` without a keyword defaults to `INNER JOIN`, but always write `INNER JOIN` explicitly for clarity.
 
 **Why INNER JOIN Here:**
 - We only want species that have been sighted
@@ -854,7 +857,7 @@ WHERE s.date >= '2021-01-01';                           -- Filter by date
 ```sql
 SELECT DISTINCT sightings.species_name, species.conservation_status
 FROM sightings
-JOIN species ON sightings.species_name = species.species_name
+INNER JOIN species ON sightings.species_name = species.species_name
 WHERE sightings.date >= '2021-01-01';
 ```
 
@@ -1708,7 +1711,7 @@ CREATE TABLE Animal (
 ```sql
 SELECT COUNT(DISTINCT a.species_latin_name) AS species_count
 FROM Animal a
-JOIN Enclosure e ON a.enclosure_name = e.name
+INNER JOIN Enclosure e ON a.enclosure_name = e.name
 WHERE e.zoo_name = 'Singapore Zoo';
 ```
 
@@ -1747,7 +1750,7 @@ Species (via species_latin_name)
 SELECT COUNT(*) FROM (
     SELECT DISTINCT a.species_latin_name
     FROM Animal a
-    JOIN Enclosure e ON a.enclosure_name = e.name
+    INNER JOIN Enclosure e ON a.enclosure_name = e.name
     WHERE e.zoo_name = 'Singapore Zoo'
 ) AS unique_species;
 
@@ -1772,7 +1775,7 @@ WHERE enclosure_name IN (
 ```sql
 SELECT e.zoo_name, MIN(a.date_of_birth) AS oldest_birth_date
 FROM Animal a
-JOIN Enclosure e ON a.enclosure_name = e.name
+INNER JOIN Enclosure e ON a.enclosure_name = e.name
 WHERE a.species_latin_name = 'Buceros bicornis'
 GROUP BY e.zoo_name;
 ```
@@ -1796,7 +1799,7 @@ SELECT MIN(date_of_birth) FROM Animal;  -- Returns: 1985-03-21
 
 -- With GROUP BY: one result per group
 SELECT zoo_name, MIN(date_of_birth)
-FROM Animal JOIN Enclosure...
+FROM Animal INNER JOIN Enclosure...
 GROUP BY zoo_name;
 -- Returns:
 -- Singapore Zoo | 1995-06-15
@@ -1814,7 +1817,7 @@ GROUP BY zoo_name;
 -- Only zoos with animals older than 2000
 SELECT e.zoo_name, MIN(a.date_of_birth) AS oldest
 FROM Animal a
-JOIN Enclosure e ON a.enclosure_name = e.name
+INNER JOIN Enclosure e ON a.enclosure_name = e.name
 WHERE a.species_latin_name = 'Buceros bicornis'
 GROUP BY e.zoo_name
 HAVING MIN(a.date_of_birth) < '2000-01-01';
@@ -1953,9 +1956,10 @@ GROUP BY ?zoo
 -- Basic query structure
 SELECT columns FROM table WHERE condition GROUP BY col HAVING condition ORDER BY col;
 
--- Joins
-SELECT * FROM A INNER JOIN B ON A.id = B.a_id;
-SELECT * FROM A LEFT JOIN B ON A.id = B.a_id;
+-- Joins (always be explicit about join type!)
+SELECT * FROM A INNER JOIN B ON A.id = B.a_id;  -- Only matching rows
+SELECT * FROM A LEFT JOIN B ON A.id = B.a_id;   -- All from A + matches from B
+SELECT * FROM A CROSS JOIN B;                    -- Cartesian product
 
 -- Aggregates
 COUNT(*), COUNT(DISTINCT col), SUM(col), AVG(col), MIN(col), MAX(col)
