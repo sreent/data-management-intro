@@ -30,6 +30,67 @@
 
 **Core Concept:** Many-to-many (M:N) relationships cannot be directly implemented in relational databases.
 
+**Original E/R Diagram (from exam):**
+
+```mermaid
+erDiagram
+    Zoo ||--o{ Animal : houses
+    Zoo ||--o{ Keeper : employs
+    Animal }o--|| Species : member
+    Keeper }o--o{ Animal : looksAfter
+
+    Zoo {
+        string name PK
+        string country
+    }
+    Keeper {
+        string name PK
+        date date_of_birth
+    }
+    Animal {
+        int identifier PK
+        date date_of_birth
+    }
+    Species {
+        string latin_name PK
+        string conservation_status
+    }
+```
+
+**Problem:** The `looksAfter` relationship between Keeper and Animal is **many-to-many (M:N)** - this cannot be directly implemented in a relational database.
+
+**Resolved E/R Diagram (with Junction Table):**
+
+```mermaid
+erDiagram
+    Zoo ||--o{ Animal : houses
+    Zoo ||--o{ Keeper : employs
+    Animal }o--|| Species : member
+    Keeper ||--o{ KeeperAnimal : ""
+    Animal ||--o{ KeeperAnimal : ""
+
+    Zoo {
+        string name PK
+        string country
+    }
+    Keeper {
+        string name PK
+        date date_of_birth
+    }
+    KeeperAnimal {
+        string keeper_name PK_FK
+        int animal_id PK_FK
+    }
+    Animal {
+        int identifier PK
+        date date_of_birth
+    }
+    Species {
+        string latin_name PK
+        string conservation_status
+    }
+```
+
 **Why Option ii is Correct:**
 - The `looksAfter` relationship between Keeper and Animal is M:N (many keepers can look after many animals)
 - In relational model, M:N relationships require a **junction/bridge table**
@@ -1490,6 +1551,35 @@ mei:note1 mei:pitchName "c" .
 
 **Core Concept:** E/R diagrams translate to relational tables by converting entities to tables and relationships to foreign keys.
 
+**E/R Diagram (from exam):**
+
+```mermaid
+erDiagram
+    Zoo ||--o{ Enclosure : contains
+    Enclosure ||--o{ Animal : has
+    Animal }o--|| Species : member
+
+    Zoo {
+        string name PK
+        string country
+    }
+    Enclosure {
+        string name PK
+        string location
+        string zoo_name FK
+    }
+    Animal {
+        int identifier PK
+        date date_of_birth
+        string latin_name FK
+        string enclosure_name FK
+    }
+    Species {
+        string latin_name PK
+        string conservation_status
+    }
+```
+
 **E/R to Relational Mapping Rules:**
 
 | E/R Concept | Relational Equivalent |
@@ -1500,15 +1590,11 @@ mei:note1 mei:pitchName "c" .
 | 1:M relationship | Foreign key in "many" side |
 | M:N relationship | Junction/bridge table |
 
-**Reading the E/R Diagram:**
+**Reading the Relationships:**
 
-```
-Zoo (1) ---contains---> (M) Enclosure (1) ---has---> (M) Animal (M) ---member---> (1) Species
-```
-
-- One Zoo contains many Enclosures → FK in Enclosure
-- One Enclosure has many Animals → FK in Animal
-- Many Animals belong to one Species → FK in Animal
+- **Zoo (1) → (M) Enclosure**: One Zoo contains many Enclosures → FK `zoo_name` in Enclosure
+- **Enclosure (1) → (M) Animal**: One Enclosure has many Animals → FK `enclosure_name` in Animal
+- **Species (1) → (M) Animal**: Many Animals belong to one Species → FK `latin_name` in Animal
 
 **Why These Primary Keys:**
 - `Zoo.name` - Zoo names are unique identifiers
