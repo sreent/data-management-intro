@@ -4,8 +4,9 @@
 
 | Section | Questions | Marks | Time |
 |---------|-----------|-------|------|
-| Section A | 10 MCQs | 40 | ~4 hours max |
+| Section A | 10 MCQs | 40 | |
 | Section B | Answer 2 of 3 | 60 | ~1 hour |
+| **Total** | | **100** | **4 hours** |
 
 ---
 
