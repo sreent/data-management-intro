@@ -562,7 +562,7 @@ INNER JOIN: 0 to 12 rows (depends on matches)
 
 ```sql
 SELECT DISTINCT Species
-FROM Sightings
+FROM sightings
 WHERE Date >= '2021-01-01';
 ```
 
@@ -581,11 +581,11 @@ WHERE Date >= '2021-01-01';
 **Alternative Approaches:**
 ```sql
 -- Using BETWEEN for a date range
-SELECT DISTINCT Species FROM Sightings
+SELECT DISTINCT Species FROM sightings
 WHERE Date BETWEEN '2021-01-01' AND '2021-12-31';
 
 -- Using YEAR() function (MySQL specific)
-SELECT DISTINCT Species FROM Sightings
+SELECT DISTINCT Species FROM sightings
 WHERE YEAR(Date) >= 2021;
 ```
 
@@ -653,23 +653,23 @@ WHERE YEAR(Date) >= 2021;
 
 **Three tables after normalization:**
 
-**1. Species**
+**1. species**
 | Column | Key |
 |--------|-----|
 | species_name | PK |
 | conservation_status | |
 
-**2. NatureReserves**
+**2. nature_reserves**
 | Column | Key |
 |--------|-----|
 | reserve_name | PK |
 | location | |
 
-**3. Sightings**
+**3. sightings**
 | Column | Key |
 |--------|-----|
-| species_name | PK, FK → Species |
-| reserve_name | PK, FK → NatureReserves |
+| species_name | PK, FK → species |
+| reserve_name | PK, FK → nature_reserves |
 | date | PK |
 | number_sighted | |
 
@@ -703,24 +703,24 @@ In the original table:
 Create a new table for each entity that has its own attributes:
 
 ```
-Original: Sightings(Species, Date, Number_sighted, Conservation_status,
-                    Nature_reserve, Location)
+Original: sightings(species, date, number_sighted, conservation_status,
+                    nature_reserve, location)
 
 Decomposed:
-  Species(species_name, conservation_status)
-  NatureReserves(reserve_name, location)
-  Sightings(species_name, reserve_name, date, number_sighted)
+  species(species_name, conservation_status)
+  nature_reserves(reserve_name, location)
+  sightings(species_name, reserve_name, date, number_sighted)
 ```
 
 **Why This Design:**
-- **No update anomaly**: Change conservation status once in `Species` table
+- **No update anomaly**: Change conservation status once in `species` table
 - **No insert anomaly**: Can add a new species without needing a sighting
 - **No delete anomaly**: Deleting last sighting doesn't lose species info
 
 **Visual Representation:**
 ```
 ┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Species   │     │    Sightings    │     │ NatureReserves  │
+│   species   │     │    sightings    │     │ nature_reserves │
 ├─────────────┤     ├─────────────────┤     ├─────────────────┤
 │ species_name│◄────│ species_name    │     │ reserve_name    │
 │ conserv_stat│     │ reserve_name    │────►│ location        │
@@ -812,8 +812,8 @@ DeptName depends on DeptID, not directly on EmpID
 
 ```sql
 SELECT DISTINCT s.species_name, sp.conservation_status
-FROM Sightings s
-INNER JOIN Species sp ON s.species_name = sp.species_name
+FROM sightings s
+INNER JOIN species sp ON s.species_name = sp.species_name
 WHERE s.date >= '2021-01-01';
 ```
 
@@ -827,8 +827,8 @@ WHERE s.date >= '2021-01-01';
 
 ```sql
 SELECT DISTINCT s.species_name, sp.conservation_status  -- What we want
-FROM Sightings s                                        -- Start with Sightings
-INNER JOIN Species sp ON s.species_name = sp.species_name  -- Link to Species table
+FROM sightings s                                        -- Start with Sightings
+INNER JOIN species sp ON s.species_name = sp.species_name  -- Link to Species table
 WHERE s.date >= '2021-01-01';                           -- Filter by date
 ```
 
@@ -849,16 +849,16 @@ WHERE s.date >= '2021-01-01';                           -- Filter by date
 - If a species exists but has no sightings since 2021, we don't want it
 
 **Table Aliases:**
-- `s` for Sightings, `sp` for Species
+- `s` for sightings, `sp` for species
 - Makes query shorter and clearer
 - Essential when same table appears multiple times
 
 **Alternative Without Alias:**
 ```sql
-SELECT DISTINCT Sightings.species_name, Species.conservation_status
-FROM Sightings
-INNER JOIN Species ON Sightings.species_name = Species.species_name
-WHERE Sightings.date >= '2021-01-01';
+SELECT DISTINCT sightings.species_name, species.conservation_status
+FROM sightings
+INNER JOIN species ON sightings.species_name = species.species_name
+WHERE sightings.date >= '2021-01-01';
 ```
 
 **Common Mistakes:**
@@ -1526,32 +1526,32 @@ mei:note1 mei:pitchName "c" .
 
 ### Answer
 
-**1. Zoo**
+**1. zoo**
 | Field | Key |
 |-------|-----|
 | name | PK |
 | country | |
 
-**2. Enclosure**
+**2. enclosure**
 | Field | Key |
 |-------|-----|
 | name | PK |
 | location | |
-| zoo_name | FK → Zoo |
+| zoo_name | FK → zoo |
 
-**3. Species**
+**3. species**
 | Field | Key |
 |-------|-----|
 | latin_name | PK |
 | conservation_status | |
 
-**4. Animal**
+**4. animal**
 | Field | Key |
 |-------|-----|
 | identifier | PK |
 | date_of_birth | |
-| species_latin_name | FK → Species |
-| enclosure_name | FK → Enclosure |
+| species_latin_name | FK → species |
+| enclosure_name | FK → enclosure |
 
 ---
 
@@ -1600,15 +1600,15 @@ erDiagram
 
 **Reading the Relationships:**
 
-- **Zoo (1) → (M) Enclosure**: One Zoo contains many Enclosures → FK `zoo_name` in Enclosure
-- **Enclosure (1) → (M) Animal**: One Enclosure has many Animals → FK `enclosure_name` in Animal
-- **Species (1) → (M) Animal**: Many Animals belong to one Species → FK `latin_name` in Animal
+- **zoo (1) → (M) enclosure**: One zoo contains many enclosures → FK `zoo_name` in enclosure
+- **enclosure (1) → (M) animal**: One enclosure has many animals → FK `enclosure_name` in animal
+- **species (1) → (M) animal**: Many animals belong to one species → FK `latin_name` in animal
 
 **Why These Primary Keys:**
-- `Zoo.name` - Zoo names are unique identifiers
-- `Enclosure.name` - Could also use `(zoo_name, name)` if names repeat across zoos
-- `Species.latin_name` - Scientific names are unique
-- `Animal.identifier` - Individual animal ID (like a microchip number)
+- `zoo.name` - Zoo names are unique identifiers
+- `enclosure.name` - Could also use `(zoo_name, name)` if names repeat across zoos
+- `species.latin_name` - Scientific names are unique
+- `animal.identifier` - Individual animal ID (like a microchip number)
 
 ---
 
@@ -1621,16 +1621,16 @@ erDiagram
 ### Answer
 
 ```sql
-CREATE TABLE Zoo (
+CREATE TABLE zoo (
     name VARCHAR(255) PRIMARY KEY,
     country VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE Enclosure (
+CREATE TABLE enclosure (
     name VARCHAR(255) PRIMARY KEY,
     location VARCHAR(255),
     zoo_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (zoo_name) REFERENCES Zoo(name)
+    FOREIGN KEY (zoo_name) REFERENCES zoo(name)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -1676,30 +1676,30 @@ CREATE TABLE Enclosure (
 
 **Complete Zoo Schema:**
 ```sql
-CREATE TABLE Zoo (
+CREATE TABLE zoo (
     name VARCHAR(255) PRIMARY KEY,
     country VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE Species (
+CREATE TABLE species (
     latin_name VARCHAR(255) PRIMARY KEY,
     conservation_status VARCHAR(50)
 );
 
-CREATE TABLE Enclosure (
+CREATE TABLE enclosure (
     name VARCHAR(255) PRIMARY KEY,
     location VARCHAR(255),
     zoo_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (zoo_name) REFERENCES Zoo(name)
+    FOREIGN KEY (zoo_name) REFERENCES zoo(name)
 );
 
-CREATE TABLE Animal (
+CREATE TABLE animal (
     identifier VARCHAR(255) PRIMARY KEY,
     date_of_birth DATE,
     species_latin_name VARCHAR(255) NOT NULL,
     enclosure_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (species_latin_name) REFERENCES Species(latin_name),
-    FOREIGN KEY (enclosure_name) REFERENCES Enclosure(name)
+    FOREIGN KEY (species_latin_name) REFERENCES species(latin_name),
+    FOREIGN KEY (enclosure_name) REFERENCES enclosure(name)
 );
 ```
 
@@ -1715,8 +1715,8 @@ CREATE TABLE Animal (
 
 ```sql
 SELECT COUNT(DISTINCT a.species_latin_name) AS species_count
-FROM Animal a
-INNER JOIN Enclosure e ON a.enclosure_name = e.name
+FROM animal a
+INNER JOIN enclosure e ON a.enclosure_name = e.name
 WHERE e.zoo_name = 'Singapore Zoo';
 ```
 
@@ -1754,16 +1754,16 @@ Species (via species_latin_name)
 -- Using subquery
 SELECT COUNT(*) FROM (
     SELECT DISTINCT a.species_latin_name
-    FROM Animal a
-    INNER JOIN Enclosure e ON a.enclosure_name = e.name
+    FROM animal a
+    INNER JOIN enclosure e ON a.enclosure_name = e.name
     WHERE e.zoo_name = 'Singapore Zoo'
 ) AS unique_species;
 
 -- Using EXISTS (if you just need to verify)
 SELECT COUNT(DISTINCT species_latin_name)
-FROM Animal
+FROM animal
 WHERE enclosure_name IN (
-    SELECT name FROM Enclosure WHERE zoo_name = 'Singapore Zoo'
+    SELECT name FROM enclosure WHERE zoo_name = 'Singapore Zoo'
 );
 ```
 
@@ -1779,8 +1779,8 @@ WHERE enclosure_name IN (
 
 ```sql
 SELECT e.zoo_name, MIN(a.date_of_birth) AS oldest_birth_date
-FROM Animal a
-INNER JOIN Enclosure e ON a.enclosure_name = e.name
+FROM animal a
+INNER JOIN enclosure e ON a.enclosure_name = e.name
 WHERE a.species_latin_name = 'Buceros bicornis'
 GROUP BY e.zoo_name;
 ```
@@ -1800,11 +1800,11 @@ GROUP BY e.zoo_name;
 
 ```sql
 -- Without GROUP BY: one result for entire table
-SELECT MIN(date_of_birth) FROM Animal;  -- Returns: 1985-03-21
+SELECT MIN(date_of_birth) FROM animal;  -- Returns: 1985-03-21
 
 -- With GROUP BY: one result per group
 SELECT zoo_name, MIN(date_of_birth)
-FROM Animal INNER JOIN Enclosure...
+FROM animal INNER JOIN enclosure...
 GROUP BY zoo_name;
 -- Returns:
 -- Singapore Zoo | 1995-06-15
@@ -1821,8 +1821,8 @@ GROUP BY zoo_name;
 ```sql
 -- Only zoos with animals older than 2000
 SELECT e.zoo_name, MIN(a.date_of_birth) AS oldest
-FROM Animal a
-INNER JOIN Enclosure e ON a.enclosure_name = e.name
+FROM animal a
+INNER JOIN enclosure e ON a.enclosure_name = e.name
 WHERE a.species_latin_name = 'Buceros bicornis'
 GROUP BY e.zoo_name
 HAVING MIN(a.date_of_birth) < '2000-01-01';
