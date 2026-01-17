@@ -10,6 +10,481 @@
 
 ---
 
+# Section A: Multiple Choice Questions [40 marks]
+
+---
+
+## Question 1(a) [4 marks]
+
+**Question:** The E/R diagram shows Zoo, Keeper, Animal, and Species entities. If this Entity/Relationship model is going to be implemented as a relational model, what will need to change?
+
+---
+
+### Answer
+
+**ii. The relationship between Keeper and Animal is many-to-many and will need to be rewritten with a new entity between them.**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Many-to-many (M:N) relationships cannot be directly implemented in relational databases.
+
+**Why Option ii is Correct:**
+- The `looksAfter` relationship between Keeper and Animal is M:N (many keepers can look after many animals)
+- In relational model, M:N relationships require a **junction/bridge table**
+- The junction table would have foreign keys to both Keeper and Animal
+
+**Why Other Options are Wrong:**
+
+| Option | Why Incorrect |
+|--------|---------------|
+| i. Rename attributes | Attribute names can be the same in different tables (they're scoped to their table) |
+| iii. Remove circular relationships | Circular relationships are allowed and often necessary |
+| iv. Spaces not permitted | Spaces are just conventionally avoided; they can be used with quotes |
+
+**Junction Table Example:**
+```sql
+CREATE TABLE KeeperAnimal (
+    keeper_name VARCHAR(100),
+    animal_id INT,
+    PRIMARY KEY (keeper_name, animal_id),
+    FOREIGN KEY (keeper_name) REFERENCES Keeper(name),
+    FOREIGN KEY (animal_id) REFERENCES Animal(identifier)
+);
+```
+
+---
+
+## Question 1(b) [4 marks]
+
+**Question:** Look at the Animal/Species/Feed table and assess its level of normalisation.
+
+| Animal | Species | Feed |
+|--------|---------|------|
+| Simba | Lion | Meat |
+| Hiss | Royal python | Meat |
+| Eeyore | Donkey | Silage |
+| Fozzy | Brown bear | Nuts |
+| Fozzy | Brown bear | Berries |
+| Baloo | Brown bear | Nuts |
+| Baloo | Brown bear | Berries |
+
+---
+
+### Answer
+
+**i. The table is in 1NF – all rows are a single data type**
+
+(Only statement i is correct)
+
+---
+
+### Revision Notes
+
+**Core Concept:** Analyzing normalization requires identifying functional dependencies and violations.
+
+**Analysis:**
+
+| Statement | Correct? | Reasoning |
+|-----------|----------|-----------|
+| **i. In 1NF** | ✓ Yes | All values are atomic (single values per cell) |
+| **ii. In 2NF** | ✗ No | Has multi-valued dependency (Animal → multiple Feeds) |
+| **iii. In 3NF** | ✗ No | Not in 2NF, so cannot be in 3NF |
+| **iv. In 4NF** | ✗ No | Has multi-valued dependencies (violates 4NF) |
+
+**The Problem - Multi-valued Dependency:**
+- `Animal →→ Feed` (an animal can have multiple feeds, independent of species)
+- Brown bears (Fozzy, Baloo) both eat Nuts AND Berries
+- This creates redundancy: "Brown bear" appears 4 times
+
+**To reach higher normal forms:**
+```
+Animals(animal_name, species)
+AnimalFeeds(animal_name, feed)
+```
+
+---
+
+## Question 1(c) [4 marks]
+
+**Question:** A temporary administrator needs to add students to the school database. Which GRANT command is most appropriate?
+
+---
+
+### Answer
+
+**iii. GRANT INSERT, UPDATE, SELECT, DELETE ON Students to 'temp';**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Principle of least privilege - grant only permissions necessary for the task.
+
+**Analysis:**
+
+| Option | Why Correct/Incorrect |
+|--------|----------------------|
+| i. `GRANT ALL ON * WITH GRANT OPTION` | ✗ Too permissive - access to ALL tables, can grant to others |
+| ii. `GRANT SELECT ON Students` | ✗ Too restrictive - can only read, cannot add students |
+| **iii. `GRANT INSERT, UPDATE, SELECT, DELETE ON Students`** | ✓ Appropriate - full CRUD on Students table only |
+| iv. `GRANT ALL ON Students` | ✗ Slightly too permissive - includes ALTER, DROP, etc. |
+
+**Key Points:**
+- `WITH GRANT OPTION` allows user to grant permissions to others - dangerous for temp staff
+- `ALL` includes administrative privileges like `ALTER TABLE`, `DROP TABLE`
+- Specific permissions (INSERT, UPDATE, SELECT, DELETE) are safer
+
+**GRANT Syntax:**
+```sql
+GRANT privilege_list ON table_name TO 'username'@'host';
+REVOKE privilege_list ON table_name FROM 'username'@'host';
+```
+
+---
+
+## Question 1(d) [4 marks]
+
+**Question:** How many triples are there in the following RDF/Turtle?
+
+```turtle
+chEvents:22498 a event:Event, ecrm:E7_Activity, schema:Event ;
+               dct:date "1952-11-30T17:30:00"^^xsd:dateTime ;
+               rdfs:label "Cordelle Walcott"@en .
+```
+
+---
+
+### Answer
+
+**iii. 5**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Each subject-predicate-object combination is one triple. Turtle syntax allows shortcuts.
+
+**Counting the Triples:**
+
+| # | Subject | Predicate | Object |
+|---|---------|-----------|--------|
+| 1 | chEvents:22498 | rdf:type (a) | event:Event |
+| 2 | chEvents:22498 | rdf:type (a) | ecrm:E7_Activity |
+| 3 | chEvents:22498 | rdf:type (a) | schema:Event |
+| 4 | chEvents:22498 | dct:date | "1952-11-30T17:30:00"^^xsd:dateTime |
+| 5 | chEvents:22498 | rdfs:label | "Cordelle Walcott"@en |
+
+**Turtle Shortcuts:**
+- `a` = shorthand for `rdf:type`
+- `;` = same subject, new predicate
+- `,` = same subject AND predicate, new object
+- `.` = end of statement
+
+**Expanded N-Triples Form:**
+```
+<chEvents:22498> <rdf:type> <event:Event> .
+<chEvents:22498> <rdf:type> <ecrm:E7_Activity> .
+<chEvents:22498> <rdf:type> <schema:Event> .
+<chEvents:22498> <dct:date> "1952-11-30T17:30:00"^^xsd:dateTime .
+<chEvents:22498> <rdfs:label> "Cordelle Walcott"@en .
+```
+
+---
+
+## Question 1(e) [4 marks]
+
+**Question:** The XML below is not **well-formed**. Why not?
+
+```xml
+<movie>
+  <title>Citizen Kane</title>
+  <cast>
+    <actor>Orson Welles</actor>
+    <actor role="Jebediah Leland">Joseph Cotton</actor>
+</movie>
+```
+
+---
+
+### Answer
+
+**ii. The cast element is not closed**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Well-formed XML must follow basic syntax rules, regardless of any schema.
+
+**Well-formedness Rules:**
+1. Single root element ✓
+2. All elements must be closed ✗ (`<cast>` has no `</cast>`)
+3. Proper nesting ✓
+4. Attribute values in quotes ✓
+5. Case-sensitive tags match ✓
+
+**Why Other Options are Wrong (for well-formedness):**
+
+| Option | Why Not a Well-formedness Issue |
+|--------|--------------------------------|
+| i. cast before title | Order is a **validation** issue, not well-formedness |
+| iii. title needs lang | Missing attributes are **validation** issues |
+| iv. actor needs role | Attributes being optional/required is **validation** |
+| v. releaseYear missing | Missing elements are **validation** issues |
+
+**Fixed Well-formed XML:**
+```xml
+<movie>
+  <title>Citizen Kane</title>
+  <cast>
+    <actor>Orson Welles</actor>
+    <actor role="Jebediah Leland">Joseph Cotton</actor>
+  </cast>  <!-- Added closing tag -->
+</movie>
+```
+
+---
+
+## Question 1(f) [4 marks]
+
+**Question:** The XML is not **valid**. Why not? (Exclude well-formedness issues)
+
+---
+
+### Answer
+
+**iii. title should have a lang attribute**
+**v. releaseYear is missing**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Validity means conforming to a schema (XSD/DTD). Requires well-formedness first.
+
+**Schema Requirements vs XML:**
+
+| Schema Requirement | XML Has | Valid? |
+|-------------------|---------|--------|
+| `<title>` with `lang` attribute (required) | `<title>` without `lang` | ✗ |
+| `<releaseYear>` element | Missing | ✗ |
+| `<cast>` element | Present | ✓ |
+| `<actor>` with optional `role` | Present | ✓ |
+
+**From the Schema:**
+```xml
+<xs:element name="title">
+  <xs:complexType mixed="true">
+    <xs:attribute name="lang" use="required"/>  <!-- REQUIRED! -->
+  </xs:complexType>
+</xs:element>
+<xs:element name="releaseYear" type="xs:integer"/>  <!-- Must exist -->
+```
+
+**Why Other Options are Wrong:**
+
+| Option | Why Not a Validation Issue Here |
+|--------|--------------------------------|
+| i. cast before title | `xs:all` allows any order |
+| ii. cast not closed | This is a well-formedness issue (excluded) |
+| iv. actor needs role | `role` attribute is optional (no `use="required"`) |
+
+---
+
+## Question 1(g) [4 marks]
+
+**Question:** Which statements comparing MongoDB with SQL are true?
+
+---
+
+### Answer
+
+**iii. A single MongoDB update would often map to more than one command in SQL.**
+**iv. A MongoDB document can have a more complex structure than an SQL table.**
+
+---
+
+### Revision Notes
+
+**Core Concept:** MongoDB (document store) vs SQL (relational) have fundamental structural differences.
+
+**Analysis:**
+
+| Statement | Correct? | Reasoning |
+|-----------|----------|-----------|
+| i. MongoDB has no explicit indexes | ✗ False | MongoDB supports indexes (`createIndex()`) |
+| ii. SQL guarantees ACID in all transactions | ✗ False | MongoDB 4.0+ also supports ACID transactions |
+| **iii. MongoDB update → multiple SQL** | ✓ True | Updating nested documents = updating multiple related tables in SQL |
+| **iv. MongoDB more complex structure** | ✓ True | Documents can nest arrays/objects; SQL tables are flat |
+
+**Example - Why iii is True:**
+```javascript
+// MongoDB: Single update
+db.orders.updateOne(
+  { _id: 1 },
+  { $push: { items: { product: "Book", qty: 2 } } }
+)
+
+// SQL equivalent: Multiple statements
+INSERT INTO OrderItems (order_id, product, qty) VALUES (1, 'Book', 2);
+UPDATE Orders SET item_count = item_count + 1 WHERE id = 1;
+```
+
+**Example - Why iv is True:**
+```javascript
+// MongoDB document with nested structure
+{
+  name: "John",
+  addresses: [
+    { type: "home", city: "London" },
+    { type: "work", city: "Manchester" }
+  ]
+}
+// SQL would need: Person table + Address table + join
+```
+
+---
+
+## Question 1(h) [4 marks]
+
+**Question:** An international researcher wants ALL documents satisfying their research requirements. They will digitise during their visit and manually discard irrelevant ones later. How would you best evaluate the IR system?
+
+---
+
+### Answer
+
+**ii. Evaluate the system's recall (precision is less important here).**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Precision vs Recall trade-off depends on the cost of false positives vs false negatives.
+
+**Definitions:**
+
+| Metric | Formula | Meaning |
+|--------|---------|---------|
+| **Precision** | TP / (TP + FP) | Of retrieved docs, how many are relevant? |
+| **Recall** | TP / (TP + FN) | Of relevant docs, how many were retrieved? |
+| **F-measure** | 2 × (P × R) / (P + R) | Harmonic mean of precision and recall |
+
+**Why Recall Matters Here:**
+
+| Scenario Factor | Implication |
+|-----------------|-------------|
+| Researcher wants ALL relevant docs | Missing a doc (false negative) is costly |
+| Will manually filter later | Extra irrelevant docs (false positive) is acceptable |
+| Digitisation is "quick and cost-free" | Low cost to process extra docs |
+| One-time visit | Can't come back for missed documents |
+
+**When to Prioritize:**
+
+| Prioritize | When |
+|------------|------|
+| **Recall** | Missing relevant items is costly (medical diagnosis, legal discovery) |
+| **Precision** | Processing irrelevant items is costly (web search, spam filtering) |
+| **F-measure** | Both matter equally |
+
+---
+
+## Question 1(i) [4 marks]
+
+**Question:** What distinguishes a graph from a tree?
+
+---
+
+### Answer
+
+**i. A graph does not need a root node, a tree does.**
+**iii. A node in a tree has exactly one parent node, a graph has no such constraint.**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Trees are a special case of graphs with specific structural constraints.
+
+**Comparison:**
+
+| Property | Tree | Graph |
+|----------|------|-------|
+| Root node | Required (one) | Not required |
+| Parent per node | Exactly one (except root) | Any number (0 to many) |
+| Cycles | Not allowed | Allowed |
+| Path between nodes | Exactly one | Zero, one, or many |
+| Direction | Usually directed (parent→child) | Can be directed or undirected |
+
+**Analysis of Options:**
+
+| Statement | Correct? | Reasoning |
+|-----------|----------|-----------|
+| **i. Graph no root, tree needs root** | ✓ True | Trees have a designated root; graphs don't |
+| ii. Tree has text, graph cannot | ✗ False | Both can contain any data |
+| **iii. Tree node has one parent** | ✓ True | Defining property of trees |
+| iv. Tree no root, graph needs root | ✗ False | Opposite of reality |
+
+**Visual Example:**
+```
+Tree:                    Graph:
+    A (root)               A --- B
+   / \                     |   / |
+  B   C                    |  /  |
+ / \                       | /   |
+D   E                      C --- D
+(Each node has one parent) (Nodes can have multiple connections)
+```
+
+---
+
+## Question 1(j) [4 marks]
+
+**Question:** Which statements about types of JOIN in SQL are correct?
+
+---
+
+### Answer
+
+**i. A LEFT JOIN will produce at least as many rows as an INNER JOIN**
+**iii. A CROSS JOIN will produce at least as many rows as a LEFT JOIN**
+**v. No type of join can produce more rows than a CROSS JOIN**
+
+---
+
+### Revision Notes
+
+**Core Concept:** Different JOIN types have different row-count guarantees.
+
+**JOIN Types and Row Counts:**
+
+| JOIN Type | Result Size | Description |
+|-----------|-------------|-------------|
+| **INNER JOIN** | ≤ min(A, B) × max(A, B) | Only matching rows |
+| **LEFT JOIN** | ≥ INNER JOIN, ≤ CROSS JOIN | All left rows + matches |
+| **RIGHT JOIN** | ≥ INNER JOIN, ≤ CROSS JOIN | All right rows + matches |
+| **CROSS JOIN** | A × B (Cartesian product) | Every combination |
+
+**Analysis:**
+
+| Statement | Correct? | Reasoning |
+|-----------|----------|-----------|
+| **i. LEFT ≥ INNER** | ✓ True | LEFT includes all INNER results plus unmatched left rows |
+| ii. INNER ≥ LEFT | ✗ False | INNER can only be ≤ LEFT |
+| **iii. CROSS ≥ LEFT** | ✓ True | CROSS is maximum possible; LEFT is subset |
+| iv. LEFT ≥ CROSS | ✗ False | CROSS is always the largest |
+| **v. Nothing > CROSS** | ✓ True | CROSS is the Cartesian product (maximum) |
+
+**Example with Tables A(3 rows) and B(4 rows):**
+```
+CROSS JOIN: 3 × 4 = 12 rows (always)
+LEFT JOIN:  3 to 12 rows (depends on matches)
+INNER JOIN: 0 to 12 rows (depends on matches)
+```
+
+---
+
 # Section B
 
 ---
