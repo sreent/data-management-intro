@@ -562,7 +562,7 @@ INNER JOIN: 0 to 12 rows (depends on matches)
 
 ```sql
 SELECT DISTINCT Species
-FROM sightings
+FROM Sightings
 WHERE Date >= '2021-01-01';
 ```
 
@@ -581,11 +581,11 @@ WHERE Date >= '2021-01-01';
 **Alternative Approaches:**
 ```sql
 -- Using BETWEEN for a date range
-SELECT DISTINCT Species FROM sightings
+SELECT DISTINCT Species FROM Sightings
 WHERE Date BETWEEN '2021-01-01' AND '2021-12-31';
 
 -- Using YEAR() function (MySQL specific)
-SELECT DISTINCT Species FROM sightings
+SELECT DISTINCT Species FROM Sightings
 WHERE YEAR(Date) >= 2021;
 ```
 
@@ -653,23 +653,23 @@ WHERE YEAR(Date) >= 2021;
 
 **Three tables after normalization:**
 
-**1. species**
+**1. Species**
 | Column | Key |
 |--------|-----|
 | species_name | PK |
 | conservation_status | |
 
-**2. nature_reserves**
+**2. NatureReserves**
 | Column | Key |
 |--------|-----|
 | reserve_name | PK |
 | location | |
 
-**3. sightings**
+**3. Sightings**
 | Column | Key |
 |--------|-----|
-| species_name | PK, FK → species |
-| reserve_name | PK, FK → nature_reserves |
+| species_name | PK, FK → Species |
+| reserve_name | PK, FK → NatureReserves |
 | date | PK |
 | number_sighted | |
 
@@ -703,24 +703,24 @@ In the original table:
 Create a new table for each entity that has its own attributes:
 
 ```
-Original: sightings(Species, Date, Number_sighted, Conservation_status,
+Original: Sightings(Species, Date, Number_sighted, Conservation_status,
                     Nature_reserve, Location)
 
 Decomposed:
-  species(species_name, conservation_status)
-  nature_reserves(reserve_name, location)
-  sightings(species_name, reserve_name, date, number_sighted)
+  Species(species_name, conservation_status)
+  NatureReserves(reserve_name, location)
+  Sightings(species_name, reserve_name, date, number_sighted)
 ```
 
 **Why This Design:**
-- **No update anomaly**: Change conservation status once in `species` table
+- **No update anomaly**: Change conservation status once in `Species` table
 - **No insert anomaly**: Can add a new species without needing a sighting
 - **No delete anomaly**: Deleting last sighting doesn't lose species info
 
 **Visual Representation:**
 ```
 ┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   species   │     │    sightings    │     │ nature_reserves │
+│   Species   │     │    Sightings    │     │ NatureReserves  │
 ├─────────────┤     ├─────────────────┤     ├─────────────────┤
 │ species_name│◄────│ species_name    │     │ reserve_name    │
 │ conserv_stat│     │ reserve_name    │────►│ location        │
@@ -812,8 +812,8 @@ DeptName depends on DeptID, not directly on EmpID
 
 ```sql
 SELECT DISTINCT s.species_name, sp.conservation_status
-FROM sightings s
-INNER JOIN species sp ON s.species_name = sp.species_name
+FROM Sightings s
+INNER JOIN Species sp ON s.species_name = sp.species_name
 WHERE s.date >= '2021-01-01';
 ```
 
@@ -827,8 +827,8 @@ WHERE s.date >= '2021-01-01';
 
 ```sql
 SELECT DISTINCT s.species_name, sp.conservation_status  -- What we want
-FROM sightings s                                        -- Start with sightings
-INNER JOIN species sp ON s.species_name = sp.species_name  -- Link to species table
+FROM Sightings s                                        -- Start with Sightings
+INNER JOIN Species sp ON s.species_name = sp.species_name  -- Link to Species table
 WHERE s.date >= '2021-01-01';                           -- Filter by date
 ```
 
@@ -849,16 +849,16 @@ WHERE s.date >= '2021-01-01';                           -- Filter by date
 - If a species exists but has no sightings since 2021, we don't want it
 
 **Table Aliases:**
-- `s` for sightings, `sp` for species
+- `s` for Sightings, `sp` for Species
 - Makes query shorter and clearer
 - Essential when same table appears multiple times
 
 **Alternative Without Alias:**
 ```sql
-SELECT DISTINCT sightings.species_name, species.conservation_status
-FROM sightings
-INNER JOIN species ON sightings.species_name = species.species_name
-WHERE sightings.date >= '2021-01-01';
+SELECT DISTINCT Sightings.species_name, Species.conservation_status
+FROM Sightings
+INNER JOIN Species ON Sightings.species_name = Species.species_name
+WHERE Sightings.date >= '2021-01-01';
 ```
 
 **Common Mistakes:**
@@ -1047,11 +1047,6 @@ measure
 ### Answer
 
 ```xpath
-//staff[@n="2"]/layer/chord[note/@pname="f"]
-```
-
-Or to match the original intent (finding notes with pname="c"):
-```xpath
 //staff[@n="2"]/layer/chord[note/@pname="c"]
 ```
 
@@ -1061,12 +1056,22 @@ Or to match the original intent (finding notes with pname="c"):
 
 **Core Concept:** XPath navigates XML documents using path expressions. Attributes are accessed with `@`.
 
-**What Was Wrong:**
+**Exam Question Note:** The question text says "pname of **f**" but the incorrect XPath shows `pname="c"`. This is an inconsistency in the exam. The answer above fixes the XPath syntax while keeping `pname="c"` (which matches staff n="2"). If looking for `pname="f"`, you'd need staff n="3":
+
+```xpath
+//staff[@n="3"]/layer/chord[note/@pname="f"]
+```
+
+**What Was Wrong in the Original XPath:**
 
 | Original | Problem | Correct |
 |----------|---------|---------|
 | `/staff[n="2"]` | `n="2"` looks for child element `<n>` | `[@n="2"]` checks attribute |
 | `/staff` | Starts from root, but `staff` isn't root | `//staff` searches anywhere |
+
+**Data Reference:**
+- Staff n="2" contains notes with pname: **c**, **a**, **c**
+- Staff n="3" contains notes with pname: **f**, **f**
 
 **XPath Syntax Reference:**
 
