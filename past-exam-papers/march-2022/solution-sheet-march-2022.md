@@ -384,49 +384,49 @@ Genealogical data IS graph-like, so RDF captures this naturally. But relational 
 **Example Schema:**
 
 ```sql
-CREATE TABLE royals (
-    id VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
+CREATE TABLE Royals (
+    Id VARCHAR(50) PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE titles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    royal_id VARCHAR(50) NOT NULL,
-    rank VARCHAR(20),
-    territory VARCHAR(50),
-    regnal VARCHAR(10),
-    from_date DATE,
-    to_date DATE,
-    FOREIGN KEY (royal_id) REFERENCES royals(id)
+CREATE TABLE Titles (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    RoyalId VARCHAR(50) NOT NULL,
+    Rank VARCHAR(20),
+    Territory VARCHAR(50),
+    Regnal VARCHAR(10),
+    FromDate DATE,
+    ToDate DATE,
+    FOREIGN KEY (RoyalId) REFERENCES Royals(Id)
 );
 
-CREATE TABLE relationships (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    royal_id VARCHAR(50) NOT NULL,
-    type VARCHAR(20),
-    spouse_id VARCHAR(50),
-    from_date DATE,
-    to_date DATE,
-    FOREIGN KEY (royal_id) REFERENCES royals(id),
-    FOREIGN KEY (spouse_id) REFERENCES royals(id)
+CREATE TABLE Relationships (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    RoyalId VARCHAR(50) NOT NULL,
+    Type VARCHAR(20),
+    SpouseId VARCHAR(50),
+    FromDate DATE,
+    ToDate DATE,
+    FOREIGN KEY (RoyalId) REFERENCES Royals(Id),
+    FOREIGN KEY (SpouseId) REFERENCES Royals(Id)
 );
 
-CREATE TABLE parent_child (
-    parent_id VARCHAR(50),
-    child_id VARCHAR(50),
-    relationship_id INT,
-    PRIMARY KEY (parent_id, child_id),
-    FOREIGN KEY (parent_id) REFERENCES royals(id),
-    FOREIGN KEY (child_id) REFERENCES royals(id)
+CREATE TABLE ParentChild (
+    ParentId VARCHAR(50),
+    ChildId VARCHAR(50),
+    RelationshipId INT,
+    PRIMARY KEY (ParentId, ChildId),
+    FOREIGN KEY (ParentId) REFERENCES Royals(Id),
+    FOREIGN KEY (ChildId) REFERENCES Royals(Id)
 );
 ```
 
 **Example Query - Find all monarchs:**
 ```sql
-SELECT r.name, t.rank, t.territory, t.regnal
-FROM royals r
-INNER JOIN titles t ON r.id = t.royal_id
-WHERE t.rank IN ('king', 'queen');
+SELECT R.Name, T.Rank, T.Territory, T.Regnal
+FROM Royals R
+INNER JOIN Titles T ON R.Id = T.RoyalId
+WHERE T.Rank IN ('king', 'queen');
 ```
 
 ---
@@ -847,31 +847,31 @@ Then use the IMDB ID to fetch filmography from IMDB.
 **Relational Model (Triple Table Approach):**
 
 ```sql
-CREATE TABLE triples (
-    subject VARCHAR(100),
-    predicate VARCHAR(50),
-    object VARCHAR(100),
-    PRIMARY KEY (subject, predicate, object)
+CREATE TABLE Triples (
+    Subject VARCHAR(100),
+    Predicate VARCHAR(50),
+    Object VARCHAR(100),
+    PRIMARY KEY (Subject, Predicate, Object)
 );
 ```
 
 **Sample Data:**
-| subject | predicate | object |
+| Subject | Predicate | Object |
 |---------|-----------|--------|
-| Person123 | instance_of | Human |
-| Person123 | birth_place | New_York_City |
-| Person456 | instance_of | Human |
-| Person456 | birth_place | Boston |
+| Person123 | InstanceOf | Human |
+| Person123 | BirthPlace | New_York_City |
+| Person456 | InstanceOf | Human |
+| Person456 | BirthPlace | Boston |
 
 **Equivalent SQL Query:**
 ```sql
-SELECT DISTINCT t1.subject AS person
-FROM triples t1
-INNER JOIN triples t2 ON t1.subject = t2.subject
-WHERE t1.predicate = 'instance_of'
-  AND t1.object = 'Human'
-  AND t2.predicate = 'birth_place'
-  AND t2.object = 'New_York_City';
+SELECT DISTINCT T1.Subject AS Person
+FROM Triples T1
+INNER JOIN Triples T2 ON T1.Subject = T2.Subject
+WHERE T1.Predicate = 'InstanceOf'
+  AND T1.Object = 'Human'
+  AND T2.Predicate = 'BirthPlace'
+  AND T2.Object = 'New_York_City';
 ```
 
 ---
@@ -881,7 +881,7 @@ WHERE t1.predicate = 'instance_of'
 **Core Concept:** RDF triples can be stored in a relational table.
 
 **The Triple Table Pattern:**
-- Subject, Predicate, Object columns
+- Subject, Predicate, Object columns (PascalCase)
 - Each RDF triple = one row
 - Self-joins to combine conditions
 
@@ -917,17 +917,17 @@ To handle the hierarchical location path (`P131*`), we can use self-joins for a 
 This approach works when you know the maximum hierarchy depth (e.g., 2 levels):
 
 ```sql
-SELECT DISTINCT t1.subject AS person
-FROM triples t1
-INNER JOIN triples t2 ON t1.subject = t2.subject
-LEFT JOIN triples t3 ON t2.object = t3.subject AND t3.predicate = 'located_in'
-LEFT JOIN triples t4 ON t3.object = t4.subject AND t4.predicate = 'located_in'
-WHERE t1.predicate = 'instance_of'
-  AND t1.object = 'Human'
-  AND t2.predicate = 'birth_place'
-  AND (t2.object = 'New_York_City'
-       OR t3.object = 'New_York_City'
-       OR t4.object = 'New_York_City');
+SELECT DISTINCT T1.Subject AS Person
+FROM Triples T1
+INNER JOIN Triples T2 ON T1.Subject = T2.Subject
+LEFT JOIN Triples T3 ON T2.Object = T3.Subject AND T3.Predicate = 'LocatedIn'
+LEFT JOIN Triples T4 ON T3.Object = T4.Subject AND T4.Predicate = 'LocatedIn'
+WHERE T1.Predicate = 'InstanceOf'
+  AND T1.Object = 'Human'
+  AND T2.Predicate = 'BirthPlace'
+  AND (T2.Object = 'New_York_City'
+       OR T3.Object = 'New_York_City'
+       OR T4.Object = 'New_York_City');
 ```
 
 **Option 2: Recursive CTE (Advanced)**
@@ -935,26 +935,26 @@ WHERE t1.predicate = 'instance_of'
 For arbitrary depth hierarchies, use a recursive Common Table Expression:
 
 ```sql
-WITH RECURSIVE location_chain AS (
+WITH RECURSIVE LocationChain AS (
     -- Base case: direct birth place
-    SELECT subject, object AS location
-    FROM triples
-    WHERE predicate = 'birth_place'
+    SELECT Subject, Object AS Location
+    FROM Triples
+    WHERE Predicate = 'BirthPlace'
 
     UNION
 
-    -- Recursive case: follow located_in chain
-    SELECT lc.subject, t.object
-    FROM location_chain lc
-    INNER JOIN triples t ON lc.location = t.subject
-    WHERE t.predicate = 'located_in'
+    -- Recursive case: follow LocatedIn chain
+    SELECT LC.Subject, T.Object
+    FROM LocationChain LC
+    INNER JOIN Triples T ON LC.Location = T.Subject
+    WHERE T.Predicate = 'LocatedIn'
 )
-SELECT DISTINCT t.subject AS person
-FROM triples t
-INNER JOIN location_chain lc ON t.subject = lc.subject
-WHERE t.predicate = 'instance_of'
-  AND t.object = 'Human'
-  AND lc.location = 'New_York_City';
+SELECT DISTINCT T.Subject AS Person
+FROM Triples T
+INNER JOIN LocationChain LC ON T.Subject = LC.Subject
+WHERE T.Predicate = 'InstanceOf'
+  AND T.Object = 'Human'
+  AND LC.Location = 'New_York_City';
 ```
 
 ---
@@ -1069,21 +1069,21 @@ In E/R, relationships can have attributes. In relational model, this requires a 
 
 **Junction Table Pattern:**
 ```sql
-CREATE TABLE stay_in (
-    patient_id INT,
-    ward_name VARCHAR(100),
-    arrived DATE,
-    departed DATE,
-    PRIMARY KEY (patient_id, ward_name, arrived),
-    FOREIGN KEY (patient_id) REFERENCES patients(id),
-    FOREIGN KEY (ward_name) REFERENCES wards(name)
+CREATE TABLE StayIn (
+    PatientId INT,
+    WardName VARCHAR(100),
+    Arrived DATE,
+    Departed DATE,
+    PRIMARY KEY (PatientId, WardName, Arrived),
+    FOREIGN KEY (PatientId) REFERENCES Patients(Id),
+    FOREIGN KEY (WardName) REFERENCES Wards(Name)
 );
 ```
 
 **Common Mistakes:**
 - Trying to put M:N relationship as a foreign key in one of the entities (impossible!)
-- Forgetting relationship attributes — `arrived`/`departed` must go somewhere
-- Not including all parts of the composite primary key (patient + ward + arrived)
+- Forgetting relationship attributes — `Arrived`/`Departed` must go somewhere
+- Not including all parts of the composite primary key (Patient + Ward + Arrived)
 - Confusing 1:M (can use FK) with M:N (requires junction table)
 
 ---
@@ -1100,67 +1100,67 @@ CREATE TABLE stay_in (
 
 ```mermaid
 erDiagram
-    patients {
-        int id PK
-        string name
-        date dob
-        string treated_by FK
+    Patients {
+        int Id PK
+        string Name
+        date DoB
+        string TreatedBy FK
     }
 
-    doctors {
-        string name PK
+    Doctors {
+        string Name PK
     }
 
-    stay_in {
-        int patient PK_FK
-        string ward PK_FK
-        date arrived PK
-        date departed
+    StayIn {
+        int Patient PK_FK
+        string Ward PK_FK
+        date Arrived PK
+        date Departed
     }
 
-    wards {
-        string name PK
-        string located_in FK
-        string operated_by FK
+    Wards {
+        string Name PK
+        string LocatedIn FK
+        string OperatedBy FK
     }
 
-    buildings {
-        string name PK
-        string address
-        string run_by FK
+    Buildings {
+        string Name PK
+        string Address
+        string RunBy FK
     }
 
-    hospitals {
-        string name PK
+    Hospitals {
+        string Name PK
     }
 
-    departments {
-        string name PK
-        string part_of FK
-        string specialisation
+    Departments {
+        string Name PK
+        string PartOf FK
+        string Specialisation
     }
 
-    works_at {
-        string doctor PK_FK
-        string department PK_FK
+    WorksAt {
+        string Doctor PK_FK
+        string Department PK_FK
     }
 
-    patients }o--|| doctors : "treated_by"
-    patients ||--|{ stay_in : "patient"
-    stay_in }|--|| wards : "ward"
-    wards }|--|| buildings : "located_in"
-    wards }|--|| departments : "operated_by"
-    buildings }|--|| hospitals : "run_by"
-    departments }|--|| hospitals : "part_of"
-    doctors ||--|{ works_at : "doctor"
-    works_at }|--|| departments : "department"
+    Patients }o--|| Doctors : "TreatedBy"
+    Patients ||--|{ StayIn : "Patient"
+    StayIn }|--|| Wards : "Ward"
+    Wards }|--|| Buildings : "LocatedIn"
+    Wards }|--|| Departments : "OperatedBy"
+    Buildings }|--|| Hospitals : "RunBy"
+    Departments }|--|| Hospitals : "PartOf"
+    Doctors ||--|{ WorksAt : "Doctor"
+    WorksAt }|--|| Departments : "Department"
 ```
 
 **Key Additions:**
-1. `stay_in` junction table with `arrived`, `departed` attributes
-2. `works_at` junction table for Doctor-Department M:N
-3. `treated_by` FK in patients → doctors (answers question vi)
-4. `operated_by` FK in wards → departments (answers question iii)
+1. `StayIn` junction table with `Arrived`, `Departed` attributes
+2. `WorksAt` junction table for Doctor-Department M:N
+3. `TreatedBy` FK in Patients → Doctors (answers question vi)
+4. `OperatedBy` FK in Wards → Departments (answers question iii)
 
 ---
 
@@ -1174,14 +1174,14 @@ erDiagram
 
 | Table | Primary Key | Foreign Keys |
 |-------|-------------|--------------|
-| **hospitals** | name | - |
-| **buildings** | name | run_by → hospitals(name) |
-| **departments** | name | part_of → hospitals(name) |
-| **wards** | name | located_in → buildings(name), operated_by → departments(name) |
-| **doctors** | name | - |
-| **patients** | id | treated_by → doctors(name) |
-| **stay_in** | (patient, ward, arrived) | patient → patients(id), ward → wards(name) |
-| **works_at** | (doctor, department) | doctor → doctors(name), department → departments(name) |
+| **Hospitals** | Name | - |
+| **Buildings** | Name | RunBy → Hospitals(Name) |
+| **Departments** | Name | PartOf → Hospitals(Name) |
+| **Wards** | Name | LocatedIn → Buildings(Name), OperatedBy → Departments(Name) |
+| **Doctors** | Name | - |
+| **Patients** | Id | TreatedBy → Doctors(Name) |
+| **StayIn** | (Patient, Ward, Arrived) | Patient → Patients(Id), Ward → Wards(Name) |
+| **WorksAt** | (Doctor, Department) | Doctor → Doctors(Name), Department → Departments(Name) |
 
 ---
 
@@ -1195,54 +1195,54 @@ erDiagram
 
 **(i) Which building did patient Neha Ahuja stay in?**
 ```sql
-SELECT DISTINCT w.located_in AS building_name
-FROM patients p
-INNER JOIN stay_in s ON p.id = s.patient
-INNER JOIN wards w ON s.ward = w.name
-WHERE p.name = 'Neha Ahuja';
+SELECT DISTINCT W.LocatedIn AS BuildingName
+FROM Patients P
+INNER JOIN StayIn S ON P.Id = S.Patient
+INNER JOIN Wards W ON S.Ward = W.Name
+WHERE P.Name = 'Neha Ahuja';
 ```
 
 **(ii) Which hospital was responsible for Neha Ahuja's stay?**
 ```sql
-SELECT DISTINCT b.run_by AS hospital_name
-FROM patients p
-INNER JOIN stay_in s ON p.id = s.patient
-INNER JOIN wards w ON s.ward = w.name
-INNER JOIN buildings b ON w.located_in = b.name
-WHERE p.name = 'Neha Ahuja';
+SELECT DISTINCT B.RunBy AS HospitalName
+FROM Patients P
+INNER JOIN StayIn S ON P.Id = S.Patient
+INNER JOIN Wards W ON S.Ward = W.Name
+INNER JOIN Buildings B ON W.LocatedIn = B.Name
+WHERE P.Name = 'Neha Ahuja';
 ```
 
 **(iii) In which wards are Orthopedics patients housed?**
 ```sql
-SELECT DISTINCT w.name AS ward_name
-FROM wards w
-INNER JOIN departments d ON w.operated_by = d.name
-WHERE d.specialisation = 'Orthopedics';
+SELECT DISTINCT W.Name AS WardName
+FROM Wards W
+INNER JOIN Departments D ON W.OperatedBy = D.Name
+WHERE D.Name = 'Orthopedics';
 ```
 
 **(iv) Which hospitals does doctor Song Ci work in?**
 ```sql
-SELECT DISTINCT d.part_of AS hospital_name
-FROM doctors doc
-INNER JOIN works_at wa ON doc.name = wa.doctor
-INNER JOIN departments d ON wa.department = d.name
-WHERE doc.name = 'Song Ci';
+SELECT DISTINCT D.PartOf AS HospitalName
+FROM Doctors Doc
+INNER JOIN WorksAt WA ON Doc.Name = WA.Doctor
+INNER JOIN Departments D ON WA.Department = D.Name
+WHERE Doc.Name = 'Song Ci';
 ```
 
 **(v) What departments does the hospital have that contains 'The Alexander Fleming Building'?**
 ```sql
-SELECT d.name AS department_name
-FROM departments d
-INNER JOIN hospitals h ON d.part_of = h.name
-INNER JOIN buildings b ON b.run_by = h.name
-WHERE b.name = 'The Alexander Fleming Building';
+SELECT D.Name AS DepartmentName
+FROM Departments D
+INNER JOIN Hospitals H ON D.PartOf = H.Name
+INNER JOIN Buildings B ON B.RunBy = H.Name
+WHERE B.Name = 'The Alexander Fleming Building';
 ```
 
 **(vi) Which doctor treated Neha Ahuja?**
 ```sql
-SELECT p.treated_by AS doctor_name
-FROM patients p
-WHERE p.name = 'Neha Ahuja';
+SELECT P.TreatedBy AS DoctorName
+FROM Patients P
+WHERE P.Name = 'Neha Ahuja';
 ```
 
 **Common Mistakes:**
@@ -1312,21 +1312,21 @@ SERVICE wikibase:label { ... }           -- Get human-readable labels
 
 ```sql
 -- For M:N relationships
-CREATE TABLE junction (
-    entity1_id INT,
-    entity2_id INT,
-    PRIMARY KEY (entity1_id, entity2_id),
-    FOREIGN KEY (entity1_id) REFERENCES entity1(id),
-    FOREIGN KEY (entity2_id) REFERENCES entity2(id)
+CREATE TABLE Junction (
+    Entity1Id INT,
+    Entity2Id INT,
+    PRIMARY KEY (Entity1Id, Entity2Id),
+    FOREIGN KEY (Entity1Id) REFERENCES Entity1(Id),
+    FOREIGN KEY (Entity2Id) REFERENCES Entity2(Id)
 );
 
 -- For relationships with attributes
-CREATE TABLE relationship (
-    entity1_id INT,
-    entity2_id INT,
-    attribute1 DATE,
-    attribute2 VARCHAR(100),
-    PRIMARY KEY (entity1_id, entity2_id, attribute1),
+CREATE TABLE Relationship (
+    Entity1Id INT,
+    Entity2Id INT,
+    Attribute1 DATE,
+    Attribute2 VARCHAR(100),
+    PRIMARY KEY (Entity1Id, Entity2Id, Attribute1),
     ...
 );
 ```
