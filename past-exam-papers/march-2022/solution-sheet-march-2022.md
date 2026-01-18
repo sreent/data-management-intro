@@ -1157,10 +1157,10 @@ erDiagram
 ```
 
 **Key Additions:**
-1. `stay_in` junction table with `arrived`, `departed` attributes
-2. `works_at` junction table for Doctor-Department M:N
-3. `treated_by` FK in patients → doctors (answers question vi)
-4. `operated_by` FK in wards → departments (answers question iii)
+1. `StayIn` junction table with `Arrived`, `Departed` attributes
+2. `WorksAt` junction table for Doctor-Department M:N
+3. `TreatedBy` FK in Patients → Doctors (answers question vi)
+4. `OperatedBy` FK in Wards → Departments (answers question iii)
 
 ---
 
@@ -1217,7 +1217,7 @@ WHERE P.Name = 'Neha Ahuja';
 SELECT DISTINCT W.Name AS WardName
 FROM Wards W
 INNER JOIN Departments D ON W.OperatedBy = D.Name
-WHERE D.Specialisation = 'Orthopedics';
+WHERE D.Name = 'Orthopedics';
 ```
 
 **(iv) Which hospitals does doctor Song Ci work in?**
