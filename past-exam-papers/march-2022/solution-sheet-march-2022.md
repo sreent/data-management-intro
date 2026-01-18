@@ -107,14 +107,9 @@ Section A consists of 10 MCQs taken separately on the VLE. See the VLE for MCQ q
 
 ### Answer
 
-This query returns the `<royal>` element with `name="Henry"` that shares the same parent as a `<title>` element with `rank="king"` and `regnal="VIII"`.
+**This query returns NOTHING (empty result).**
 
-**Result:**
-```xml
-<royal name="Henry" xml:id="HenryVIII">
-  ...
-</royal>
-```
+The query attempts to find a `<royal>` element with `name="Henry"` that is a direct child of the parent of Henry VIII's `<title>` element, but no such element exists.
 
 ---
 
@@ -129,15 +124,32 @@ This query returns the `<royal>` element with `name="Henry"` that shares the sam
 | `//title` | Find any `<title>` element anywhere in the document |
 | `[@rank="king" and @regnal="VIII"]` | Filter: must have both attributes with these values |
 | `/..` | Navigate UP to the parent element |
-| `/royal[@name="Henry"]` | Find child `<royal>` with `name="Henry"` |
+| `/royal[@name="Henry"]` | Find **direct child** `<royal>` with `name="Henry"` |
 
 **Step-by-Step Evaluation:**
 1. Find `<title rank="king" ... regnal="VIII">` → This is Henry VIII's title
-2. Go to parent → `<royal name="Henry" xml:id="HenryVIII">`
-3. From that parent, find child `<royal>` with `name="Henry"`
-4. But wait: the parent IS the `<royal name="Henry">`, so we're looking for a CHILD named Henry
+2. Go to parent (`/..`) → `<royal name="Henry" xml:id="HenryVIII">`
+3. From that parent, find a direct child `<royal>` with `name="Henry"`
+4. **Result: Empty** — Henry VIII's `<royal>` element has NO direct child `<royal name="Henry">`
 
-**Important Note:** This query looks for a `<royal name="Henry">` that is a **sibling** of the `<title>`. Looking at the data structure, the `<title>` is a direct child of `<royal name="Henry">`, so the parent of `<title>` is `<royal name="Henry">` itself, and we're then looking for a child `<royal>` of that parent.
+**Why It Returns Nothing:**
+
+The parent of the `<title>` IS `<royal name="Henry" xml:id="HenryVIII">` itself. We're then looking for a **child** element `<royal name="Henry">` inside it. Henry VIII's children (Mary, Elizabeth, Edward) are nested inside `<relationship><children>` elements, and none are named "Henry":
+
+```
+<royal name="Henry" xml:id="HenryVIII">    ← parent of title
+  <title rank="king" regnal="VIII"/>       ← the title we found
+  <relationship>
+    <children>
+      <royal name="Mary">...</royal>       ← NOT name="Henry"
+      <royal name="Elizabeth">...</royal>  ← NOT name="Henry"
+      <royal name="Edward">...</royal>     ← NOT name="Henry"
+    </children>
+  </relationship>
+</royal>
+```
+
+**Common Mistake:** Confusing `/royal` (direct child) with `//royal` (any descendant). If the query used `//royal[@name="Henry"]` instead, it would return all descendant `<royal>` elements named Henry.
 
 **XPath Axes Reference:**
 
