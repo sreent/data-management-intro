@@ -40,20 +40,20 @@ erDiagram
     Keeper }o--o{ Animal : looksAfter
 
     Zoo {
-        string name PK
-        string country
+        string Name PK
+        string Country
     }
     Keeper {
-        string name PK
-        date date_of_birth
+        string Name PK
+        date DateOfBirth
     }
     Animal {
-        int identifier PK
-        date date_of_birth
+        int Identifier PK
+        date DateOfBirth
     }
     Species {
-        string latin_name PK
-        string conservation_status
+        string LatinName PK
+        string ConservationStatus
     }
 ```
 
@@ -70,24 +70,24 @@ erDiagram
     Animal ||--o{ KeeperAnimal : ""
 
     Zoo {
-        string name PK
-        string country
+        string Name PK
+        string Country
     }
     Keeper {
-        string name PK
-        date date_of_birth
+        string Name PK
+        date DateOfBirth
     }
     KeeperAnimal {
-        string keeper_name PK_FK
-        int animal_id PK_FK
+        string KeeperName PK_FK
+        int AnimalId PK_FK
     }
     Animal {
-        int identifier PK
-        date date_of_birth
+        int Identifier PK
+        date DateOfBirth
     }
     Species {
-        string latin_name PK
-        string conservation_status
+        string LatinName PK
+        string ConservationStatus
     }
 ```
 
@@ -106,12 +106,12 @@ erDiagram
 
 **Junction Table Example:**
 ```sql
-CREATE TABLE keeper_animal (
-    keeper_name VARCHAR(100),
-    animal_id INT,
-    PRIMARY KEY (keeper_name, animal_id),
-    FOREIGN KEY (keeper_name) REFERENCES keeper(name),
-    FOREIGN KEY (animal_id) REFERENCES animal(identifier)
+CREATE TABLE KeeperAnimal (
+    KeeperName VARCHAR(100),
+    AnimalId INT,
+    PRIMARY KEY (KeeperName, AnimalId),
+    FOREIGN KEY (KeeperName) REFERENCES Keeper(Name),
+    FOREIGN KEY (AnimalId) REFERENCES Animal(Identifier)
 );
 ```
 
@@ -161,8 +161,8 @@ CREATE TABLE keeper_animal (
 
 **To reach higher normal forms:**
 ```
-Animals(animal_name, species)
-AnimalFeeds(animal_name, feed)
+Animals(AnimalName, Species)
+AnimalFeeds(AnimalName, Feed)
 ```
 
 ---
@@ -562,7 +562,7 @@ INNER JOIN: 0 to 12 rows (depends on matches)
 
 ```sql
 SELECT DISTINCT Species
-FROM sightings
+FROM Sightings
 WHERE Date >= '2021-01-01';
 ```
 
@@ -653,25 +653,25 @@ WHERE YEAR(Date) >= 2021;
 
 **Three tables after normalization:**
 
-**1. species**
+**1. Species**
 | Column | Key |
 |--------|-----|
-| species_name | PK |
-| conservation_status | |
+| SpeciesName | PK |
+| ConservationStatus | |
 
-**2. nature_reserves**
+**2. NatureReserves**
 | Column | Key |
 |--------|-----|
-| reserve_name | PK |
-| location | |
+| ReserveName | PK |
+| Location | |
 
-**3. sightings**
+**3. Sightings**
 | Column | Key |
 |--------|-----|
-| species_name | PK, FK → species |
-| reserve_name | PK, FK → nature_reserves |
-| date | PK |
-| number_sighted | |
+| SpeciesName | PK, FK → Species |
+| ReserveName | PK, FK → NatureReserves |
+| Date | PK |
+| NumberSighted | |
 
 ---
 
@@ -686,9 +686,9 @@ WHERE YEAR(Date) >= 2021;
 A functional dependency X → Y means "X determines Y" (if you know X, you know Y).
 
 From the original table:
-- `Species → Conservation_status` (each species has one conservation status)
-- `Nature_reserve → Location` (each reserve has one location)
-- `(Species, Nature_reserve, Date) → Number_sighted` (the combination determines count)
+- `SpeciesName → ConservationStatus` (each species has one conservation status)
+- `ReserveName → Location` (each reserve has one location)
+- `(SpeciesName, ReserveName, Date) → NumberSighted` (the combination determines count)
 
 **Step 2: Identify Redundancy**
 
@@ -703,13 +703,13 @@ In the original table:
 Create a new table for each entity that has its own attributes:
 
 ```
-Original: sightings(species, date, number_sighted, conservation_status,
-                    nature_reserve, location)
+Original: Sightings(SpeciesName, Date, NumberSighted, ConservationStatus,
+                    ReserveName, Location)
 
 Decomposed:
-  species(species_name, conservation_status)
-  nature_reserves(reserve_name, location)
-  sightings(species_name, reserve_name, date, number_sighted)
+  Species(SpeciesName, ConservationStatus)
+  NatureReserves(ReserveName, Location)
+  Sightings(SpeciesName, ReserveName, Date, NumberSighted)
 ```
 
 **Why This Design:**
@@ -719,14 +719,14 @@ Decomposed:
 
 **Visual Representation:**
 ```
-┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   species   │     │    sightings    │     │ nature_reserves │
-├─────────────┤     ├─────────────────┤     ├─────────────────┤
-│ species_name│◄────│ species_name    │     │ reserve_name    │
-│ conserv_stat│     │ reserve_name    │────►│ location        │
-└─────────────┘     │ date            │     └─────────────────┘
-                    │ number_sighted  │
-                    └─────────────────┘
+┌───────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│      Species      │     │    Sightings    │     │  NatureReserves │
+├───────────────────┤     ├─────────────────┤     ├─────────────────┤
+│ SpeciesName       │◄────│ SpeciesName     │     │ ReserveName     │
+│ ConservationStatus│     │ ReserveName     │────►│ Location        │
+└───────────────────┘     │ Date            │     └─────────────────┘
+                          │ NumberSighted   │
+                          └─────────────────┘
 ```
 
 **Common Mistakes:**
@@ -791,9 +791,9 @@ DeptName depends on DeptID, not directly on EmpID
 
 | Table | Check | Result |
 |-------|-------|--------|
-| species | PK: species_name, conservation_status depends only on PK | ✓ 3NF |
-| nature_reserves | PK: reserve_name, location depends only on PK | ✓ 3NF |
-| sightings | PK: (species, reserve, date), number_sighted depends on full PK | ✓ 3NF |
+| Species | PK: SpeciesName, ConservationStatus depends only on PK | ✓ 3NF |
+| NatureReserves | PK: ReserveName, Location depends only on PK | ✓ 3NF |
+| Sightings | PK: (SpeciesName, ReserveName, Date), NumberSighted depends on full PK | ✓ 3NF |
 
 **Common Mistakes:**
 - Confusing 2NF and 3NF
@@ -811,10 +811,10 @@ DeptName depends on DeptID, not directly on EmpID
 ### Answer
 
 ```sql
-SELECT DISTINCT s.species_name, sp.conservation_status
-FROM sightings s
-INNER JOIN species sp ON s.species_name = sp.species_name
-WHERE s.date >= '2021-01-01';
+SELECT DISTINCT S.SpeciesName, SP.ConservationStatus
+FROM Sightings S
+INNER JOIN Species SP ON S.SpeciesName = SP.SpeciesName
+WHERE S.Date >= '2021-01-01';
 ```
 
 ---
@@ -826,10 +826,10 @@ WHERE s.date >= '2021-01-01';
 **Query Breakdown:**
 
 ```sql
-SELECT DISTINCT s.species_name, sp.conservation_status  -- What we want
-FROM sightings s                                        -- Start with sightings
-INNER JOIN species sp ON s.species_name = sp.species_name  -- Link to species table
-WHERE s.date >= '2021-01-01';                           -- Filter by date
+SELECT DISTINCT S.SpeciesName, SP.ConservationStatus   -- What we want
+FROM Sightings S                                       -- Start with Sightings
+INNER JOIN Species SP ON S.SpeciesName = SP.SpeciesName  -- Link to Species table
+WHERE S.Date >= '2021-01-01';                          -- Filter by date
 ```
 
 **Types of JOINs:**
@@ -855,10 +855,10 @@ WHERE s.date >= '2021-01-01';                           -- Filter by date
 
 **Alternative Without Alias:**
 ```sql
-SELECT DISTINCT sightings.species_name, species.conservation_status
-FROM sightings
-INNER JOIN species ON sightings.species_name = species.species_name
-WHERE sightings.date >= '2021-01-01';
+SELECT DISTINCT Sightings.SpeciesName, Species.ConservationStatus
+FROM Sightings
+INNER JOIN Species ON Sightings.SpeciesName = Species.SpeciesName
+WHERE Sightings.Date >= '2021-01-01';
 ```
 
 **Common Mistakes:**
@@ -882,16 +882,16 @@ WHERE sightings.date >= '2021-01-01';
 START TRANSACTION;
 
 -- Insert new sighting
-INSERT INTO sightings (species_name, reserve_name, date, number_sighted)
+INSERT INTO Sightings (SpeciesName, ReserveName, Date, NumberSighted)
 VALUES ('European turtle dove', 'Epping Forest', '2021-09-07', 3);
 
 -- Update species if conservation status changed
-UPDATE species
-SET conservation_status = 'Endangered'
-WHERE species_name = 'European turtle dove';
+UPDATE Species
+SET ConservationStatus = 'Endangered'
+WHERE SpeciesName = 'European turtle dove';
 
 -- Insert new reserve if visiting new location
-INSERT INTO nature_reserves (reserve_name, location)
+INSERT INTO NatureReserves (ReserveName, Location)
 VALUES ('Hyde Park', '51.5N 0.2W');
 
 COMMIT;
@@ -955,10 +955,10 @@ Without a transaction: If the system crashes after the debit but before the cred
 ```sql
 START TRANSACTION;
 
-INSERT INTO sightings VALUES (...);
+INSERT INTO Sightings VALUES (...);
 SAVEPOINT after_sighting;
 
-INSERT INTO nature_reserves VALUES (...);
+INSERT INTO NatureReserves VALUES (...);
 -- If this fails but we want to keep the sighting:
 ROLLBACK TO after_sighting;
 
@@ -1526,32 +1526,32 @@ mei:note1 mei:pitchName "c" .
 
 ### Answer
 
-**1. zoo**
+**1. Zoo**
 | Field | Key |
 |-------|-----|
-| name | PK |
-| country | |
+| Name | PK |
+| Country | |
 
-**2. enclosure**
+**2. Enclosure**
 | Field | Key |
 |-------|-----|
-| name | PK |
-| location | |
-| zoo_name | FK → zoo |
+| Name | PK |
+| Location | |
+| ZooName | FK → Zoo |
 
-**3. species**
+**3. Species**
 | Field | Key |
 |-------|-----|
-| latin_name | PK |
-| conservation_status | |
+| LatinName | PK |
+| ConservationStatus | |
 
-**4. animal**
+**4. Animal**
 | Field | Key |
 |-------|-----|
-| identifier | PK |
-| date_of_birth | |
-| species_latin_name | FK → species |
-| enclosure_name | FK → enclosure |
+| Identifier | PK |
+| DateOfBirth | |
+| SpeciesLatinName | FK → Species |
+| EnclosureName | FK → Enclosure |
 
 ---
 
@@ -1568,23 +1568,23 @@ erDiagram
     Animal }o--|| Species : member
 
     Zoo {
-        string name PK
-        string country
+        string Name PK
+        string Country
     }
     Enclosure {
-        string name PK
-        string location
-        string zoo_name FK
+        string Name PK
+        string Location
+        string ZooName FK
     }
     Animal {
-        int identifier PK
-        date date_of_birth
-        string latin_name FK
-        string enclosure_name FK
+        int Identifier PK
+        date DateOfBirth
+        string LatinName FK
+        string EnclosureName FK
     }
     Species {
-        string latin_name PK
-        string conservation_status
+        string LatinName PK
+        string ConservationStatus
     }
 ```
 
@@ -1600,15 +1600,15 @@ erDiagram
 
 **Reading the Relationships:**
 
-- **zoo (1) → (M) enclosure**: One zoo contains many enclosures → FK `zoo_name` in enclosure
-- **enclosure (1) → (M) animal**: One enclosure has many animals → FK `enclosure_name` in animal
-- **species (1) → (M) animal**: Many animals belong to one species → FK `latin_name` in animal
+- **Zoo (1) → (M) Enclosure**: One zoo contains many enclosures → FK `ZooName` in Enclosure
+- **Enclosure (1) → (M) Animal**: One enclosure has many animals → FK `EnclosureName` in Animal
+- **Species (1) → (M) Animal**: Many animals belong to one species → FK `SpeciesLatinName` in Animal
 
 **Why These Primary Keys:**
-- `zoo.name` - Zoo names are unique identifiers
-- `enclosure.name` - Could also use `(zoo_name, name)` if names repeat across zoos
-- `species.latin_name` - Scientific names are unique
-- `animal.identifier` - Individual animal ID (like a microchip number)
+- `Zoo.Name` - Zoo names are unique identifiers
+- `Enclosure.Name` - Could also use `(ZooName, Name)` if names repeat across zoos
+- `Species.LatinName` - Scientific names are unique
+- `Animal.Identifier` - Individual animal ID (like a microchip number)
 
 ---
 
@@ -1621,16 +1621,16 @@ erDiagram
 ### Answer
 
 ```sql
-CREATE TABLE zoo (
-    name VARCHAR(255) PRIMARY KEY,
-    country VARCHAR(255) NOT NULL
+CREATE TABLE Zoo (
+    Name VARCHAR(255) PRIMARY KEY,
+    Country VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE enclosure (
-    name VARCHAR(255) PRIMARY KEY,
-    location VARCHAR(255),
-    zoo_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (zoo_name) REFERENCES zoo(name)
+CREATE TABLE Enclosure (
+    Name VARCHAR(255) PRIMARY KEY,
+    Location VARCHAR(255),
+    ZooName VARCHAR(255) NOT NULL,
+    FOREIGN KEY (ZooName) REFERENCES Zoo(Name)
         ON DELETE CASCADE
         ON UPDATE CASCADE
 );
@@ -1676,30 +1676,30 @@ CREATE TABLE enclosure (
 
 **Complete Zoo Schema:**
 ```sql
-CREATE TABLE zoo (
-    name VARCHAR(255) PRIMARY KEY,
-    country VARCHAR(255) NOT NULL
+CREATE TABLE Zoo (
+    Name VARCHAR(255) PRIMARY KEY,
+    Country VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE species (
-    latin_name VARCHAR(255) PRIMARY KEY,
-    conservation_status VARCHAR(50)
+CREATE TABLE Species (
+    LatinName VARCHAR(255) PRIMARY KEY,
+    ConservationStatus VARCHAR(50)
 );
 
-CREATE TABLE enclosure (
-    name VARCHAR(255) PRIMARY KEY,
-    location VARCHAR(255),
-    zoo_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (zoo_name) REFERENCES zoo(name)
+CREATE TABLE Enclosure (
+    Name VARCHAR(255) PRIMARY KEY,
+    Location VARCHAR(255),
+    ZooName VARCHAR(255) NOT NULL,
+    FOREIGN KEY (ZooName) REFERENCES Zoo(Name)
 );
 
-CREATE TABLE animal (
-    identifier VARCHAR(255) PRIMARY KEY,
-    date_of_birth DATE,
-    species_latin_name VARCHAR(255) NOT NULL,
-    enclosure_name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (species_latin_name) REFERENCES species(latin_name),
-    FOREIGN KEY (enclosure_name) REFERENCES enclosure(name)
+CREATE TABLE Animal (
+    Identifier VARCHAR(255) PRIMARY KEY,
+    DateOfBirth DATE,
+    SpeciesLatinName VARCHAR(255) NOT NULL,
+    EnclosureName VARCHAR(255) NOT NULL,
+    FOREIGN KEY (SpeciesLatinName) REFERENCES Species(LatinName),
+    FOREIGN KEY (EnclosureName) REFERENCES Enclosure(Name)
 );
 ```
 
@@ -1714,10 +1714,10 @@ CREATE TABLE animal (
 ### Answer
 
 ```sql
-SELECT COUNT(DISTINCT a.species_latin_name) AS species_count
-FROM animal a
-INNER JOIN enclosure e ON a.enclosure_name = e.name
-WHERE e.zoo_name = 'Singapore Zoo';
+SELECT COUNT(DISTINCT A.SpeciesLatinName) AS SpeciesCount
+FROM Animal A
+INNER JOIN Enclosure E ON A.EnclosureName = E.Name
+WHERE E.ZooName = 'Singapore Zoo';
 ```
 
 ---
@@ -1730,7 +1730,7 @@ WHERE e.zoo_name = 'Singapore Zoo';
 ```
 Animal → Enclosure → Zoo
    ↓
-Species (via species_latin_name)
+Species (via SpeciesLatinName)
 ```
 
 1. Start with Animals
@@ -1747,23 +1747,23 @@ Species (via species_latin_name)
 | `COUNT(DISTINCT col)` | Count unique values | `SELECT COUNT(DISTINCT species)` |
 | `SUM(column)` | Sum values | `SELECT SUM(quantity)` |
 | `AVG(column)` | Average | `SELECT AVG(age)` |
-| `MIN/MAX(column)` | Minimum/Maximum | `SELECT MAX(date_of_birth)` |
+| `MIN/MAX(column)` | Minimum/Maximum | `SELECT MAX(DateOfBirth)` |
 
 **Alternative Approaches:**
 ```sql
 -- Using subquery
 SELECT COUNT(*) FROM (
-    SELECT DISTINCT a.species_latin_name
-    FROM animal a
-    INNER JOIN enclosure e ON a.enclosure_name = e.name
-    WHERE e.zoo_name = 'Singapore Zoo'
-) AS unique_species;
+    SELECT DISTINCT A.SpeciesLatinName
+    FROM Animal A
+    INNER JOIN Enclosure E ON A.EnclosureName = E.Name
+    WHERE E.ZooName = 'Singapore Zoo'
+) AS UniqueSpecies;
 
 -- Using EXISTS (if you just need to verify)
-SELECT COUNT(DISTINCT species_latin_name)
-FROM animal
-WHERE enclosure_name IN (
-    SELECT name FROM enclosure WHERE zoo_name = 'Singapore Zoo'
+SELECT COUNT(DISTINCT SpeciesLatinName)
+FROM Animal
+WHERE EnclosureName IN (
+    SELECT Name FROM Enclosure WHERE ZooName = 'Singapore Zoo'
 );
 ```
 
@@ -1778,11 +1778,11 @@ WHERE enclosure_name IN (
 ### Answer
 
 ```sql
-SELECT e.zoo_name, MIN(a.date_of_birth) AS oldest_birth_date
-FROM animal a
-INNER JOIN enclosure e ON a.enclosure_name = e.name
-WHERE a.species_latin_name = 'Buceros bicornis'
-GROUP BY e.zoo_name;
+SELECT E.ZooName, MIN(A.DateOfBirth) AS OldestBirthDate
+FROM Animal A
+INNER JOIN Enclosure E ON A.EnclosureName = E.Name
+WHERE A.SpeciesLatinName = 'Buceros bicornis'
+GROUP BY E.ZooName;
 ```
 
 ---
@@ -1794,18 +1794,18 @@ GROUP BY e.zoo_name;
 **Query Logic:**
 - Filter for specific species
 - Group by zoo
-- Find MIN(date_of_birth) in each group → oldest animal (earliest birth)
+- Find MIN(DateOfBirth) in each group → oldest animal (earliest birth)
 
 **GROUP BY Explained:**
 
 ```sql
 -- Without GROUP BY: one result for entire table
-SELECT MIN(date_of_birth) FROM animal;  -- Returns: 1985-03-21
+SELECT MIN(DateOfBirth) FROM Animal;  -- Returns: 1985-03-21
 
 -- With GROUP BY: one result per group
-SELECT zoo_name, MIN(date_of_birth)
-FROM animal INNER JOIN enclosure...
-GROUP BY zoo_name;
+SELECT ZooName, MIN(DateOfBirth)
+FROM Animal INNER JOIN Enclosure...
+GROUP BY ZooName;
 -- Returns:
 -- Singapore Zoo | 1995-06-15
 -- London Zoo    | 1988-03-21
@@ -1814,18 +1814,18 @@ GROUP BY zoo_name;
 
 **GROUP BY Rules:**
 1. Every non-aggregated column in SELECT must be in GROUP BY
-2. Can group by multiple columns: `GROUP BY zoo_name, species`
+2. Can group by multiple columns: `GROUP BY ZooName, SpeciesLatinName`
 3. WHERE filters before grouping, HAVING filters after
 
 **Using HAVING (filter on aggregates):**
 ```sql
 -- Only zoos with animals older than 2000
-SELECT e.zoo_name, MIN(a.date_of_birth) AS oldest
-FROM animal a
-INNER JOIN enclosure e ON a.enclosure_name = e.name
-WHERE a.species_latin_name = 'Buceros bicornis'
-GROUP BY e.zoo_name
-HAVING MIN(a.date_of_birth) < '2000-01-01';
+SELECT E.ZooName, MIN(A.DateOfBirth) AS Oldest
+FROM Animal A
+INNER JOIN Enclosure E ON A.EnclosureName = E.Name
+WHERE A.SpeciesLatinName = 'Buceros bicornis'
+GROUP BY E.ZooName
+HAVING MIN(A.DateOfBirth) < '2000-01-01';
 ```
 
 **WHERE vs HAVING:**
