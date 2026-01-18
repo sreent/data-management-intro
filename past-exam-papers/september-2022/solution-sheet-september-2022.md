@@ -183,7 +183,7 @@ Given XML:
 
 ---
 
-### Answer: **ii. 4**
+### Answer: **vi. None**
 
 ---
 
@@ -199,12 +199,26 @@ Given XML:
 | `/track[@duration>150]` | Direct child tracks with duration > 150 |
 | `/*` | All direct children of matching tracks |
 
-**Step-by-Step:**
+**Why it returns NOTHING:**
+
+The XPath uses `/track` which looks for **direct children** of `<disk>`, but in the XML structure:
+```
+<disk>
+  <title>...</title>
+  <tracks>           ← direct child of disk
+    <track>...</track>   ← child of tracks, NOT direct child of disk!
+  </tracks>
+</disk>
+```
+
+The `<track>` elements are children of `<tracks>` (plural), not direct children of `<disk>`. Therefore, `/track` finds nothing.
+
+**If the XPath were correct** (`//disk[@xml:id="1847336"]/tracks/track[@duration>150]/*`):
 1. Find tracks with `duration > 150`: Track 1 (193) and Track 2 (167)
 2. Each track has 2 children: `<title>` and `<artist>`
-3. Total: 2 tracks × 2 children = **4 elements**
+3. Total would be: 2 tracks × 2 children = 4 elements
 
-**Note:** The XPath as written won't match because `<track>` elements are inside `<tracks>`, not direct children of `<disk>`. The correct path would be `//disk[@xml:id="1847336"]/tracks/track[@duration>150]/*`.
+**Common Mistake:** Confusing `/` (direct child) with `//` (descendant). Using `//track` instead of `/track` would find tracks at any depth.
 
 ---
 
