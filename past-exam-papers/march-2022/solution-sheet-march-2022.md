@@ -94,6 +94,11 @@ Section A consists of 10 MCQs taken separately on the VLE. See the VLE for MCQ q
 - Attributes store **metadata** or properties about elements
 - Self-closing tags like `<title ... />` are still elements
 
+**Common Mistakes:**
+- Confusing elements with attributes: `rank` is an attribute (inside a tag), `<title>` is an element
+- Including the angle brackets as part of the element name: the element is `royal`, not `<royal>`
+- Forgetting that `xml:id` is an attribute despite having a colon (it's in the xml namespace)
+
 ---
 
 ## Question 2(b) [3 marks]
@@ -201,6 +206,12 @@ This query returns all `<royal>` elements that are **great-grandchildren** (thro
 - Then to their grandchildren via another `relationship/children/royal`
 - Returns those grandchildren `<royal>` elements
 
+**Common Mistakes:**
+- Forgetting `/..` returns the parent, not the element itself
+- Confusing "grandchildren" vs "great-grandchildren" (count the relationship levels!)
+- Not realizing `[@rank="king" or @rank="queen"]` applies to `<title>`, not to `<royal>`
+- Using `//` when you mean `/` — `//` skips intermediate levels
+
 ---
 
 ## Question 2(d) [4 marks]
@@ -250,6 +261,12 @@ This query returns all `<royal>` elements that are **great-grandchildren** (thro
 - Follow existing patterns in the document
 - Place new data in the **logical** location in the hierarchy
 - Mary's death date (1558-11-17) serves as the `to` date
+
+**Common Mistakes:**
+- Not following existing attribute patterns (e.g., using `queen-consort` instead of `regnal="consort"`)
+- Using a different date format than what's in the document (`ISO 8601: YYYY-MM-DD`)
+- Placing the element in the wrong location in the hierarchy
+- Forgetting required attributes that appear on other `<title>` elements
 
 ---
 
@@ -522,6 +539,12 @@ In other words: **all humans born in New York City**.
 - `,` continues with same subject AND predicate
 - `.` ends the statement
 
+**Common Mistakes:**
+- Confusing `;` with `.` — semicolon continues with same subject, period ends the statement
+- Forgetting `DISTINCT` when duplicates are possible
+- Misreading Wikidata property codes (P19 = birthplace, P31 = instance of)
+- Using SQL syntax in SPARQL (`SELECT * FROM` instead of `SELECT ?var WHERE`)
+
 ---
 
 ## Question 3(b) [2 marks]
@@ -623,6 +646,12 @@ Person --P19--> Manhattan --P131--> NYC --P131--> NY State
                       Query finds this!
 ```
 
+**Common Mistakes:**
+- Confusing `*` (zero or more) with `+` (one or more) — `P131*` includes the start node, `P131+` doesn't
+- Forgetting `/` between properties: `wdt:P19/wdt:P131*` not `wdt:P19 wdt:P131*`
+- Not understanding that `*` allows zero steps (birthplace = NYC directly matches)
+- Thinking property paths work backwards — they always follow the direction of the predicate
+
 ---
 
 ## Question 3(d) [1 mark]
@@ -710,6 +739,12 @@ WHERE {
 SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de". }
 ```
 This tries English first, then French, then German.
+
+**Common Mistakes:**
+- Forgetting to add `?personLabel` to the SELECT clause — the service creates it but you must select it
+- Omitting the SERVICE block entirely and expecting labels to appear automatically
+- Using `lang()` FILTER on Wikidata (less efficient than the label service)
+- Forgetting the period `.` after the SERVICE block in the WHERE clause
 
 ---
 
@@ -858,6 +893,12 @@ WHERE t1.predicate = 'instance_of'
 | Query complexity | Many self-joins | Simpler JOINs |
 | Performance | Can be slow | Better with indexes |
 | Schema changes | None needed | ALTER TABLE |
+
+**Common Mistakes:**
+- Forgetting you need self-joins for multiple conditions on the same subject
+- Using a single WHERE clause instead of joining the table to itself
+- Not using DISTINCT when the same subject could match multiple ways
+- Missing the equivalence mapping (P31 → `instance_of`, P19 → `birth_place`)
 
 ---
 
@@ -1026,6 +1067,12 @@ CREATE TABLE stay_in (
 );
 ```
 
+**Common Mistakes:**
+- Trying to put M:N relationship as a foreign key in one of the entities (impossible!)
+- Forgetting relationship attributes — `arrived`/`departed` must go somewhere
+- Not including all parts of the composite primary key (patient + ward + arrived)
+- Confusing 1:M (can use FK) with M:N (requires junction table)
+
 ---
 
 ## Question 4(c) [10 marks]
@@ -1184,6 +1231,13 @@ SELECT p.treated_by AS doctor_name
 FROM patients p
 WHERE p.name = 'Neha Ahuja';
 ```
+
+**Common Mistakes:**
+- Using implicit joins (comma-separated tables) instead of explicit `INNER JOIN`
+- Forgetting `DISTINCT` when a patient might have multiple stays
+- Wrong join order — always start from the entity you're filtering on
+- Using `=` for string matching when `LIKE` is needed for partial matches
+- Missing table aliases when same table appears multiple times
 
 ---
 
