@@ -745,8 +745,7 @@ ProductName depends on ProductId alone, not the full PK
 SELECT D.PlayedBy
 FROM Doctors D
 INNER JOIN DoctorCompanion DC ON D.Incarnation = DC.Doctor
-INNER JOIN Companions C ON DC.Companion = C.Name
-WHERE C.Name = 'Amy Pond';
+WHERE DC.Companion = 'Amy Pond';
 ```
 
 ---
