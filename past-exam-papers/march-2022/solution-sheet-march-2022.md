@@ -706,7 +706,7 @@ WHERE {
 }
 ```
 
-**Method 2: Using Wikidata's Label Service (Recommended)**
+**Method 2: Using Wikidata's Label Service**
 ```sparql
 SELECT DISTINCT ?person ?personLabel
 WHERE {
@@ -741,10 +741,10 @@ SERVICE wikibase:label { bd:serviceParam wikibase:language "en,fr,de". }
 This tries English first, then French, then German.
 
 **Common Mistakes:**
-- Forgetting to add `?personLabel` to the SELECT clause — the service creates it but you must select it
-- Omitting the SERVICE block entirely and expecting labels to appear automatically
-- Using `lang()` FILTER on Wikidata (less efficient than the label service)
-- Forgetting the period `.` after the SERVICE block in the WHERE clause
+- Forgetting to add `?personLabel` to the SELECT clause
+- With Method 1: forgetting the `lang()` FILTER (returns labels in all languages)
+- With Method 2: forgetting the period `.` after the SERVICE block
+- Expecting labels to appear automatically without either method
 
 ---
 
