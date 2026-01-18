@@ -161,8 +161,8 @@ CREATE TABLE KeeperAnimal (
 
 **To reach higher normal forms:**
 ```
-Animals(animal_name, species)
-AnimalFeeds(animal_name, feed)
+Animals(AnimalName, Species)
+AnimalFeeds(AnimalName, Feed)
 ```
 
 ---
@@ -686,9 +686,9 @@ WHERE YEAR(Date) >= 2021;
 A functional dependency X → Y means "X determines Y" (if you know X, you know Y).
 
 From the original table:
-- `Species → Conservation_status` (each species has one conservation status)
-- `Nature_reserve → Location` (each reserve has one location)
-- `(Species, Nature_reserve, Date) → Number_sighted` (the combination determines count)
+- `SpeciesName → ConservationStatus` (each species has one conservation status)
+- `ReserveName → Location` (each reserve has one location)
+- `(SpeciesName, ReserveName, Date) → NumberSighted` (the combination determines count)
 
 **Step 2: Identify Redundancy**
 
@@ -703,8 +703,8 @@ In the original table:
 Create a new table for each entity that has its own attributes:
 
 ```
-Original: Sightings(Species, Date, NumberSighted, ConservationStatus,
-                    NatureReserve, Location)
+Original: Sightings(SpeciesName, Date, NumberSighted, ConservationStatus,
+                    ReserveName, Location)
 
 Decomposed:
   Species(SpeciesName, ConservationStatus)
@@ -719,14 +719,14 @@ Decomposed:
 
 **Visual Representation:**
 ```
-┌─────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   species   │     │    sightings    │     │ nature_reserves │
-├─────────────┤     ├─────────────────┤     ├─────────────────┤
-│ species_name│◄────│ species_name    │     │ reserve_name    │
-│ conserv_stat│     │ reserve_name    │────►│ location        │
-└─────────────┘     │ date            │     └─────────────────┘
-                    │ number_sighted  │
-                    └─────────────────┘
+┌───────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│      Species      │     │    Sightings    │     │  NatureReserves │
+├───────────────────┤     ├─────────────────┤     ├─────────────────┤
+│ SpeciesName       │◄────│ SpeciesName     │     │ ReserveName     │
+│ ConservationStatus│     │ ReserveName     │────►│ Location        │
+└───────────────────┘     │ Date            │     └─────────────────┘
+                          │ NumberSighted   │
+                          └─────────────────┘
 ```
 
 **Common Mistakes:**
@@ -791,9 +791,9 @@ DeptName depends on DeptID, not directly on EmpID
 
 | Table | Check | Result |
 |-------|-------|--------|
-| species | PK: species_name, conservation_status depends only on PK | ✓ 3NF |
-| nature_reserves | PK: reserve_name, location depends only on PK | ✓ 3NF |
-| sightings | PK: (species, reserve, date), number_sighted depends on full PK | ✓ 3NF |
+| Species | PK: SpeciesName, ConservationStatus depends only on PK | ✓ 3NF |
+| NatureReserves | PK: ReserveName, Location depends only on PK | ✓ 3NF |
+| Sightings | PK: (SpeciesName, ReserveName, Date), NumberSighted depends on full PK | ✓ 3NF |
 
 **Common Mistakes:**
 - Confusing 2NF and 3NF
@@ -826,10 +826,10 @@ WHERE S.Date >= '2021-01-01';
 **Query Breakdown:**
 
 ```sql
-SELECT DISTINCT s.species_name, sp.conservation_status  -- What we want
-FROM sightings s                                        -- Start with sightings
-INNER JOIN species sp ON s.species_name = sp.species_name  -- Link to species table
-WHERE s.date >= '2021-01-01';                           -- Filter by date
+SELECT DISTINCT S.SpeciesName, SP.ConservationStatus   -- What we want
+FROM Sightings S                                       -- Start with Sightings
+INNER JOIN Species SP ON S.SpeciesName = SP.SpeciesName  -- Link to Species table
+WHERE S.Date >= '2021-01-01';                          -- Filter by date
 ```
 
 **Types of JOINs:**
@@ -855,10 +855,10 @@ WHERE s.date >= '2021-01-01';                           -- Filter by date
 
 **Alternative Without Alias:**
 ```sql
-SELECT DISTINCT sightings.species_name, species.conservation_status
-FROM sightings
-INNER JOIN species ON sightings.species_name = species.species_name
-WHERE sightings.date >= '2021-01-01';
+SELECT DISTINCT Sightings.SpeciesName, Species.ConservationStatus
+FROM Sightings
+INNER JOIN Species ON Sightings.SpeciesName = Species.SpeciesName
+WHERE Sightings.Date >= '2021-01-01';
 ```
 
 **Common Mistakes:**
@@ -955,10 +955,10 @@ Without a transaction: If the system crashes after the debit but before the cred
 ```sql
 START TRANSACTION;
 
-INSERT INTO sightings VALUES (...);
+INSERT INTO Sightings VALUES (...);
 SAVEPOINT after_sighting;
 
-INSERT INTO nature_reserves VALUES (...);
+INSERT INTO NatureReserves VALUES (...);
 -- If this fails but we want to keep the sighting:
 ROLLBACK TO after_sighting;
 
@@ -1600,15 +1600,15 @@ erDiagram
 
 **Reading the Relationships:**
 
-- **zoo (1) → (M) enclosure**: One zoo contains many enclosures → FK `zoo_name` in enclosure
-- **enclosure (1) → (M) animal**: One enclosure has many animals → FK `enclosure_name` in animal
-- **species (1) → (M) animal**: Many animals belong to one species → FK `latin_name` in animal
+- **Zoo (1) → (M) Enclosure**: One zoo contains many enclosures → FK `ZooName` in Enclosure
+- **Enclosure (1) → (M) Animal**: One enclosure has many animals → FK `EnclosureName` in Animal
+- **Species (1) → (M) Animal**: Many animals belong to one species → FK `SpeciesLatinName` in Animal
 
 **Why These Primary Keys:**
-- `zoo.name` - Zoo names are unique identifiers
-- `enclosure.name` - Could also use `(zoo_name, name)` if names repeat across zoos
-- `species.latin_name` - Scientific names are unique
-- `animal.identifier` - Individual animal ID (like a microchip number)
+- `Zoo.Name` - Zoo names are unique identifiers
+- `Enclosure.Name` - Could also use `(ZooName, Name)` if names repeat across zoos
+- `Species.LatinName` - Scientific names are unique
+- `Animal.Identifier` - Individual animal ID (like a microchip number)
 
 ---
 
@@ -1730,7 +1730,7 @@ WHERE E.ZooName = 'Singapore Zoo';
 ```
 Animal → Enclosure → Zoo
    ↓
-Species (via species_latin_name)
+Species (via SpeciesLatinName)
 ```
 
 1. Start with Animals
@@ -1747,7 +1747,7 @@ Species (via species_latin_name)
 | `COUNT(DISTINCT col)` | Count unique values | `SELECT COUNT(DISTINCT species)` |
 | `SUM(column)` | Sum values | `SELECT SUM(quantity)` |
 | `AVG(column)` | Average | `SELECT AVG(age)` |
-| `MIN/MAX(column)` | Minimum/Maximum | `SELECT MAX(date_of_birth)` |
+| `MIN/MAX(column)` | Minimum/Maximum | `SELECT MAX(DateOfBirth)` |
 
 **Alternative Approaches:**
 ```sql
@@ -1794,7 +1794,7 @@ GROUP BY E.ZooName;
 **Query Logic:**
 - Filter for specific species
 - Group by zoo
-- Find MIN(date_of_birth) in each group → oldest animal (earliest birth)
+- Find MIN(DateOfBirth) in each group → oldest animal (earliest birth)
 
 **GROUP BY Explained:**
 
@@ -1814,7 +1814,7 @@ GROUP BY ZooName;
 
 **GROUP BY Rules:**
 1. Every non-aggregated column in SELECT must be in GROUP BY
-2. Can group by multiple columns: `GROUP BY zoo_name, species`
+2. Can group by multiple columns: `GROUP BY ZooName, SpeciesLatinName`
 3. WHERE filters before grouping, HAVING filters after
 
 **Using HAVING (filter on aggregates):**
