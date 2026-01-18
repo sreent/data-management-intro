@@ -179,7 +179,7 @@ The parent of the `<title>` IS `<royal name="Henry" xml:id="HenryVIII">` itself.
 
 ### Answer
 
-This query returns all `<royal>` elements that are **great-grandchildren** (through relationships) of any king or queen. Essentially, it finds descendants two relationship levels deep from monarchs.
+This query returns all `<royal>` elements that are **grandchildren** (through relationships) of any king or queen. It navigates two relationship levels deep from monarchs (children's children = grandchildren).
 
 ---
 
@@ -193,8 +193,8 @@ This query returns all `<royal>` elements that are **great-grandchildren** (thro
 |------|-----------------|
 | `//title[@rank="king" or @rank="queen"]` | Titles of any monarch (king OR queen) |
 | `/..` | Parent `<royal>` (the monarch themselves) |
-| `/relationship/children/royal` | Their children (first generation) |
-| `/relationship/children/royal` | Their grandchildren (second generation) |
+| `/relationship/children/royal` | Monarch's children (first generation) |
+| `/relationship/children/royal` | Children's children = grandchildren (second generation) |
 
 **Logical OR in XPath:**
 - `[@rank="king" or @rank="queen"]` matches EITHER condition
@@ -910,12 +910,33 @@ WHERE t1.predicate = 'instance_of'
 
 ### Answer
 
-To handle the hierarchical location path (`P131*`), we need to either:
+To handle the hierarchical location path (`P131*`), we can use self-joins for a fixed depth, or recursive CTEs for arbitrary depth.
 
-**Option 1: Recursive CTE**
+**Option 1: Multiple Self-Joins (Pragmatic Exam Approach)**
+
+This approach works when you know the maximum hierarchy depth (e.g., 2 levels):
+
+```sql
+SELECT DISTINCT t1.subject AS person
+FROM triples t1
+INNER JOIN triples t2 ON t1.subject = t2.subject
+LEFT JOIN triples t3 ON t2.object = t3.subject AND t3.predicate = 'located_in'
+LEFT JOIN triples t4 ON t3.object = t4.subject AND t4.predicate = 'located_in'
+WHERE t1.predicate = 'instance_of'
+  AND t1.object = 'Human'
+  AND t2.predicate = 'birth_place'
+  AND (t2.object = 'New_York_City'
+       OR t3.object = 'New_York_City'
+       OR t4.object = 'New_York_City');
+```
+
+**Option 2: Recursive CTE (Advanced)**
+
+For arbitrary depth hierarchies, use a recursive Common Table Expression:
+
 ```sql
 WITH RECURSIVE location_chain AS (
-    -- Base case: direct match
+    -- Base case: direct birth place
     SELECT subject, object AS location
     FROM triples
     WHERE predicate = 'birth_place'
@@ -936,36 +957,28 @@ WHERE t.predicate = 'instance_of'
   AND lc.location = 'New_York_City';
 ```
 
-**Option 2: Multiple Self-Joins (Limited Depth)**
-```sql
-SELECT DISTINCT t1.subject AS person
-FROM triples t1
-INNER JOIN triples t2 ON t1.subject = t2.subject
-LEFT JOIN triples t3 ON t2.object = t3.subject AND t3.predicate = 'located_in'
-LEFT JOIN triples t4 ON t3.object = t4.subject AND t4.predicate = 'located_in'
-WHERE t1.predicate = 'instance_of'
-  AND t1.object = 'Human'
-  AND t2.predicate = 'birth_place'
-  AND (t2.object = 'New_York_City'
-       OR t3.object = 'New_York_City'
-       OR t4.object = 'New_York_City');
-```
-
 ---
 
 ### Revision Notes
 
-**Core Concept:** Hierarchical queries require recursion or multiple joins.
+**Core Concept:** Hierarchical queries require multiple joins or recursion.
+
+**Option 1 (Self-Joins) - Use in Exams:**
+- Simple to understand and write
+- Works when hierarchy depth is known
+- Each additional level = one more LEFT JOIN
+- Suitable for exam context where pragmatism matters
+
+**Option 2 (Recursive CTE) - Advanced:**
+- Handles arbitrary depth automatically
+- More elegant for deep/variable hierarchies
+- Not all SQL implementations support it
+- More complex syntax
 
 **Recursive CTE Explained:**
 1. **Base case:** Start with birth_place values
 2. **Recursive case:** Follow `located_in` relationships
 3. **Termination:** Stops when no more matches
-
-**Limitations of Multiple Joins:**
-- Must know maximum depth in advance
-- Gets unwieldy for deep hierarchies
-- Less flexible than recursion
 
 **Why SPARQL is Better Here:**
 - `P131*` handles arbitrary depth automatically
