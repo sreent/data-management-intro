@@ -2,35 +2,36 @@
 
 ## Overview
 
-This document provides a comprehensive analysis of exam questions and solution sheets from **Mock March 2021 through March 2025**, identifying topics, key concepts, and trends to help students prepare for future exams.
+This document provides a comprehensive analysis of exam questions and solution sheets from **Mock March 2021 through Mock October 2025**, identifying topics, key concepts, and trends to help students prepare for future exams.
 
 ---
 
 ## Summary Table: Topics by Exam Period
 
-| Topic | Key Concepts | Mar 2021 | Sep 2021 | Mar 2022 | Sep 2022 | Mar 2023 | Sep 2023 | Mar 2024 | Sep 2024 | Mar 2025 |
-|-------|--------------|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
-| **SQL/Relational** | Normal forms, E/R, CREATE TABLE, JOINs, GROUP BY | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **SQL Transactions** | COMMIT, ROLLBACK, ACID | ✓ | ✓ | | ✓ | | | | | |
-| **SQL Permissions** | GRANT, least privilege | | ✓ | | ✓ | | | | ✓ | |
-| **XML/XPath** | Navigation, predicates, attributes | ✓ | ✓ | ✓ | ✓ | ✓ | | | ✓ | ✓ |
-| **XML Validation** | Well-formed vs valid, DTD, XSD, RelaxNG | | ✓ | | ✓ | ✓ | | | | ✓ |
-| **TEI** | Text encoding, lg/l elements | | | | ✓ | | ✓ | | ✓ | |
-| **XSLT** | Transformations, namespaces | | | | ✓ | | | | | |
-| **RDF/Turtle** | Triple counting, serialization | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | ✓ |
-| **SPARQL** | Basic queries, property paths, SERVICE | | | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Linked Data Principles** | URIs, dereferencing, 4 principles | ✓ | | | | | ✓ | ✓ | ✓ | |
-| **Ontologies** | schema.org, FOAF, Dublin Core, OWL | ✓ | | | ✓ | ✓ | ✓ | ✓ | | ✓ |
-| **Wikidata** | Property paths, P-codes, federated queries | | | ✓ | | | | ✓ | ✓ | |
-| **MongoDB** | find(), regex, $elemMatch, operators | ✓ | ✓ | | ✓ | | ✓ | ✓ | ✓ | |
-| **JSON/JSON-LD** | Structure, conversion from XML | | ✓ | | | | | | | ✓ |
-| **Precision/Recall** | IR metrics, F1-measure | ✓ | ✓ | | ✓ | | ✓ | | | ✓ |
-| **Data Model Comparison** | Tree vs graph vs relational | | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **MapReduce** | Distributed processing | ✓ | | | | | | | | |
-| **Licensing** | Copyleft, GPL, MIT | ✓ | | | | | | | | |
-| **Star Schema** | Dimensional modeling, fact/dimension tables | | | | | | | | | ✓ |
-| **Open/Closed World** | Assumption differences | | | | | | | | | ✓ |
-| **Cross-validation** | k-fold, model evaluation | | | | | | | | | ✓ |
+| Topic | Key Concepts | Mar 2021 | Sep 2021 | Mar 2022 | Sep 2022 | Mar 2023 | Sep 2023 | Mar 2024 | Sep 2024 | Mar 2025 | Oct 2025 |
+|-------|--------------|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
+| **SQL/Relational** | Normal forms, E/R, CREATE TABLE, JOINs, GROUP BY | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **SQL Transactions** | COMMIT, ROLLBACK, ACID | ✓ | ✓ | | ✓ | | | | | | |
+| **SQL Permissions** | GRANT, least privilege | | ✓ | | ✓ | | | | ✓ | | ✓ |
+| **XML/XPath** | Navigation, predicates, attributes | ✓ | ✓ | ✓ | ✓ | ✓ | | | ✓ | ✓ | ✓ |
+| **XML Validation** | Well-formed vs valid, DTD, XSD, RelaxNG | | ✓ | | ✓ | ✓ | | | | ✓ | |
+| **TEI** | Text encoding, lg/l elements | | | | ✓ | | ✓ | | ✓ | | |
+| **XSLT** | Transformations, namespaces | | | | ✓ | | | | | | |
+| **RDF/Turtle** | Triple counting, serialization | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | | ✓ | |
+| **SPARQL** | Basic queries, property paths, SERVICE | | | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | |
+| **Linked Data Principles** | URIs, dereferencing, 4 principles, BIBFRAME | ✓ | | | | | ✓ | ✓ | ✓ | | ✓ |
+| **Ontologies** | schema.org, FOAF, Dublin Core, OWL | ✓ | | | ✓ | ✓ | ✓ | ✓ | | ✓ | |
+| **Wikidata** | Property paths, P-codes, federated queries | | | ✓ | | | | ✓ | ✓ | | |
+| **MongoDB** | find(), regex, $elemMatch, operators | ✓ | ✓ | | ✓ | | ✓ | ✓ | ✓ | | |
+| **JSON/JSON-LD** | Structure, conversion from XML | | ✓ | | | | | | | ✓ | |
+| **Precision/Recall** | IR metrics, F1-measure | ✓ | ✓ | | ✓ | | ✓ | | | ✓ | |
+| **Data Model Comparison** | Tree vs graph vs relational | | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **MapReduce** | Distributed processing | ✓ | | | | | | | | | |
+| **Licensing** | Copyleft, GPL, MIT | ✓ | | | | | | | | | |
+| **Star Schema** | Dimensional modeling, fact/dimension tables | | | | | | | | | ✓ | |
+| **Open/Closed World** | Assumption differences | | | | | | | | | ✓ | |
+| **Cross-validation** | k-fold, model evaluation | | | | | | | | | ✓ | |
+| **Denormalization** | Performance vs integrity trade-offs | | | | | | | | | | ✓ |
 
 ---
 
@@ -38,20 +39,20 @@ This document provides a comprehensive analysis of exam questions and solution s
 
 | Topic | Exam Appearances | Frequency |
 |-------|------------------|-----------|
-| SQL/Relational (E/R, Normal forms, JOINs) | 9/9 | **100%** |
-| Data Model Comparison | 8/9 | **89%** |
-| RDF/Turtle | 8/9 | **89%** |
-| SPARQL | 7/9 | **78%** |
-| XML/XPath | 7/9 | **78%** |
-| MongoDB | 7/9 | **78%** |
-| Ontologies | 6/9 | **67%** |
-| Precision/Recall | 5/9 | **56%** |
-| Linked Data Principles | 4/9 | **44%** |
-| XML Validation (DTD, XSD, RelaxNG) | 4/9 | **44%** |
-| TEI | 3/9 | **33%** |
-| Wikidata SPARQL | 3/9 | **33%** |
-| SQL Transactions | 3/9 | **33%** |
-| SQL Permissions (GRANT) | 3/9 | **33%** |
+| SQL/Relational (E/R, Normal forms, JOINs) | 10/10 | **100%** |
+| Data Model Comparison | 9/10 | **90%** |
+| XML/XPath | 8/10 | **80%** |
+| RDF/Turtle | 8/10 | **80%** |
+| SPARQL | 7/10 | **70%** |
+| MongoDB | 7/10 | **70%** |
+| Ontologies | 6/10 | **60%** |
+| Precision/Recall | 5/10 | **50%** |
+| Linked Data Principles | 5/10 | **50%** |
+| XML Validation (DTD, XSD, RelaxNG) | 4/10 | **40%** |
+| SQL Permissions (GRANT) | 4/10 | **40%** |
+| TEI | 3/10 | **30%** |
+| Wikidata SPARQL | 3/10 | **30%** |
+| SQL Transactions | 3/10 | **30%** |
 
 ---
 
@@ -128,6 +129,7 @@ These appear sporadically (about 1/3 of exams):
 
 - COMMIT/ROLLBACK and ACID properties
 - GRANT statements and principle of least privilege
+- Practical security scenarios (e.g., double-blind peer review systems in Oct 2025)
 
 ---
 
@@ -145,6 +147,7 @@ These appear sporadically (about 1/3 of exams):
 
 - **Earlier exams**: Hypothetical scenarios (Doctor Who, Zoos, Recipe databases)
 - **Later exams**: Real datasets (Wikidata, Carnegie Hall, MusicBrainz, UK Government data)
+- **Oct 2025**: Domain-specific standards (MARC library cataloguing from Bodleian Library)
 
 #### 3. Growing Emphasis on Data Quality
 
@@ -162,6 +165,23 @@ Introduced in March 2025, suggesting potential future emphasis on data warehousi
 #### 5. JSON-LD and RDF Interoperability
 
 Increasing focus on understanding different serialization formats as equivalent representations of the same underlying RDF graph.
+
+#### 6. Domain-Specific Linked Data Standards
+
+October 2025 introduced BIBFRAME (Bibliographic Framework), the Library of Congress's Linked Data standard designed to replace MARC:
+
+- Benefits: Web integration, deduplication via shared URIs, richer relationships
+- Risks: Migration costs, training requirements, ecosystem changes
+- This signals growing interest in how Linked Data principles apply to real-world domain migrations
+
+#### 7. Database Performance vs Integrity Trade-offs
+
+October 2025 explicitly tested denormalization concepts:
+
+- When denormalization is appropriate (read-heavy workloads, proven bottlenecks)
+- Why premature optimization is problematic (update anomalies, complexity)
+- Alternative solutions (indexing, caching, read replicas)
+- Understanding that 1,000 records is trivial for modern databases
 
 ---
 
@@ -290,7 +310,8 @@ Based on this analysis, students should prioritize:
 | Mar 2024 | Carnegie Hall RDF, UK Government Education Data, MongoDB People |
 | Sep 2024 | Lute Music Database, Poetry Contest, Wikidata Belgian Artists |
 | Mar 2025 | London Mortality Bills, BeerXML, MusicBrainz JSON-LD |
+| Oct 2025 | MARC Library Catalogue (Bodleian), Conference Management System |
 
 ---
 
-*Analysis generated from solution sheets: Mock March 2021 through March 2025*
+*Analysis generated from solution sheets: Mock March 2021 through Mock October 2025*
