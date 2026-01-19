@@ -614,6 +614,34 @@ The question describes Doctor Who with:
 | DoctorCompanion junction | M:N relationship (companions overlap Doctors) |
 | Incarnation as PK | "First Doctor", "Second Doctor" are distinct |
 
+**E/R Diagram:**
+
+```mermaid
+erDiagram
+    Actors ||--o{ Doctors : "plays"
+    Actors ||--o{ Companions : "plays"
+    Doctors ||--o{ DoctorCompanion : ""
+    Companions ||--o{ DoctorCompanion : ""
+
+    Actors {
+        string Name PK
+    }
+    Doctors {
+        string Incarnation PK
+        string PlayedBy FK
+        date PeriodStart
+        date PeriodEnd
+    }
+    Companions {
+        string Name PK
+        string PlayedBy FK
+    }
+    DoctorCompanion {
+        string Doctor PK_FK
+        string Companion PK_FK
+    }
+```
+
 ---
 
 ## Question 2(b) [3 marks]
@@ -1112,6 +1140,32 @@ CREATE TABLE Roles (
 );
 ```
 
+**E/R Diagram:**
+
+```mermaid
+erDiagram
+    Plays ||--o{ CastGroups : "contains"
+    CastGroups ||--o{ CastGroups : "parent"
+    CastGroups ||--o{ Roles : "contains"
+
+    Plays {
+        string PlayId PK
+        string Title
+    }
+    CastGroups {
+        string GroupId PK
+        string GroupName
+        string PlayId FK
+        string ParentGroupId FK
+    }
+    Roles {
+        string RoleId PK
+        string Name
+        string Description
+        string GroupId FK
+    }
+```
+
 ---
 
 ### (ii) Which works better here, relational or XML? [5 marks]
@@ -1225,6 +1279,47 @@ RecipeBook ──Contains──> Recipe ──uses──> Ingredient
 Recipe ──M:N── Ingredient
     ↓
 RecipeIngredient (junction table)
+```
+
+**E/R Diagram:**
+
+```mermaid
+erDiagram
+    RecipeBooks ||--o{ BookContains : ""
+    Recipes ||--o{ BookContains : ""
+    Recipes ||--o{ RecipeIngredients : ""
+    Ingredients ||--o{ RecipeIngredients : ""
+    Recipes ||--o{ PreparationSteps : "preparedBy"
+
+    RecipeBooks {
+        int BookId PK
+        string Title
+        string Author
+    }
+    Recipes {
+        int RecipeId PK
+        string Name
+    }
+    BookContains {
+        int BookId PK_FK
+        int RecipeId PK_FK
+    }
+    Ingredients {
+        int IngredientId PK
+        string Name
+    }
+    RecipeIngredients {
+        int RecipeId PK_FK
+        int IngredientId PK_FK
+        decimal Quantity
+        string Unit
+    }
+    PreparationSteps {
+        int StepId PK
+        int RecipeId FK
+        int StepNumber
+        string Action
+    }
 ```
 
 ---

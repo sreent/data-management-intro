@@ -29,7 +29,7 @@ An enthusiast website for historical lute music stores data in CSV files:
 
 ---
 
-## Q2(a): Database vs File-Based Approach [6 marks]
+## Question 2(a) [6 marks]
 
 **Question:** What might be the advantages and disadvantages of a database approach compared to the file-based approach used here?
 
@@ -73,7 +73,7 @@ An enthusiast website for historical lute music stores data in CSV files:
 
 ---
 
-## Q2(b): Recommended Database Model [2 marks]
+## Question 2(b) [2 marks]
 
 **Question:** What database model would you recommend as the easiest to use, given the current state of the data? Why?
 
@@ -93,7 +93,7 @@ Alternative acceptable answer: **Relational database** because the data already 
 
 ### Revision Notes
 
-**Choosing a Database Model:**
+**Core Concept:** Choosing a Database Model
 
 | Data Characteristic | Best Model |
 |--------------------|------------|
@@ -104,7 +104,7 @@ Alternative acceptable answer: **Relational database** because the data already 
 
 ---
 
-## Q2(c): Relational Database Model [12 marks]
+## Question 2(c) [12 marks]
 
 **Question:** Propose a relational model, listing tables, fields, and keys. List any concerns about the data.
 
@@ -162,6 +162,51 @@ CREATE TABLE ConcordanceLocation (
 );
 ```
 
+**E/R Diagram:**
+
+```mermaid
+erDiagram
+    Source ||--o{ Piece : contains
+    Source ||--o{ ConcordanceLocation : referenced_in
+    Composer ||--o{ Concordance : attributed_to
+    Composer ||--o{ Piece : composed
+    Concordance ||--o{ ConcordanceLocation : has_locations
+    Concordance ||--o{ Piece : groups
+
+    Source {
+        string RefShort PK
+        string RefLong
+        string Library
+        string NameGerman
+        string NameEnglish
+        string DateRange
+        string Instrument
+    }
+    Composer {
+        int ComposerId PK
+        string Name UK
+    }
+    Concordance {
+        string ConcNo PK
+        int ComposerId FK
+    }
+    Piece {
+        int PieceId PK
+        string SourceRef FK
+        int PieceNo
+        string MusicalKey
+        string PageNo
+        string Title
+        int ComposerId FK
+        string ConcNo FK
+    }
+    ConcordanceLocation {
+        string ConcNo PK_FK
+        string SourceRef PK_FK
+        string PageNo PK
+    }
+```
+
 **Concerns:**
 
 | Concern | Issue | Resolution |
@@ -175,14 +220,44 @@ CREATE TABLE ConcordanceLocation (
 
 ### Revision Notes
 
+**Core Concept:** Database Normalization and E/R Mapping
+
 **Normalization Applied:**
 - **1NF**: All fields atomic (split Concordances list)
 - **2NF**: No partial dependencies (Composer separate from Piece)
 - **3NF**: No transitive dependencies (Instrument depends on Source, not Piece)
 
+**Visual Schema Relationships:**
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────────────┐
+│   Source    │     │    Piece     │     │     Composer        │
+├─────────────┤     ├──────────────┤     ├─────────────────────┤
+│ RefShort PK │◄────│ SourceRef FK │     │ ComposerId PK       │
+│ Library     │     │ ComposerId FK│────►│ Name                │
+│ DateRange   │     │ ConcNo FK    │     └─────────────────────┘
+└─────────────┘     └──────────────┘              │
+       │                   │                      │
+       │            ┌──────┴───────┐              │
+       │            ▼              │              ▼
+       │     ┌─────────────┐       │     ┌─────────────────┐
+       │     │ Concordance │       │     │   Concordance   │
+       │     ├─────────────┤       │     ├─────────────────┤
+       │     │ ConcNo PK   │◄──────┘     │ ComposerId FK   │
+       │     └─────────────┘             └─────────────────┘
+       │            │
+       ▼            ▼
+┌─────────────────────────┐
+│  ConcordanceLocation    │
+├─────────────────────────┤
+│ ConcNo PK, FK           │
+│ SourceRef PK, FK        │
+│ PageNo PK               │
+└─────────────────────────┘
+```
+
 ---
 
-## Q2(d): Query for Ungrouped Lachrimae Pieces [6 marks]
+## Question 2(d) [6 marks]
 
 **Question:** Write a query that finds all pieces with 'lachrimae' or 'flow' in their names that are not included in a Concordance associated with composer 'John Dowland'.
 
@@ -221,7 +296,43 @@ WHERE (LOWER(p.Title) LIKE '%lachrimae%'
 
 ### Revision Notes
 
-**Query Pattern:** Finding records NOT in a related set
+**Core Concept:** Finding Records NOT in a Related Set
+
+**Visual Query Breakdown (NOT IN approach):**
+```
+Step 1: Find matching titles
+┌─────────────────────────────────┐
+│ Piece                           │
+│ WHERE Title LIKE '%lachrimae%'  │
+│    OR Title LIKE '%flow%'       │
+└───────────────┬─────────────────┘
+                │
+                ▼
+Step 2: Exclude Dowland concordances
+┌─────────────────────────────────┐
+│ Filter out pieces where:        │
+│ ConcNo IN (                     │
+│   Concordance                   │
+│   JOIN Composer                 │
+│   WHERE Name = 'John Dowland'   │
+│ )                               │
+└─────────────────────────────────┘
+```
+
+**Visual Query Breakdown (LEFT JOIN approach):**
+```
+┌─────────┐      ┌─────────────┐      ┌──────────┐
+│  Piece  │─LEFT─│ Concordance │─LEFT─│ Composer │
+│         │ JOIN │             │ JOIN │(Dowland) │
+└────┬────┘      └──────┬──────┘      └────┬─────┘
+     │                  │                   │
+     │                  │                   │
+     └──────────────────┴───────────────────┘
+                        │
+                        ▼
+              WHERE Composer.Id IS NULL
+              (No match = not Dowland's)
+```
 
 | Method | Syntax |
 |--------|--------|
@@ -231,7 +342,7 @@ WHERE (LOWER(p.Title) LIKE '%lachrimae%'
 
 ---
 
-## Q2(e): GRANT Command for Web Application [4 marks]
+## Question 2(e) [4 marks]
 
 **Question:** Write an appropriate GRANT command for the account that the web application will use.
 
@@ -259,7 +370,7 @@ GRANT SELECT ON lutemusic.Composer TO 'webapp'@'localhost';
 
 ### Revision Notes
 
-**Principle of Least Privilege:**
+**Core Concept:** Principle of Least Privilege
 
 | Operation | When to Grant |
 |-----------|---------------|
@@ -295,7 +406,7 @@ XML file collecting poetry contest entries with TEI namespace elements for poem 
 
 ---
 
-## Q3(a): File Format [1 mark]
+## Question 3(a) [1 mark]
 
 **Question:** What is the format of this file?
 
@@ -307,7 +418,20 @@ XML file collecting poetry contest entries with TEI namespace elements for poem 
 
 ---
 
-## Q3(b): TEI Claim Assessment [3 marks]
+### Revision Notes
+
+**Core Concept:** Recognizing Data Formats
+
+| Format | Key Indicators |
+|--------|----------------|
+| XML | Angle brackets `<>`, nested tags, attributes |
+| JSON | Curly braces `{}`, square brackets `[]`, key-value pairs |
+| CSV | Comma-separated values, newlines |
+| RDF/Turtle | `@prefix`, URIs, triples with `.` and `;` |
+
+---
+
+## Question 3(b) [3 marks]
 
 **Question:** The competition website says they save data as Text Encoding Initiative files. Are they correct? Give a more specific statement.
 
@@ -326,7 +450,8 @@ More accurate statement: "The file is **XML that incorporates TEI elements** (sp
 
 ### Revision Notes
 
-**TEI (Text Encoding Initiative):**
+**Core Concept:** TEI (Text Encoding Initiative)
+
 - Standard XML vocabulary for humanities texts
 - Root element: `<TEI>`
 - Required sections: `<teiHeader>` (metadata), `<text>` (content)
@@ -334,7 +459,7 @@ More accurate statement: "The file is **XML that incorporates TEI elements** (sp
 
 ---
 
-## Q3(c): XPath for First Lines [3 marks]
+## Question 3(c) [3 marks]
 
 **Question:** Write a simple XPath expression to retrieve the first line from all entries to competitions with theme 'limericks'.
 
@@ -361,7 +486,7 @@ Or more explicitly:
 
 ### Revision Notes
 
-**XPath Position Predicates:**
+**Core Concept:** XPath Position Predicates
 
 | Expression | Meaning |
 |------------|---------|
@@ -371,7 +496,7 @@ Or more explicitly:
 
 ---
 
-## Q3(d): Relational Model with Judging [12 marks]
+## Question 3(d) [12 marks]
 
 **Question:** Design a relational model for the files, adding the ability for judges to give numerical assessments of each entry. Give CREATE commands. Explain choices and Normal Forms.
 
@@ -426,6 +551,49 @@ CREATE TABLE Assessment (
 );
 ```
 
+**E/R Diagram:**
+
+```mermaid
+erDiagram
+    Competition ||--o{ Entry : hosts
+    Entry ||--|{ EntryAuthor : has
+    Author ||--|{ EntryAuthor : writes
+    Entry ||--o{ Assessment : receives
+    Judge ||--o{ Assessment : gives
+
+    Competition {
+        int CompetitionId PK
+        string Theme
+        date CompDate
+    }
+    Author {
+        int AuthorId PK
+        string Name
+        string ViafId
+    }
+    Entry {
+        int EntryId PK
+        int CompetitionId FK
+        text PoemText
+        datetime SubmittedAt
+    }
+    EntryAuthor {
+        int EntryId PK_FK
+        int AuthorId PK_FK
+    }
+    Judge {
+        int JudgeId PK
+        string Name
+    }
+    Assessment {
+        int AssessmentId PK
+        int EntryId FK
+        int JudgeId FK
+        decimal Score
+        datetime AssessedAt
+    }
+```
+
 **Design Choices:**
 
 | Choice | Rationale |
@@ -445,7 +613,41 @@ CREATE TABLE Assessment (
 
 ---
 
-## Q3(e): Winning Entry Query [5 marks]
+### Revision Notes
+
+**Core Concept:** Junction Tables for Many-to-Many Relationships
+
+**Visual Schema Relationships:**
+```
+┌─────────────────┐          ┌──────────────┐          ┌─────────────┐
+│   Competition   │          │    Entry     │          │   Author    │
+├─────────────────┤          ├──────────────┤          ├─────────────┤
+│ CompetitionId PK│◄────────┐│ EntryId PK   │┌────────►│ AuthorId PK │
+│ Theme           │         ││ CompetitionId││         │ Name        │
+│ CompDate        │         │└──────────────┘│         │ ViafId      │
+└─────────────────┘         │       │        │         └─────────────┘
+                            │       │        │
+                            │       ▼        │
+                            │ ┌────────────┐ │
+                            │ │EntryAuthor │ │
+                            │ ├────────────┤ │
+                            └─│ EntryId FK │─┘
+                              │ AuthorId FK│
+                              └────────────┘
+
+┌──────────────┐          ┌──────────────┐          ┌─────────────┐
+│    Entry     │          │  Assessment  │          │    Judge    │
+├──────────────┤          ├──────────────┤          ├─────────────┤
+│ EntryId PK   │◄─────────│ EntryId FK   │          │ JudgeId PK  │
+└──────────────┘          │ JudgeId FK   │─────────►│ Name        │
+                          │ Score        │          └─────────────┘
+                          │ AssessedAt   │
+                          └──────────────┘
+```
+
+---
+
+## Question 3(e) [5 marks]
 
 **Question:** Give a query that retrieves the winning (highest scoring) entry for the Limerick challenge of 3 Jan 2024.
 
@@ -482,7 +684,29 @@ LIMIT 1;
 
 ### Revision Notes
 
-**Finding Maximum with GROUP BY:**
+**Core Concept:** Finding Maximum with GROUP BY and Aggregation
+
+**Visual Query Breakdown:**
+```
+Step 1: Join tables to connect entries to competitions and scores
+┌─────────────┐      ┌───────────┐      ┌────────────┐
+│ Competition │─────►│   Entry   │◄─────│ Assessment │
+│ (filter by  │ JOIN │           │ JOIN │ (get all   │
+│  theme/date)│      │           │      │  scores)   │
+└─────────────┘      └───────────┘      └────────────┘
+
+Step 2: Group by entry and calculate average
+┌─────────────────────────────────┐
+│ GROUP BY EntryId                │
+│ AVG(Score) for each entry       │
+└─────────────────────────────────┘
+
+Step 3: Order and limit
+┌─────────────────────────────────┐
+│ ORDER BY AvgScore DESC          │
+│ LIMIT 1 (top scorer)            │
+└─────────────────────────────────┘
+```
 
 | Method | Use Case |
 |--------|----------|
@@ -492,7 +716,7 @@ LIMIT 1;
 
 ---
 
-## Q3(f): XML vs Relational Comparison [6 marks]
+## Question 3(f) [6 marks]
 
 **Question:** How do the XML document-based approach and the relational model compare? What works best in each? Would there be any benefit to a hybrid approach?
 
@@ -531,7 +755,7 @@ LIMIT 1;
 
 ### Revision Notes
 
-**Hybrid Database Approaches:**
+**Core Concept:** Hybrid Database Approaches
 
 | Database | XML Support |
 |----------|-------------|
@@ -550,7 +774,7 @@ A researcher queries Wikidata for Belgian artists born before 1600.
 
 ---
 
-## Q4(a): Query Language [1 mark]
+## Question 4(a) [1 mark]
 
 **Question:** What language does this query use?
 
@@ -562,7 +786,20 @@ A researcher queries Wikidata for Belgian artists born before 1600.
 
 ---
 
-## Q4(b): Syntax Corrections [2 marks]
+### Revision Notes
+
+**Core Concept:** Query Languages for Different Data Models
+
+| Data Model | Query Language |
+|------------|----------------|
+| Relational | SQL |
+| RDF/Linked Data | SPARQL |
+| XML | XPath, XQuery |
+| Document (MongoDB) | MongoDB Query Language |
+
+---
+
+## Question 4(b) [2 marks]
 
 **Question:** Some of the syntax of this query is wrong. Correct it.
 
@@ -608,7 +845,7 @@ WHERE {
 
 ### Revision Notes
 
-**SPARQL Syntax:**
+**Core Concept:** SPARQL Syntax
 
 | Element | Usage |
 |---------|-------|
@@ -619,7 +856,7 @@ WHERE {
 
 ---
 
-## Q4(c): Retrieval Less Than 100% [4 marks]
+## Question 4(c) [4 marks]
 
 **Question:** What might cause the retrieval of this query to be less than 100%?
 
@@ -642,7 +879,7 @@ WHERE {
 
 ### Revision Notes
 
-**Linked Data Retrieval Issues:**
+**Core Concept:** Linked Data Retrieval Issues
 
 | Type | Description |
 |------|-------------|
@@ -653,7 +890,7 @@ WHERE {
 
 ---
 
-## Q4(d): Unwanted Results [3 marks]
+## Question 4(d) [3 marks]
 
 **Question:** Given the purpose of the query, what results might be returned that are not wanted?
 
@@ -674,7 +911,7 @@ WHERE {
 
 ### Revision Notes
 
-**Precision vs Recall Trade-off:**
+**Core Concept:** Precision vs Recall Trade-off
 
 | More Specific Query | Effect |
 |--------------------|--------|
@@ -684,7 +921,7 @@ WHERE {
 
 ---
 
-## Q4(e): Place of Birth vs Country of Citizenship [4 marks]
+## Question 4(e) [4 marks]
 
 **Question:** How does the query avoid the problem of Belgium not existing before 1830?
 
@@ -709,7 +946,7 @@ WHERE {
 
 ### Revision Notes
 
-**Temporal vs Current Data in Wikidata:**
+**Core Concept:** Temporal vs Current Data in Wikidata
 
 | Property | Typical Value |
 |----------|---------------|
@@ -719,7 +956,7 @@ WHERE {
 
 ---
 
-## Q4(f): MongoDB Query for Artworks [6 marks]
+## Question 4(f) [6 marks]
 
 **Question:** Give a query for a MongoDB database that returns all artworks made between 1520 and 1530 by artists born in Antwerp.
 
@@ -774,7 +1011,7 @@ db.artworks.aggregate([
 
 ### Revision Notes
 
-**MongoDB Query Operators:**
+**Core Concept:** MongoDB Query Operators
 
 | Operator | Meaning |
 |----------|---------|
@@ -785,7 +1022,7 @@ db.artworks.aggregate([
 
 ---
 
-## Q4(g): Database Model Evaluation [10 marks]
+## Question 4(g) [10 marks]
 
 **Question:** Do you think the researcher was right to use an object database for this? Evaluate graph, object, and relational models.
 
@@ -829,7 +1066,7 @@ db.artworks.aggregate([
 
 ### Revision Notes
 
-**Choosing Database Models:**
+**Core Concept:** Choosing Database Models
 
 | Use Case | Best Model |
 |----------|------------|

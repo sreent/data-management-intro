@@ -201,6 +201,30 @@ The schema defines how these list structures must be formed.
 
 ---
 
+### Revision Notes
+
+**Core Concept:** RelaxNG patterns define allowed element structures.
+
+**Schema Pattern Analysis:**
+
+| Pattern | Meaning | Applies To |
+|---------|---------|------------|
+| `element text:list` | Defines the list container | `<text:list>` |
+| `optional` | Zero or one occurrence | `<text:list-header>` |
+| `zeroOrMore` | Zero or more occurrences | `<text:list-item>` |
+
+**Document Matching:**
+```xml
+<text:list>           <!-- Matched by element text:list -->
+  <text:list-item>    <!-- Matched by zeroOrMore -->
+    <text:p>Trees</text:p>
+  </text:list-item>
+  <!-- More list items... -->
+</text:list>
+```
+
+---
+
 ## Question 2(h) [3 marks]
 
 **Question:** Give an example of an element that would not be valid given this schema code (assume `text-list-attr` only defines attributes).
@@ -362,6 +386,30 @@ http://schema.org/member
 
 ---
 
+### Revision Notes
+
+**Core Concept:** Counting resources in RDF requires identifying distinct subjects/objects.
+
+**How to Count Members in Turtle:**
+
+| Step | What to Look For |
+|------|------------------|
+| 1 | Find `schema:member` predicates from the band |
+| 2 | Each points to a blank node (`[ ... ]`) representing a role |
+| 3 | Each role's `schema:member` points to the actual person |
+| 4 | Count distinct person URIs |
+
+**Visual Breakdown:**
+```
+BTS
+ ├── schema:member → [Role1] → schema:member → Person1 (Jin)
+ └── schema:member → [Role2] → schema:member → Person2 (RM)
+                                              ↑
+                                         Count these: 2
+```
+
+---
+
 ## Question 3(d) [3 marks]
 
 **Question:** Comment on the way the `schema:member` predicate is used in this snippet.
@@ -416,6 +464,30 @@ He is typed as both:
 
 ---
 
+### Revision Notes
+
+**Core Concept:** RDF allows multiple types (classes) for a single resource.
+
+**Multiple Typing in RDF:**
+
+| Aspect | Explanation |
+|--------|-------------|
+| Why allowed | RDF is flexible - no single inheritance restriction |
+| Common cause | Auto-generated data may apply generic types |
+| How to identify | Look for multiple `a` (rdf:type) statements |
+
+**Example Pattern:**
+```turtle
+mba:jin a schema:Person ;        # Jin is a Person
+         a schema:MusicGroup .   # Jin is also typed as MusicGroup (likely error)
+```
+
+**Common Mistakes:**
+- Assuming entities can only have one type
+- Not checking all `rdf:type` declarations
+
+---
+
 ## Question 3(f) [1 mark]
 
 **Question:** What prefixes need to be defined for this SPARQL query to work?
@@ -442,6 +514,37 @@ PREFIX schema: <http://schema.org/>
 
 ---
 
+### Revision Notes
+
+**Core Concept:** SPARQL prefixes must match the namespaces used in the data.
+
+**Identifying Required Prefixes:**
+
+| Step | Action |
+|------|--------|
+| 1 | Scan query for prefixed terms (e.g., `mba:`, `schema:`) |
+| 2 | Look up the full namespace URI for each prefix |
+| 3 | Declare each prefix before the query body |
+
+**Common SPARQL Prefixes:**
+
+| Prefix | Namespace URI | Used For |
+|--------|---------------|----------|
+| `rdf:` | `http://www.w3.org/1999/02/22-rdf-syntax-ns#` | `rdf:type` |
+| `rdfs:` | `http://www.w3.org/2000/01/rdf-schema#` | `rdfs:label` |
+| `schema:` | `http://schema.org/` | Schema.org vocabulary |
+| `xsd:` | `http://www.w3.org/2001/XMLSchema#` | Data types |
+
+**Query Analysis:**
+```sparql
+mba:9fe8e-ba27...    -- Needs PREFIX mba: <http://musicbrainz.org/artist/>
+schema:member        -- Needs PREFIX schema: <http://schema.org/>
+schema:startDate     -- Already covered by schema: prefix
+schema:name          -- Already covered by schema: prefix
+```
+
+---
+
 ## Question 3(g) [2 marks]
 
 **Question:** What would the query return?
@@ -455,6 +558,41 @@ It returns pairs of `(?a, ?b)` where:
 - `?b` = **startDate** from the membership role
 
 Essentially, each band member's name plus when they joined.
+
+---
+
+### Revision Notes
+
+**Core Concept:** SPARQL SELECT returns variable bindings based on graph pattern matching.
+
+**Step-by-Step Query Execution:**
+
+| Step | Triple Pattern | What It Matches |
+|------|----------------|-----------------|
+| 1 | `mba:9fe8e... schema:member ?c` | `?c` = OrganizationRole blank nodes |
+| 2 | `?c schema:startDate ?b` | `?b` = start date from role |
+| 3 | `?c schema:member ?d` | `?d` = person URI |
+| 4 | `?d schema:name ?a` | `?a` = person's name |
+
+**Query Flow Diagram:**
+```
+BTS (mba:9fe8e...)
+    │
+    └── schema:member ──► ?c (Role)
+                              │
+                              ├── schema:startDate ──► ?b ("2013-06-13")
+                              │
+                              └── schema:member ──► ?d (Person)
+                                                        │
+                                                        └── schema:name ──► ?a ("Jin")
+```
+
+**Expected Output:**
+
+| ?a | ?b |
+|----|----|
+| "Jin" | "2013-06-13" |
+| "RM" | "2013-06-13" |
 
 ---
 
@@ -495,6 +633,31 @@ erDiagram
 
 ---
 
+### Revision Notes
+
+**Core Concept:** RDF data can be reverse-engineered into E/R models by identifying entities and relationships.
+
+**RDF to E/R Mapping Process:**
+
+| Step | Action | Example |
+|------|--------|---------|
+| 1 | Identify distinct entity types | `schema:MusicGroup`, `schema:Person` |
+| 2 | Determine if same table or separate | Both are "Artists" with a Type discriminator |
+| 3 | Find relationships between entities | `schema:member` connects band to person |
+| 4 | Check for relationship attributes | `schema:startDate` suggests a junction table |
+
+**Why Single Artist Table:**
+- Both bands and members share similar attributes (name, identifiers)
+- Simplifies queries that work with "any artist"
+- Type column distinguishes between categories
+
+**Why Membership Junction Table:**
+- Many-to-many relationship (members can be in multiple bands)
+- Relationship has its own attributes (startDate, roleName)
+- Enables recording historical membership changes
+
+---
+
 ## Question 3(i) [4 marks]
 
 **Question:** Give the CREATE TABLE commands for two tables based on your ER diagram.
@@ -526,9 +689,30 @@ CREATE TABLE Membership (
 
 ### Revision Notes
 
+**Core Concept:** Composite primary keys enforce uniqueness across multiple columns.
+
 **Key Points:**
 - `PRIMARY KEY (BandId, MemberId)` enforces one membership record per (band, person) pair
 - If multiple memberships needed (e.g., someone rejoins), add another field to the PK
+
+**CREATE TABLE Best Practices:**
+
+| Element | Best Practice | Example |
+|---------|---------------|---------|
+| Primary Key | Use meaningful or surrogate key | `ArtistId INT PRIMARY KEY` |
+| Foreign Key | Always name the constraint | `FOREIGN KEY (BandId) REFERENCES Artist(ArtistId)` |
+| NOT NULL | Apply to required fields | `Name VARCHAR(100) NOT NULL` |
+| Data Types | Match the referenced column | Both FKs use INT to match Artist PK |
+
+**Self-Referencing Table Pattern:**
+```
+Artist Table
+    ↑           ↑
+    │           │
+  BandId    MemberId
+    └─────┬─────┘
+     Membership Table
+```
 
 ---
 
@@ -598,6 +782,32 @@ WHERE m.StartDate < aBand.FoundingDate;
 
 ---
 
+### Revision Notes
+
+**Core Concept:** Data distribution strategies involve trade-offs between freshness, performance, and control.
+
+**Decision Matrix:**
+
+| Factor | Database Dump | Linked Data |
+|--------|---------------|-------------|
+| Data freshness | Snapshot at download time | Real-time |
+| Query speed | Fast (local) | Variable (network) |
+| Storage needs | High | None |
+| Setup complexity | Medium | Low |
+| Offline access | Yes | No |
+
+**Use Case Recommendations:**
+
+| Scenario | Best Choice | Reason |
+|----------|-------------|--------|
+| Data analytics | Dump | Need fast, complex queries |
+| Real-time lookups | Linked Data | Need current information |
+| Research project | Dump | Need reproducible dataset |
+| Web application | Linked Data | Need live updates |
+| Integration | Linked Data | Standard URIs for linking |
+
+---
+
 # Question 4: Enhancing an ER Model for 16th-Century European Music Records [30 marks]
 
 ## Context
@@ -621,6 +831,32 @@ Add attributes to the **Line** entity:
 | `LineOrder` | INT | Track visual/logical order on page |
 | `XCoordinate` | FLOAT | Horizontal position |
 | `YCoordinate` | FLOAT | Vertical position |
+
+---
+
+### Revision Notes
+
+**Core Concept:** E/R models must capture all data requirements including ordering and spatial relationships.
+
+**Identifying Missing Attributes:**
+
+| Requirement | Current State | Solution |
+|-------------|---------------|----------|
+| Line order | Not captured | Add `LineOrder` integer attribute |
+| Position on page | Not captured | Add X/Y coordinate attributes |
+
+**Attribute Design Considerations:**
+
+| Attribute | Data Type | Constraints |
+|-----------|-----------|-------------|
+| `LineOrder` | INT | NOT NULL, >= 1 |
+| `XCoordinate` | FLOAT/DECIMAL | Precision for page layout |
+| `YCoordinate` | FLOAT/DECIMAL | Precision for page layout |
+
+**Alternative Approaches:**
+- Use a single `Position` composite attribute
+- Store as JSON for flexibility
+- Use a separate `LinePosition` entity for complex layouts
 
 ---
 
@@ -688,6 +924,39 @@ erDiagram
 
 ---
 
+### Revision Notes
+
+**Core Concept:** Complex domain requirements often need new entities and relationships to model properly.
+
+**Tablebook Format Challenges:**
+
+| Challenge | E/R Solution |
+|-----------|--------------|
+| Multiple voices/parts | New `InstrumentOrVoicePart` entity |
+| Page subdivisions | New `Region` entity |
+| Different orientations | `Orientation` attribute on Region |
+| Lines belong to specific parts | FK from Line to Part |
+
+**Entity Relationship Summary:**
+
+```
+Piece ←──── Line ────→ Page
+              │
+              ├────→ Region (sub-area of page)
+              │
+              └────→ Part (soprano, alto, etc.)
+```
+
+**Design Decisions:**
+
+| Decision | Rationale |
+|----------|-----------|
+| Region as separate entity | Pages can have multiple regions |
+| Part as separate entity | Parts are reusable across pieces |
+| Line links to all three | Line is the central connecting entity |
+
+---
+
 ## Question 4(c) [7 marks]
 
 **Question:** List the tables, primary keys, and foreign keys for a relational implementation of your modified model.
@@ -703,6 +972,37 @@ erDiagram
 | **Region** | RegionId | PageId → Page(PageId) | Description, Orientation |
 | **InstrumentOrVoicePart** | PartId | - | PartName |
 | **Line** | LineId | PieceId → Piece(PieceId), PageId → Page(PageId), RegionId → Region(RegionId), PartId → InstrumentOrVoicePart(PartId) | LineOrder, XCoordinate, YCoordinate |
+
+---
+
+### Revision Notes
+
+**Core Concept:** E/R to relational mapping requires identifying PKs, FKs, and handling relationship cardinalities.
+
+**Mapping Rules Applied:**
+
+| E/R Element | Relational Equivalent |
+|-------------|----------------------|
+| Entity | Table |
+| Entity attribute | Column |
+| 1:M relationship | FK in "many" side |
+| M:N relationship | Junction table with composite PK |
+| Identifying relationship | FK as part of PK |
+
+**Foreign Key Placement Logic:**
+
+```
+Page (1) ──→ (M) Region    : FK PageId in Region
+Page (1) ──→ (M) Line      : FK PageId in Line
+Piece (1) ──→ (M) Line     : FK PieceId in Line
+Region (1) ──→ (M) Line    : FK RegionId in Line
+Part (1) ──→ (M) Line      : FK PartId in Line
+```
+
+**Common Mistakes:**
+- Forgetting to add FKs for all relationships
+- Not including inherited FKs (e.g., BookId for Page)
+- Missing attributes from original entities
 
 ---
 
@@ -790,6 +1090,40 @@ GROUP BY p.PieceId, p.Title;
 - Deeply nested layout data
 - Preserving document structure
 - Integration with music encoding standards (MEI)
+
+---
+
+### Revision Notes
+
+**Core Concept:** Data model selection depends on the primary use case and data characteristics.
+
+**Model Selection Decision Tree:**
+
+```
+Is data highly structured with fixed schema?
+    ├── Yes → Consider Relational
+    │         Is complex querying/aggregation needed?
+    │             ├── Yes → Relational (SQL)
+    │             └── No  → Consider simpler options
+    │
+    └── No → Is data hierarchical/document-like?
+              ├── Yes → Consider XML/Document DB
+              │         Is there an existing standard (MEI, TEI)?
+              │             ├── Yes → Use standard (XML)
+              │             └── No  → MongoDB/JSON
+              │
+              └── Is data graph-like with many relationships?
+                    └── Yes → Consider Linked Data/RDF
+```
+
+**Music Notation Specific Factors:**
+
+| Factor | Best Model | Reason |
+|--------|------------|--------|
+| Page layout preservation | XML | Natural hierarchy matches document structure |
+| Cross-piece analysis | Relational | SQL aggregation and joins |
+| Linking to external sources | RDF | URI-based connections |
+| Flexible notation variants | MongoDB | Schema-less adaptation |
 
 ---
 
