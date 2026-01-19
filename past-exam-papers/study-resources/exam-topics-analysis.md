@@ -129,6 +129,7 @@ These appear sporadically (about 1/3 of exams):
 
 - COMMIT/ROLLBACK and ACID properties
 - GRANT statements and principle of least privilege
+- Practical security scenarios (e.g., double-blind peer review systems in Oct 2025)
 
 ---
 
@@ -146,6 +147,7 @@ These appear sporadically (about 1/3 of exams):
 
 - **Earlier exams**: Hypothetical scenarios (Doctor Who, Zoos, Recipe databases)
 - **Later exams**: Real datasets (Wikidata, Carnegie Hall, MusicBrainz, UK Government data)
+- **Oct 2025**: Domain-specific standards (MARC library cataloguing from Bodleian Library)
 
 #### 3. Growing Emphasis on Data Quality
 
@@ -163,6 +165,23 @@ Introduced in March 2025, suggesting potential future emphasis on data warehousi
 #### 5. JSON-LD and RDF Interoperability
 
 Increasing focus on understanding different serialization formats as equivalent representations of the same underlying RDF graph.
+
+#### 6. Domain-Specific Linked Data Standards
+
+October 2025 introduced BIBFRAME (Bibliographic Framework), the Library of Congress's Linked Data standard designed to replace MARC:
+
+- Benefits: Web integration, deduplication via shared URIs, richer relationships
+- Risks: Migration costs, training requirements, ecosystem changes
+- This signals growing interest in how Linked Data principles apply to real-world domain migrations
+
+#### 7. Database Performance vs Integrity Trade-offs
+
+October 2025 explicitly tested denormalization concepts:
+
+- When denormalization is appropriate (read-heavy workloads, proven bottlenecks)
+- Why premature optimization is problematic (update anomalies, complexity)
+- Alternative solutions (indexing, caching, read replicas)
+- Understanding that 1,000 records is trivial for modern databases
 
 ---
 
