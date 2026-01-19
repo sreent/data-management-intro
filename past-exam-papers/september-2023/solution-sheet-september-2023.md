@@ -249,17 +249,22 @@ Could also be RDF/XML depending on how it's served.
 @prefix bn: <http://babelnet.org/rdf/> .
 @prefix ex: <http://example.org/> .
 
+# Link the LexicalEntry to a LexicalSense
+bn:post_n_EN lemon:sense bn:post_n_EN_sense .
+
+# Define the LexicalSense and link to SenseDefinition
 bn:post_n_EN_sense a lemon:LexicalSense ;
     lemon:definition ex:post_n_EN_def .
 
+# Provide the actual definition text
 ex:post_n_EN_def a lemon:SenseDefinition ;
-    lemon:value "A piece of wood or metal set upright to support something, or a position of employment."@en .
+    lemon:value "A piece of wood or metal set upright to support something."@en .
 ```
 
 **Structure:**
-1. Create a `LexicalSense` for the word
-2. Link it to a `SenseDefinition` via `:definition`
-3. Provide the actual text via `:value`
+1. Link `LexicalEntry` to `LexicalSense` via `lemon:sense`
+2. Create a `LexicalSense` and link it to a `SenseDefinition` via `lemon:definition`
+3. Provide the actual text via `lemon:value`
 
 ---
 
@@ -479,9 +484,9 @@ Hathi Trust Digital Library uses ML to classify book languages. German classifie
 
 ---
 
-## Q3(a): True German Books Calculation [2 marks]
+## Q3(a): Precision Calculation [2 marks]
 
-**Question:** If the system lists 2,200,000 books as being in German, how many are likely to be in German?
+**Question:** If the system lists 2,200,000 books as being in German, how many of these are likely to be in German?
 
 ---
 
