@@ -257,11 +257,11 @@ CREATE TABLE BookAuthor (
 
 ```mermaid
 erDiagram
-    Person }|--o{ Work : "creates (M:N)"
-    Work ||--o{ Expression : "has (1:M)"
-    Expression ||--o{ Manifestation : "has (1:M)"
-    CorporateBody ||--o{ Manifestation : "publishes (1:M)"
-    Manifestation ||--o{ Item : "has (1:M)"
+    Person ||--o{ Work : "creates"
+    Work ||--o{ Expression : "has"
+    Expression ||--o{ Manifestation : "has"
+    CorporateBody ||--o{ Manifestation : "publishes"
+    Manifestation ||--o{ Item : "has"
 
     Person {
         int person_id PK
@@ -559,21 +559,21 @@ An academic conference system covering:
 
 ```mermaid
 erDiagram
-    Person }|--o{ PaperAuthor : "submits"
+    Person ||--o{ PaperAuthor : "submits"
     Paper ||--o{ PaperAuthor : "authored_by"
     Person ||--o{ Review : "writes"
     Paper ||--o{ Review : "receives"
     Person ||--o{ Registration : "registers"
     Conference ||--o{ Registration : "has"
-    Registration }|--o{ AttendsDay : "attends"
-    Registration }|--o{ AttendsWorkshop : "attends"
-    Registration }|--o{ AttendsDinner : "attends"
+    Registration ||--o{ AttendsDay : "attends"
+    Registration ||--o{ AttendsWorkshop : "attends"
+    Registration ||--o{ AttendsDinner : "attends"
     Conference ||--o{ Day : "has"
     Conference ||--o{ Workshop : "has"
     Conference ||--o{ Dinner : "has"
-    Day ||--o{ AttendsDay : ""
-    Workshop ||--o{ AttendsWorkshop : ""
-    Dinner ||--o{ AttendsDinner : ""
+    Day ||--o{ AttendsDay : "has"
+    Workshop ||--o{ AttendsWorkshop : "has"
+    Dinner ||--o{ AttendsDinner : "has"
 
     Person {
         int person_id PK
