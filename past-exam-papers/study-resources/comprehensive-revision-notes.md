@@ -47,6 +47,55 @@ An E/R diagram represents the logical structure of a database before implementat
 | **1:M** | One-to-many | Department → Employees |
 | **M:N** | Many-to-many | Students ↔ Courses |
 
+### Resolving M:N with Junction Tables (Associative Entities)
+
+M:N relationships **cannot be directly implemented** in relational databases. You must create a **junction table** (also called associative entity, bridge table, or linking table).
+
+**Why?** A foreign key can only hold ONE value, but M:N requires multiple values on both sides.
+
+**Pattern:**
+```
+┌───────────┐         ┌─────────────────┐         ┌───────────┐
+│  Student  │───M:N───│   Enrollment    │───M:N───│  Course   │
+├───────────┤         ├─────────────────┤         ├───────────┤
+│student_id │◄───────►│ student_id (FK) │◄───────►│ course_id │
+│name       │         │ course_id (FK)  │         │title      │
+└───────────┘         │ grade           │         └───────────┘
+                      │ enrollment_date │
+                      └─────────────────┘
+                         Junction Table
+                      (can have its own attributes!)
+```
+
+**SQL Implementation:**
+```sql
+CREATE TABLE Student (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+CREATE TABLE Course (
+    course_id INT PRIMARY KEY,
+    title VARCHAR(200)
+);
+
+-- Junction table resolves M:N
+CREATE TABLE Enrollment (
+    student_id INT,
+    course_id INT,
+    grade DECIMAL(3,2),           -- Junction tables can have attributes!
+    enrollment_date DATE,
+    PRIMARY KEY (student_id, course_id),  -- Composite primary key
+    FOREIGN KEY (student_id) REFERENCES Student(student_id),
+    FOREIGN KEY (course_id) REFERENCES Course(course_id)
+);
+```
+
+**Key Points:**
+- Junction table has **composite primary key** (both FKs together)
+- Can include **relationship attributes** (grade, date, role, etc.)
+- Query using JOINs through the junction table
+
 ### Worked Example: Library Database
 
 **Scenario:** A library tracks books, members, and loans. Each book has one author (simplified). Members can borrow multiple books. Each loan records the date borrowed and returned.
