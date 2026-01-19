@@ -4,7 +4,7 @@
 
 | Section | Questions | Marks |
 |---------|-----------|-------|
-| Section A | 10 MCQs (Q1a-j) | 40 |
+| Section A | 10 MCQs | 40 |
 | Section B | Answer 2 of 3 | 60 |
 | **Total** | | **100** |
 
@@ -37,7 +37,7 @@ bn:post_n_EN a lemon:LexicalEntry ;
 
 ---
 
-## Q1(a)(i): Generic Data Model [1 mark]
+## Question 1(a)(i) [1 mark]
 
 **Question:** What is the generic data model this information is represented in?
 
@@ -51,14 +51,29 @@ bn:post_n_EN a lemon:LexicalEntry ;
 
 ### Revision Notes
 
-**RDF Basics:**
-- Data model for describing resources as subject-predicate-object triples
-- Foundation for the Semantic Web and Linked Data
-- Can be serialized in multiple formats (Turtle, RDF/XML, N-Triples, JSON-LD)
+**Core Concept:** RDF is the foundational data model for the Semantic Web.
+
+**Key Characteristics:**
+
+| Feature | Description |
+|---------|-------------|
+| **Structure** | Subject-Predicate-Object triples |
+| **Identifiers** | URIs for resources |
+| **Flexibility** | Schema-free, can link across datasets |
+| **Foundation** | Enables Linked Data and SPARQL querying |
+
+**Triple Breakdown of the Given Data:**
+
+| Subject | Predicate | Object |
+|---------|-----------|--------|
+| `bn:post_n_EN` | `rdf:type` | `lemon:LexicalEntry` |
+| `bn:post_n_EN` | `lemon:canonicalForm` | `<.../canonicalForm>` |
+| `bn:post_n_EN` | `lemon:language` | `"EN"` |
+| `bn:post_n_EN` | `lexinfo:partOfSpeech` | `lexinfo:noun` |
 
 ---
 
-## Q1(a)(ii): Serialization Format [1 mark]
+## Question 1(a)(ii) [1 mark]
 
 **Question:** What is the serialisation format used for the data model?
 
@@ -68,27 +83,33 @@ bn:post_n_EN a lemon:LexicalEntry ;
 
 **Turtle (Terse RDF Triple Language)**
 
-Evidence:
-- `@prefix` declarations
-- Semicolon (`;`) to continue same subject with different predicates
-- Period (`.`) to end statement
-
 ---
 
 ### Revision Notes
 
-**RDF Serialization Formats:**
+**Core Concept:** RDF can be serialized in multiple formats. Identifying features help distinguish them.
 
-| Format | Characteristics |
-|--------|-----------------|
-| Turtle | Human-readable, `@prefix`, `;` and `.` syntax |
-| RDF/XML | XML-based, verbose |
-| N-Triples | One triple per line, no prefixes |
-| JSON-LD | JSON-compatible, uses `@context` |
+**How to Identify Turtle:**
+
+| Feature | Example from Data |
+|---------|-------------------|
+| `@prefix` declarations | `@prefix bn: <http://babelnet.org/rdf/> .` |
+| Semicolon `;` | Continues same subject with new predicate |
+| Period `.` | Ends a statement |
+| Prefixed names | `bn:post_n_EN`, `lemon:language` |
+
+**Comparison of RDF Serialization Formats:**
+
+| Format | Identifying Features | Example |
+|--------|---------------------|---------|
+| **Turtle** | `@prefix`, `;`, `.`, human-readable | `bn:x a lemon:Entry .` |
+| **RDF/XML** | XML tags, `<rdf:RDF>` root | `<rdf:Description rdf:about="...">` |
+| **N-Triples** | Full URIs, one triple per line, no prefixes | `<http://...> <http://...> "value" .` |
+| **JSON-LD** | JSON with `@context`, `@id`, `@type` | `{"@context": {...}, "@id": "..."}` |
 
 ---
 
-## Q1(b): Interpretation Debate [4 marks]
+## Question 1(b) [4 marks]
 
 **Question:** One friend says it's impossible to know what word this RDF is talking about without more triples. Another says it's clearly the English word "post" as a noun. To what extent is either right? What further information would help?
 
@@ -96,32 +117,50 @@ Evidence:
 
 ### Answer
 
-**Both friends have a point:**
+**Both friends have valid points:**
 
-| Friend | Argument | Validity |
-|--------|----------|----------|
-| Friend 1 (Skeptic) | The actual word "post" isn't shown in these triples - only a URI reference to `canonicalForm` | **Partially correct** - strictly speaking, the written representation is in a linked resource |
-| Friend 2 (Pragmatist) | The URI `post_n_EN` strongly suggests "post", and we see language="EN" and partOfSpeech=noun | **Practically correct** - context clues are clear |
+| Friend | Argument | Assessment |
+|--------|----------|------------|
+| **Friend 1 (Skeptic)** | The actual word "post" isn't in these triples - only a URI reference to `canonicalForm` | **Technically correct** - the written form is in a linked resource |
+| **Friend 2 (Pragmatist)** | The URI `post_n_EN` strongly suggests "post", language="EN" and partOfSpeech=noun are explicit | **Practically correct** - context clues are strong |
 
-**What's Missing:**
-- The actual `writtenRep` property value "post" is in the linked document at `/canonicalForm`
-- Without following that link, the word itself isn't explicitly stated
+**Detailed Analysis:**
+
+**What IS explicitly stated:**
+- The resource is a `LexicalEntry`
+- The language is `"EN"` (English)
+- The part of speech is `noun`
+
+**What is NOT explicitly stated:**
+- The actual written word "post" - this is only implied by the URI
 
 **Further information needed:**
-- Fetch `<http://babelnet.org/rdf/post_n_EN/canonicalForm>` to see `lemon:writtenRep "post"`
+- Fetch `<http://babelnet.org/rdf/post_n_EN/canonicalForm>`
+- This would return: `lemon:writtenRep "post"`
 
 ---
 
 ### Revision Notes
 
-**Linked Data Principles:**
-- URIs identify things
-- Dereferencing URIs should return useful information
-- Link to other URIs to enable discovery
+**Core Concept:** Linked Data requires following links (dereferencing URIs) to get complete information.
+
+**Linked Data Principles (Tim Berners-Lee):**
+
+1. Use URIs as names for things
+2. Use HTTP URIs so people can look them up
+3. When someone looks up a URI, provide useful information (using RDF, SPARQL)
+4. Include links to other URIs to enable discovery
+
+**Why the Skeptic Has a Point:**
+```
+bn:post_n_EN → canonicalForm → <.../canonicalForm> → writtenRep → "post"
+     ↑                              ↑
+  We have this              We need to fetch this
+```
 
 ---
 
-## Q1(c)(i): SPARQL Query for All Nouns [6 marks]
+## Question 1(c)(i) [6 marks]
 
 **Question:** Write a SPARQL query that finds the written representation and language for all nouns.
 
@@ -144,27 +183,47 @@ WHERE {
 }
 ```
 
-**Explanation:**
-- Find all `LexicalEntry` resources with `partOfSpeech` = `noun`
-- Follow the `canonicalForm` link to get the `writtenRep`
-- Return both the written form and language
-
 ---
 
 ### Revision Notes
 
-**SPARQL Pattern Matching:**
+**Core Concept:** SPARQL uses graph pattern matching to query RDF data.
 
-| Pattern | Meaning |
-|---------|---------|
-| `?x a :Class` | Find instances of Class |
-| `?x :prop ?y` | Match property values |
-| `;` | Same subject, different predicate |
-| `.` | End of triple pattern |
+**Query Breakdown:**
+
+| Line | Pattern | Purpose |
+|------|---------|---------|
+| `?lexEntry a lemon:LexicalEntry` | Type check | Find all LexicalEntry instances |
+| `lemon:canonicalForm ?form` | Navigate link | Get the form node |
+| `lemon:language ?lang` | Get property | Retrieve language value |
+| `lexinfo:partOfSpeech lexinfo:noun` | Filter | Only nouns (not verbs, adj, etc.) |
+| `?form lemon:writtenRep ?writtenRep` | Follow link | Get the actual written word |
+
+**Visual Pattern Matching:**
+
+```
+?lexEntry ──a──────────────────→ lemon:LexicalEntry
+    │
+    ├──canonicalForm──→ ?form ──writtenRep──→ ?writtenRep ← SELECT
+    │
+    ├──language───────→ ?lang                             ← SELECT
+    │
+    └──partOfSpeech───→ lexinfo:noun                      ← FILTER
+```
+
+**SPARQL Syntax Reference:**
+
+| Symbol | Meaning | Example |
+|--------|---------|---------|
+| `?var` | Variable | `?lexEntry`, `?form` |
+| `a` | Shorthand for `rdf:type` | `?x a :Class` |
+| `;` | Same subject, different predicate | Continues pattern |
+| `.` | End of triple pattern | Separates patterns |
+| `PREFIX` | Namespace shortcut | `PREFIX lemon: <...>` |
 
 ---
 
-## Q1(c)(ii): SPARQL Query for "post" [4 marks]
+## Question 1(c)(ii) [4 marks]
 
 **Question:** Write a SPARQL query that finds the language and part of speech for all words whose canonical form is written "post".
 
@@ -187,13 +246,36 @@ WHERE {
 }
 ```
 
-**Explanation:**
-- Filter for entries where the canonical form's `writtenRep` is exactly "post"
-- Return the language and part of speech for each match
+---
+
+### Revision Notes
+
+**Query Breakdown:**
+
+| Step | Pattern | What It Does |
+|------|---------|--------------|
+| 1 | `?form lemon:writtenRep "post"` | Find forms with exact text "post" |
+| 2 | `?lexEntry lemon:canonicalForm ?form` | Find entries that have this form |
+| 3 | `lemon:language ?language` | Get the language |
+| 4 | `lexinfo:partOfSpeech ?pos` | Get the part of speech |
+
+**Key Difference from (c)(i):**
+- Q1(c)(i): Filter by `lexinfo:noun` (specific POS) → return `?writtenRep`
+- Q1(c)(ii): Filter by `"post"` (specific word) → return `?pos` (any POS)
+
+**Expected Results for "post":**
+
+| ?language | ?pos |
+|-----------|------|
+| "EN" | lexinfo:noun |
+| "EN" | lexinfo:verb |
+| "DE" | lexinfo:noun |
+
+(The word "post" exists in multiple languages with multiple parts of speech)
 
 ---
 
-## Q1(d)(i): Role of Ontology Document [1 mark]
+## Question 1(d)(i) [1 mark]
 
 **Question:** What is the role of this document (the lemon ontology extract)?
 
@@ -203,11 +285,25 @@ WHERE {
 
 **Ontology/Schema Definition**
 
-It defines the classes (`LexicalSense`, `SenseDefinition`) and properties (`:definition`, `:value`) that structure lexical data in the Lemon model.
+It defines the vocabulary (classes and properties) used to structure lexical data in the Lemon model.
 
 ---
 
-## Q1(d)(ii): Format of Ontology [1 mark]
+### Revision Notes
+
+**Core Concept:** Ontologies define the terms (classes, properties) that can be used in RDF data.
+
+**What the Lemon Ontology Defines:**
+
+| Type | Examples | Purpose |
+|------|----------|---------|
+| **Classes** | `LexicalSense`, `SenseDefinition` | Types of things |
+| **Properties** | `definition`, `value` | Relationships between things |
+| **Constraints** | `rdfs:domain`, `rdfs:range` | Valid usage rules |
+
+---
+
+## Question 1(d)(ii) [1 mark]
 
 **Question:** What format is it in?
 
@@ -215,13 +311,13 @@ It defines the classes (`LexicalSense`, `SenseDefinition`) and properties (`:def
 
 ### Answer
 
-**Turtle (RDF serialization format)**
+**Turtle** (RDF serialization format)
 
-Could also be RDF/XML depending on how it's served.
+Evidence: Uses `@prefix`-style declarations, `;` for same subject, `.` for statement end.
 
 ---
 
-## Q1(d)(iii): OWL Prefix [1 mark]
+## Question 1(d)(iii) [1 mark]
 
 **Question:** To what does the 'owl' prefix refer?
 
@@ -232,11 +328,24 @@ Could also be RDF/XML depending on how it's served.
 **OWL (Web Ontology Language)**
 
 - Namespace: `http://www.w3.org/2002/07/owl#`
-- Provides expressive ontology constructs like `owl:Class`, `owl:ObjectProperty`, `owl:disjointWith`
+- Provides expressive ontology constructs
 
 ---
 
-## Q1(d)(iv): Write Definition Triples [4 marks]
+### Revision Notes
+
+**OWL Constructs in the Lemon Extract:**
+
+| Construct | Meaning |
+|-----------|---------|
+| `owl:Class` | Defines a class (like `LexicalSense`) |
+| `owl:ObjectProperty` | Property linking two resources |
+| `owl:DatatypeProperty` | Property with a literal value |
+| `owl:disjointWith` | Classes that cannot overlap |
+
+---
+
+## Question 1(d)(iv) [4 marks]
 
 **Question:** Write triples to provide one definition for the English noun "post".
 
@@ -261,14 +370,43 @@ ex:post_n_EN_def a lemon:SenseDefinition ;
     lemon:value "A piece of wood or metal set upright to support something."@en .
 ```
 
-**Structure:**
-1. Link `LexicalEntry` to `LexicalSense` via `lemon:sense`
-2. Create a `LexicalSense` and link it to a `SenseDefinition` via `lemon:definition`
-3. Provide the actual text via `lemon:value`
+---
+
+### Revision Notes
+
+**Core Concept:** The Lemon model separates lexical entries from their meanings (senses).
+
+**Structure Diagram:**
+
+```
+bn:post_n_EN (LexicalEntry)
+      │
+      │ lemon:sense
+      ▼
+bn:post_n_EN_sense (LexicalSense)
+      │
+      │ lemon:definition
+      ▼
+ex:post_n_EN_def (SenseDefinition)
+      │
+      │ lemon:value
+      ▼
+"A piece of wood..."@en (literal)
+```
+
+**Required Triples:**
+
+| Triple | Purpose |
+|--------|---------|
+| `entry lemon:sense sense` | Link entry to sense |
+| `sense a LexicalSense` | Type the sense |
+| `sense lemon:definition def` | Link sense to definition |
+| `def a SenseDefinition` | Type the definition |
+| `def lemon:value "text"@en` | Provide the text |
 
 ---
 
-## Q1(e): ER Diagram for Relational Implementation [7 marks]
+## Question 1(e) [7 marks]
 
 **Question:** Sketch an ER diagram for a relational implementation of this model. Include cardinality.
 
@@ -276,31 +414,69 @@ ex:post_n_EN_def a lemon:SenseDefinition ;
 
 ### Answer
 
-**Entities and Relationships:**
+**ER Diagram:**
 
+```mermaid
+erDiagram
+    LexicalEntry ||--o{ Form : "has"
+    LexicalEntry ||--o{ LexicalSense : "has"
+    LexicalSense ||--o{ SenseDefinition : "has"
+
+    LexicalEntry {
+        int LexicalEntryId PK
+        string Language
+        string PartOfSpeech
+    }
+    Form {
+        int FormId PK
+        int LexicalEntryId FK
+        string WrittenRep
+        string FormType
+    }
+    LexicalSense {
+        int SenseId PK
+        int LexicalEntryId FK
+    }
+    SenseDefinition {
+        int DefId PK
+        int SenseId FK
+        string TextValue
+        string Language
+    }
 ```
-LexicalEntry (1) ----< (M) Form
-     |
-     | (1)
-     |
-     v
-    (M)
-LexicalSense (1) ----< (M) SenseDefinition
-```
 
-**Tables:**
+**Tables Summary:**
 
-| Table | Columns | Keys |
-|-------|---------|------|
-| LexicalEntry | LexicalEntryId (PK), Language, PartOfSpeech | PK: LexicalEntryId |
-| Form | FormId (PK), LexicalEntryId (FK), WrittenRep | FK → LexicalEntry |
-| LexicalSense | SenseId (PK), LexicalEntryId (FK) | FK → LexicalEntry |
-| SenseDefinition | DefId (PK), SenseId (FK), TextValue | FK → LexicalSense |
+| Table | Columns | Primary Key | Foreign Keys |
+|-------|---------|-------------|--------------|
+| LexicalEntry | LexicalEntryId, Language, PartOfSpeech | LexicalEntryId | - |
+| Form | FormId, LexicalEntryId, WrittenRep, FormType | FormId | LexicalEntryId → LexicalEntry |
+| LexicalSense | SenseId, LexicalEntryId | SenseId | LexicalEntryId → LexicalEntry |
+| SenseDefinition | DefId, SenseId, TextValue, Language | DefId | SenseId → LexicalSense |
 
 **Cardinalities:**
-- One LexicalEntry can have many Forms (1:M)
-- One LexicalEntry can have many LexicalSenses (1:M)
-- One LexicalSense can have many SenseDefinitions (1:M)
+
+| Relationship | Cardinality | Explanation |
+|--------------|-------------|-------------|
+| LexicalEntry → Form | 1:M | One entry can have many forms (e.g., "post", "posts", "posting") |
+| LexicalEntry → LexicalSense | 1:M | One word can have many meanings |
+| LexicalSense → SenseDefinition | 1:M | One sense can have definitions in multiple languages |
+
+---
+
+### Revision Notes
+
+**Core Concept:** Converting RDF to relational requires identifying entities and relationships.
+
+**Mapping RDF to Relational:**
+
+| RDF Concept | Relational Equivalent |
+|-------------|----------------------|
+| Class (e.g., `LexicalEntry`) | Table |
+| Instance URI | Row with primary key |
+| Object property | Foreign key relationship |
+| Datatype property | Column |
+| 1:M relationship | FK in the "many" table |
 
 ---
 
@@ -308,13 +484,51 @@ LexicalSense (1) ----< (M) SenseDefinition
 
 ## Context
 
-Estate agency database tracking sellers, properties, agents, buyers, offers, and viewings.
+Estate agency database with the following ER diagram:
+
+```mermaid
+erDiagram
+    Seller ||--o{ Property : "owns"
+    EstateAgent ||--o{ Property : "sells"
+    Property ||--o{ Offers : "receives"
+    Property ||--o{ Views : "has"
+    Buyer ||--o{ Offers : "makes"
+    Buyer ||--o{ Views : "attends"
+
+    Seller {
+        string Name PK
+        string Address
+        string PhoneNumber
+    }
+    EstateAgent {
+        string Name PK
+    }
+    Property {
+        string Address PK
+        string Type
+        int Bedrooms
+        decimal AskingPrice
+    }
+    Buyer {
+        string Name PK
+        string Address
+        string PhoneNumber
+    }
+    Offers {
+        date OfferDate
+        string OfferStatus
+        decimal OfferValue
+    }
+    Views {
+        date ViewDate
+    }
+```
 
 ---
 
-## Q2(a): Add Cardinality [3 marks]
+## Question 2(a) [3 marks]
 
-**Question:** Add cardinality indications for the ER diagram.
+**Question:** Add cardinality indications for this diagram.
 
 ---
 
@@ -322,16 +536,36 @@ Estate agency database tracking sellers, properties, agents, buyers, offers, and
 
 | Relationship | Cardinality | Explanation |
 |--------------|-------------|-------------|
-| Seller - Property | 1:M | One seller can own many properties; each property has one seller |
-| Estate Agent - Property | 1:M | One agent handles many properties; each property has one agent |
-| Property - Offers | 1:M | One property can have many offers; each offer is for one property |
-| Property - Views | 1:M | One property can have many viewings |
-| Buyer - Offers | 1:M | One buyer can make many offers; each offer is from one buyer |
-| Buyer - Views | 1:M | One buyer can have many viewings |
+| Seller → Property | 1:M | One seller can own multiple properties; each property has exactly one seller |
+| EstateAgent → Property | 1:M | One agent handles multiple properties; each property assigned to one agent |
+| Property → Offers | 1:M | One property can receive multiple offers |
+| Buyer → Offers | 1:M | One buyer can make multiple offers (on different properties) |
+| Property → Views | 1:M | One property can have multiple viewing appointments |
+| Buyer → Views | 1:M | One buyer can attend multiple viewings |
 
 ---
 
-## Q2(b): Adapt to Relational Model [5 marks]
+### Revision Notes
+
+**Core Concept:** Cardinality defines how many instances of one entity relate to another.
+
+**Cardinality Notation:**
+
+| Symbol | Meaning |
+|--------|---------|
+| `1` | Exactly one |
+| `M` or `N` | Many (zero or more) |
+| `1:1` | One-to-one |
+| `1:M` | One-to-many |
+| `M:N` | Many-to-many |
+
+**Reading Cardinalities from Context:**
+- "A single agent is assigned to each property" → Property:Agent is M:1 (or Agent:Property is 1:M)
+- "Sellers approach with a property" → Seller can have multiple properties
+
+---
+
+## Question 2(b) [5 marks]
 
 **Question:** How would you adapt this to a relational model? Be specific about new entities, relations, or attributes.
 
@@ -339,24 +573,42 @@ Estate agency database tracking sellers, properties, agents, buyers, offers, and
 
 ### Answer
 
-**Adaptations needed:**
+**Adaptations Required:**
 
-1. **Convert diamond relationships to tables:**
-   - `Offers` becomes a table with FKs to Property and Buyer
-   - `Views` becomes a table with FKs to Property and Buyer
-
-2. **Add surrogate keys** (recommended but optional if using natural keys):
-   - PropertyId, SellerId, AgentId, BuyerId, OfferId, ViewId
-
-3. **Resolve M:N if present:**
-   - Views and Offers are already associative entities
-
-4. **Add timestamp/date columns:**
-   - OfferDate, ViewDate for tracking when events occur
+| Adaptation | Details |
+|------------|---------|
+| **1. Convert Offers relationship to table** | Create `Offers` table with FKs to `Property` and `Buyer`, plus attributes (OfferDate, OfferStatus, OfferValue) |
+| **2. Convert Views relationship to table** | Create `Views` table with FKs to `Property` and `Buyer`, plus attributes (ViewDate) |
+| **3. Add foreign keys to Property** | Add `SellerName` FK referencing `Seller`, Add `AgentName` FK referencing `EstateAgent` |
+| **4. Define composite primary keys** | Offers: (PropertyAddress, BuyerName, OfferDate), Views: (PropertyAddress, BuyerName, ViewDate) |
 
 ---
 
-## Q2(c): List Tables, Primary and Foreign Keys [6 marks]
+### Revision Notes
+
+**Core Concept:** ER diamond relationships become tables in the relational model.
+
+**Why Diamonds Become Tables:**
+- In ER diagrams, diamonds represent **relationships** with their own attributes
+- Relationships can't have attributes in pure relational model
+- Solution: Create a **junction/associative table**
+
+**Before (ER):**
+```
+Property ◇──Offers──◇ Buyer
+         (date, status, value)
+```
+
+**After (Relational):**
+```
+Property ←─FK─ Offers ─FK─→ Buyer
+               (PK: Property+Buyer+Date,
+                status, value)
+```
+
+---
+
+## Question 2(c) [6 marks]
 
 **Question:** List the tables, primary and foreign keys for a relational implementation.
 
@@ -364,18 +616,41 @@ Estate agency database tracking sellers, properties, agents, buyers, offers, and
 
 ### Answer
 
-| Table | Columns | PK | Foreign Keys |
-|-------|---------|-----|--------------|
-| Seller | Name (PK), Address, PhoneNumber | Name | - |
-| EstateAgent | Name (PK) | Name | - |
-| Buyer | Name (PK), Address, PhoneNumber | Name | - |
-| Property | Address (PK), Type, Bedrooms, AskingPrice, SellerName, AgentName | Address | SellerName → Seller, AgentName → EstateAgent |
-| Offers | PropertyAddress, BuyerName, OfferDate, OfferStatus, OfferValue | (PropertyAddress, BuyerName, OfferDate) | PropertyAddress → Property, BuyerName → Buyer |
-| Views | PropertyAddress, BuyerName, ViewDate | (PropertyAddress, BuyerName, ViewDate) | PropertyAddress → Property, BuyerName → Buyer |
+| Table | Columns | Primary Key | Foreign Keys |
+|-------|---------|-------------|--------------|
+| **Seller** | Name, Address, PhoneNumber | Name | - |
+| **EstateAgent** | Name | Name | - |
+| **Buyer** | Name, Address, PhoneNumber | Name | - |
+| **Property** | Address, Type, Bedrooms, AskingPrice, SellerName, AgentName | Address | SellerName → Seller(Name), AgentName → EstateAgent(Name) |
+| **Offers** | PropertyAddress, BuyerName, OfferDate, OfferStatus, OfferValue | (PropertyAddress, BuyerName, OfferDate) | PropertyAddress → Property(Address), BuyerName → Buyer(Name) |
+| **Views** | PropertyAddress, BuyerName, ViewDate | (PropertyAddress, BuyerName, ViewDate) | PropertyAddress → Property(Address), BuyerName → Buyer(Name) |
 
 ---
 
-## Q2(d): MySQL CREATE Command [3 marks]
+### Revision Notes
+
+**Why Composite Primary Keys?**
+
+For `Offers`, we use `(PropertyAddress, BuyerName, OfferDate)` because:
+- Same buyer can make multiple offers on same property (different dates)
+- Same property can have offers from multiple buyers
+- Need all three to uniquely identify an offer
+
+**Alternative: Surrogate Keys**
+```sql
+-- Instead of composite key:
+CREATE TABLE Offers (
+    OfferId INT PRIMARY KEY AUTO_INCREMENT,  -- surrogate
+    PropertyAddress VARCHAR(200),
+    BuyerName VARCHAR(100),
+    ...
+    UNIQUE (PropertyAddress, BuyerName, OfferDate)  -- business key
+);
+```
+
+---
+
+## Question 2(d) [3 marks]
 
 **Question:** Give the MySQL command for creating one of those tables.
 
@@ -398,7 +673,20 @@ CREATE TABLE Property (
 
 ---
 
-## Q2(e)(i): Commission Query [6 marks]
+### Revision Notes
+
+**CREATE TABLE Syntax Elements:**
+
+| Element | Purpose | Example |
+|---------|---------|---------|
+| `PRIMARY KEY` | Unique identifier | `Address VARCHAR(200) PRIMARY KEY` |
+| `NOT NULL` | Required field | `SellerName VARCHAR(100) NOT NULL` |
+| `FOREIGN KEY` | Referential integrity | `FOREIGN KEY (SellerName) REFERENCES Seller(Name)` |
+| `DECIMAL(p,s)` | Exact numeric | `DECIMAL(12,2)` = 12 digits, 2 after decimal |
+
+---
+
+## Question 2(e)(i) [6 marks]
 
 **Question:** Write a MySQL query to calculate and list the commission earned since 1 January 2023 for each Estate Agent. Commission is 1% of sale price.
 
@@ -417,14 +705,43 @@ WHERE o.OfferStatus = 'sale completed'
 GROUP BY p.AgentName;
 ```
 
-**Explanation:**
-- Join Property with Offers to get agent for each sale
-- Filter for completed sales since Jan 1, 2023
-- Calculate 1% commission and sum per agent
+---
+
+### Revision Notes
+
+**Query Breakdown:**
+
+| Step | Clause | Purpose |
+|------|--------|---------|
+| 1 | `FROM Property p` | Start with properties (has agent info) |
+| 2 | `INNER JOIN Offers o ON p.Address = o.PropertyAddress` | Link to offers |
+| 3 | `WHERE o.OfferStatus = 'sale completed'` | Only completed sales |
+| 4 | `AND o.OfferDate >= '2023-01-01'` | Since Jan 1, 2023 |
+| 5 | `GROUP BY p.AgentName` | One row per agent |
+| 6 | `SUM(o.OfferValue * 0.01)` | Total 1% commission |
+
+**Visual Join:**
+
+```
+Property                    Offers
+┌──────────┬───────────┐   ┌─────────────┬────────────┬────────────┐
+│ Address  │ AgentName │   │ PropAddress │ OfferValue │ Status     │
+├──────────┼───────────┤   ├─────────────┼────────────┼────────────┤
+│ 10 Main  │ Grace     │◄──│ 10 Main     │ 240000     │ completed  │
+│ 20 Baker │ Heidi     │◄──│ 20 Baker    │ 340000     │ completed  │
+└──────────┴───────────┘   └─────────────┴────────────┴────────────┘
+```
+
+**Result:**
+
+| EstateAgent | TotalCommission |
+|-------------|-----------------|
+| Grace | 2400.00 |
+| Heidi | 3400.00 |
 
 ---
 
-## Q2(e)(ii): Top Earning Agent [2 marks]
+## Question 2(e)(ii) [2 marks]
 
 **Question:** Modify your query to list just the top earning agent.
 
@@ -445,9 +762,13 @@ ORDER BY TotalCommission DESC
 LIMIT 1;
 ```
 
+**Changes from (e)(i):**
+- Added `ORDER BY TotalCommission DESC` - sort highest first
+- Added `LIMIT 1` - return only the top row
+
 ---
 
-## Q2(f): Document Database Consideration [5 marks]
+## Question 2(f) [5 marks]
 
 **Question:** Give reasons specific to this use case for why a document database might be good or bad.
 
@@ -457,22 +778,26 @@ LIMIT 1;
 
 **Reasons FOR Document Database:**
 
-| Advantage | Specific Example |
-|-----------|------------------|
-| Flexible property details | Different property types have different attributes (flat vs house vs land) |
-| Embedded media | Store property photos, descriptions as embedded documents |
-| Variable offer history | Embed all offers within property document |
+| Advantage | Specific Example from Estate Agency |
+|-----------|-------------------------------------|
+| **Flexible property schema** | Flats have floor number; houses have garden size; land has acreage - different attributes per type |
+| **Embedded offer history** | All offers for a property stored in one document - no joins needed |
+| **Media storage** | Property photos and virtual tour videos as embedded binary |
 
 **Reasons AGAINST Document Database:**
 
-| Disadvantage | Specific Example |
-|--------------|------------------|
-| Commission queries harder | Aggregating across agents requires map-reduce or complex pipelines |
-| Transactional integrity | Offer status changes need ACID guarantees (made → accepted → completed) |
-| Cross-entity queries | Finding all properties viewed by a buyer requires joins |
-| Data duplication | Agent info repeated in each property document |
+| Disadvantage | Specific Example from Estate Agency |
+|--------------|-------------------------------------|
+| **Commission calculation hard** | Aggregating across all agents requires complex MapReduce or aggregation pipeline |
+| **ACID requirements** | Offer status changes (made → accepted → completed) need transactional guarantees |
+| **Cross-entity queries** | "Find all properties viewed by buyer X" requires joins across documents |
+| **Data duplication** | Agent info repeated in every property document; updating agent requires updating all |
+| **Referential integrity** | No automatic check that SellerName exists in Seller collection |
 
-**Conclusion:** Relational is better for this use case due to structured relationships and transactional requirements.
+**Conclusion:** Relational database is better for this use case due to:
+1. Structured relationships between entities
+2. Transactional requirements for offer processing
+3. Need for aggregate queries (commission calculations)
 
 ---
 
@@ -480,11 +805,13 @@ LIMIT 1;
 
 ## Context
 
-Hathi Trust Digital Library uses ML to classify book languages. German classifier: 80% precision, 88% recall.
+Hathi Trust Digital Library uses ML to classify book languages.
+- German classifier: **80% precision**, **88% recall**
+- Danish classifier: **100% precision**, **76% recall**
 
 ---
 
-## Q3(a): Precision Calculation [2 marks]
+## Question 3(a) [2 marks]
 
 **Question:** If the system lists 2,200,000 books as being in German, how many of these are likely to be in German?
 
@@ -494,22 +821,43 @@ Hathi Trust Digital Library uses ML to classify book languages. German classifie
 
 **Precision = True Positives / (True Positives + False Positives) = 80%**
 
-True Positives = 2,200,000 × 0.80 = **1,760,000 books**
+```
+Listed as German = True Positives + False Positives = 2,200,000
+Precision = TP / (TP + FP) = 0.80
+
+Therefore: TP = 2,200,000 × 0.80 = 1,760,000 books
+```
+
+**Answer: 1,760,000 books are actually German**
 
 ---
 
 ### Revision Notes
 
-**Precision vs Recall:**
+**Core Concept:** Precision measures the accuracy of positive predictions.
 
-| Metric | Formula | Meaning |
-|--------|---------|---------|
-| Precision | TP / (TP + FP) | Of retrieved items, how many are relevant |
-| Recall | TP / (TP + FN) | Of relevant items, how many were retrieved |
+**Confusion Matrix:**
+
+|  | Predicted German | Predicted Not German |
+|--|-----------------|---------------------|
+| **Actually German** | True Positive (TP) | False Negative (FN) |
+| **Not German** | False Positive (FP) | True Negative (TN) |
+
+**Key Formulas:**
+
+| Metric | Formula | Interpretation |
+|--------|---------|----------------|
+| **Precision** | TP / (TP + FP) | Of items labeled German, how many ARE German |
+| **Recall** | TP / (TP + FN) | Of actual German books, how many did we find |
+
+**Calculation Steps:**
+1. Listed = TP + FP = 2,200,000
+2. Precision = TP / Listed = 0.80
+3. TP = Listed × Precision = 2,200,000 × 0.80 = **1,760,000**
 
 ---
 
-## Q3(b): Total German Books Estimate [3 marks]
+## Question 3(b) [3 marks]
 
 **Question:** How many books in the whole collection are likely to be in German?
 
@@ -519,13 +867,39 @@ True Positives = 2,200,000 × 0.80 = **1,760,000 books**
 
 **Recall = True Positives / All Actual German Books = 88%**
 
-All German Books = True Positives / Recall = 1,760,000 / 0.88 = **2,000,000 books**
+```
+Recall = TP / (TP + FN) = TP / All_German = 0.88
+TP = 1,760,000 (from part a)
+
+Therefore: All_German = TP / Recall = 1,760,000 / 0.88 = 2,000,000 books
+```
+
+**Answer: 2,000,000 books in the collection are German**
 
 ---
 
-## Q3(c): Why Danish 100% Precision is Better for ML [5 marks]
+### Revision Notes
 
-**Question:** Danish is identified with 100% precision and 76% recall. Why might this be more useful for ML training than German's accuracy?
+**Step-by-Step Reasoning:**
+
+| Step | Value | Explanation |
+|------|-------|-------------|
+| 1 | TP = 1,760,000 | From part (a) |
+| 2 | Recall = 0.88 | Given |
+| 3 | All German = TP / Recall | Rearrange recall formula |
+| 4 | All German = 1,760,000 / 0.88 | Substitute |
+| 5 | All German = **2,000,000** | Answer |
+
+**What This Means:**
+- 2,000,000 German books exist in the collection
+- System found 1,760,000 of them (88% recall)
+- System missed 240,000 German books (12% false negatives)
+
+---
+
+## Question 3(c) [5 marks]
+
+**Question:** Danish is identified with 100% precision and 76% recall. Why might this be more useful for ML training than German's 80% precision?
 
 ---
 
@@ -533,18 +907,29 @@ All German Books = True Positives / Recall = 1,760,000 / 0.88 = **2,000,000 book
 
 **For ML training data, precision is more important than recall:**
 
-| Factor | Impact |
-|--------|--------|
-| **Data purity** | 100% precision means every labeled Danish book IS Danish - no noise |
-| **Training quality** | ML models learn wrong patterns from mislabeled examples |
-| **Smaller but clean** | Better to have 76% of Danish books that are ALL correct than 88% with 20% wrong |
-| **False positives hurt more** | A non-Danish book labeled Danish teaches wrong language patterns |
+| Factor | Why 100% Precision Matters |
+|--------|---------------------------|
+| **Data purity** | Every labeled Danish book IS Danish - zero noise in training set |
+| **No mislabeling** | ML models learn wrong patterns from incorrectly labeled examples |
+| **Quality > Quantity** | Better to have fewer correct examples than many with 20% errors |
+| **Garbage in, garbage out** | False positives (non-Danish labeled Danish) corrupt the model |
 
-**Trade-off:** You miss 24% of Danish books (lower recall), but what you have is guaranteed correct.
+**Comparison:**
+
+| Metric | German | Danish | Winner for ML Training |
+|--------|--------|--------|------------------------|
+| Precision | 80% | 100% | **Danish** - no mislabeled data |
+| Recall | 88% | 76% | German - more data |
+| **For Training** | 20% noise | 0% noise | **Danish** |
+
+**Trade-off Explained:**
+- Danish: Miss 24% of books, but 100% of what you have is correct
+- German: Get more books, but 20% are mislabeled noise
+- For ML training, clean data is essential - noise degrades model quality
 
 ---
 
-## Q3(d): F1 Measure Definition [2 marks]
+## Question 3(d) [2 marks]
 
 **Question:** What is an F1-measure?
 
@@ -556,13 +941,38 @@ All German Books = True Positives / Recall = 1,760,000 / 0.88 = **2,000,000 book
 
 $$F1 = 2 \times \frac{Precision \times Recall}{Precision + Recall}$$
 
-- Balances precision and recall into single metric
+**Properties:**
 - Ranges from 0 to 1 (higher is better)
-- Penalizes extreme imbalance between precision and recall
+- Balances precision and recall into single metric
+- Penalizes extreme imbalance (high P with low R, or vice versa)
+- F1 = 1 only when both P and R are perfect
 
 ---
 
-## Q3(e): MongoDB Find Command [1 mark]
+### Revision Notes
+
+**Why Harmonic Mean?**
+
+The harmonic mean punishes extreme values more than arithmetic mean:
+
+| P | R | Arithmetic Mean | F1 (Harmonic) |
+|---|---|-----------------|---------------|
+| 1.0 | 0.0 | 0.50 | **0.00** |
+| 0.8 | 0.8 | 0.80 | **0.80** |
+| 0.9 | 0.7 | 0.80 | **0.79** |
+
+**Calculate F1 for German and Danish:**
+
+```
+German: F1 = 2 × (0.80 × 0.88) / (0.80 + 0.88) = 0.838
+Danish: F1 = 2 × (1.00 × 0.76) / (1.00 + 0.76) = 0.864
+```
+
+Danish has higher F1 despite lower recall because of perfect precision.
+
+---
+
+## Question 3(e) [1 mark]
 
 **Question:** What does `db.books.find({ lang: "German" })` do?
 
@@ -574,7 +984,24 @@ $$F1 = 2 \times \frac{Precision \times Recall}{Precision + Recall}$$
 
 ---
 
-## Q3(f): 19th Century Query [5 marks]
+### Revision Notes
+
+**MongoDB find() Syntax:**
+
+```javascript
+db.collection.find(query, projection)
+```
+
+| Part | Purpose | Example |
+|------|---------|---------|
+| `db` | Database reference | Current database |
+| `books` | Collection name | Like a table |
+| `find()` | Query method | Returns cursor |
+| `{ lang: "German" }` | Query filter | Field equality match |
+
+---
+
+## Question 3(f) [5 marks]
 
 **Question:** Rewrite the command to include only volumes published in the nineteenth century.
 
@@ -589,14 +1016,39 @@ db.books.find({
 })
 ```
 
-**Explanation:**
-- `$gte: 1800` - year greater than or equal to 1800
-- `$lt: 1900` - year less than 1900
-- This selects years 1800-1899 (the 19th century)
+---
+
+### Revision Notes
+
+**Query Breakdown:**
+
+| Part | Meaning |
+|------|---------|
+| `lang: "German"` | Exact match on lang field |
+| `year: { $gte: 1800, $lt: 1900 }` | Range query on year |
+| `$gte` | Greater than or equal (≥ 1800) |
+| `$lt` | Less than (< 1900) |
+
+**19th Century = 1800-1899:**
+- Starts January 1, 1800
+- Ends December 31, 1899
+- Use `$lt: 1900` (not `$lte: 1899`) - both work but `$lt` is cleaner
+
+**MongoDB Comparison Operators:**
+
+| Operator | Meaning | Example |
+|----------|---------|---------|
+| `$eq` | Equals | `{ year: { $eq: 1850 } }` |
+| `$ne` | Not equals | `{ lang: { $ne: "English" } }` |
+| `$gt` | Greater than | `{ year: { $gt: 1800 } }` |
+| `$gte` | Greater or equal | `{ year: { $gte: 1800 } }` |
+| `$lt` | Less than | `{ year: { $lt: 1900 } }` |
+| `$lte` | Less or equal | `{ year: { $lte: 1899 } }` |
+| `$in` | In array | `{ lang: { $in: ["German", "Danish"] } }` |
 
 ---
 
-## Q3(g): Add Text Search for "Strudel" [2 marks]
+## Question 3(g) [2 marks]
 
 **Question:** How would you adjust your query to include only books containing the word "Strudel"?
 
@@ -623,7 +1075,25 @@ db.books.find({
 
 ---
 
-## Q3(h): Document DB vs XML/TEI Decision Factors [10 marks]
+### Revision Notes
+
+**Two Approaches to Text Search:**
+
+| Method | Syntax | Pros | Cons |
+|--------|--------|------|------|
+| **$regex** | `{ text: { $regex: /Strudel/i } }` | No index needed, case-insensitive with `i` | Slow on large collections |
+| **$text** | `{ $text: { $search: "Strudel" } }` | Fast with text index | Requires index creation |
+
+**Regex Options:**
+
+| Flag | Meaning | Example |
+|------|---------|---------|
+| `i` | Case-insensitive | `/strudel/i` matches "Strudel", "STRUDEL" |
+| `m` | Multiline | `^` and `$` match line starts/ends |
+
+---
+
+## Question 3(h) [10 marks]
 
 **Question:** What factors should the researcher consider when choosing between enriching the document database or switching to XML/TEI?
 
@@ -631,26 +1101,32 @@ db.books.find({
 
 ### Answer
 
-**Factors to Consider:**
+**Comprehensive Factor Analysis:**
 
 | Factor | Document DB (MongoDB) | XML/TEI Database |
 |--------|----------------------|------------------|
-| **Structural encoding** | Limited - flat or nested JSON | Excellent - hierarchical markup for chapters, paragraphs, footnotes |
-| **Query capability** | Simple field queries, aggregation pipeline | XQuery/XPath for fine-grained text structure queries |
-| **Standards compliance** | Proprietary format | TEI is scholarly standard, aids interoperability |
+| **Structural encoding** | Limited - flat or nested JSON | Excellent - hierarchical markup for chapters, paragraphs, footnotes, marginalia |
+| **Query capability** | Field queries, aggregation pipeline | XQuery/XPath for fine-grained text structure queries |
+| **Standards compliance** | Proprietary format | TEI is international scholarly standard |
+| **Interoperability** | Custom API integration needed | Native exchange with other TEI projects |
 | **Scalability** | Excellent horizontal scaling | Can be challenging for very large corpora |
-| **Flexibility** | Easy schema changes | Schema is more rigid but well-defined |
-| **Existing tools** | Many general-purpose tools | Specialized TEI tools, scholarly community support |
-| **Preservation** | Format may change | TEI is archival standard for humanities |
-| **Mixed content** | Harder to represent | Natural fit for text with inline markup |
-| **Full-text search** | Good with text indexes | Native support in XML databases |
-| **Integration** | Easy with web APIs | May need transformation for web use |
+| **Schema flexibility** | Easy schema changes | More rigid but well-defined vocabulary |
+| **Developer familiarity** | Many general developers know MongoDB | Specialized digital humanities expertise needed |
+| **Preservation** | Format may change over time | TEI is archival standard for humanities |
+| **Mixed content** | Difficult (inline markup in text) | Natural fit - `<p>The <name>King</name> said...</p>` |
+| **Full-text search** | Good with text indexes | Native support in XML databases (eXist-db, BaseX) |
+| **Cost** | Free/cheap cloud options | May need specialized hosting |
 
-**Recommendation depends on:**
-1. **Primary use case** - If detailed textual analysis, TEI is better
-2. **Scale** - If millions of books with simple queries, MongoDB is better
-3. **Interoperability** - If sharing with other scholars, TEI is standard
-4. **Development resources** - MongoDB has more general developer familiarity
+**Decision Framework:**
+
+| If the researcher needs... | Choose... |
+|---------------------------|-----------|
+| Simple metadata queries, millions of books | MongoDB |
+| Detailed textual analysis, chapter/paragraph queries | XML/TEI |
+| To share with other scholars | XML/TEI (standard format) |
+| Rapid development with web developers | MongoDB |
+| Long-term archival | XML/TEI |
+| To encode footnotes, marginalia, corrections | XML/TEI |
 
 ---
 
@@ -663,7 +1139,9 @@ PREFIX prefix: <uri>
 SELECT ?vars
 WHERE {
   ?s ?p ?o .           # Triple pattern
-  ?s a :Class .        # Type check
+  ?s a :Class .        # Type check (a = rdf:type)
+  ?s :prop ?value ;    # Semicolon = same subject
+     :prop2 ?value2 .  # Period = end pattern
   FILTER (condition)   # Filter results
 }
 ```
@@ -671,29 +1149,48 @@ WHERE {
 ## MongoDB Query Patterns
 
 ```javascript
-// Basic find
-db.collection.find({ field: value })
+// Exact match
+db.collection.find({ field: "value" })
 
 // Range query
 db.collection.find({ year: { $gte: 1800, $lt: 1900 } })
 
-// Text search
+// Text search with regex
 db.collection.find({ text: { $regex: /pattern/i } })
+
+// Multiple conditions (AND)
+db.collection.find({ lang: "German", year: { $gte: 1800 } })
 
 // Aggregation
 db.collection.aggregate([
-  { $match: { ... } },
-  { $group: { _id: "$field", total: { $sum: 1 } } }
+  { $match: { status: "completed" } },
+  { $group: { _id: "$agent", total: { $sum: "$value" } } },
+  { $sort: { total: -1 } },
+  { $limit: 1 }
 ])
 ```
 
 ## Precision and Recall
 
-| Metric | Formula | Use Case |
-|--------|---------|----------|
-| Precision | TP/(TP+FP) | When false positives are costly |
-| Recall | TP/(TP+FN) | When missing items is costly |
-| F1 | 2PR/(P+R) | Balance both concerns |
+| Metric | Formula | When to Prioritize |
+|--------|---------|-------------------|
+| **Precision** | TP / (TP + FP) | When false positives are costly (ML training, spam detection) |
+| **Recall** | TP / (TP + FN) | When missing items is costly (medical diagnosis, search) |
+| **F1** | 2PR / (P + R) | When you need to balance both concerns |
+
+## SQL Aggregation Pattern
+
+```sql
+SELECT
+    group_column,
+    SUM(value_column) AS total
+FROM table1
+INNER JOIN table2 ON table1.key = table2.key
+WHERE filter_condition
+GROUP BY group_column
+ORDER BY total DESC
+LIMIT n;
+```
 
 ---
 
