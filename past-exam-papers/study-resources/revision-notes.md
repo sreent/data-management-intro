@@ -1,4 +1,4 @@
-# Revision Notes: Databases & Advanced Data Techniques (Updated)
+# Revision Notes: Databases & Advanced Data Techniques
 
 ## Exam Preparation Guide
 
