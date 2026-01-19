@@ -2,8 +2,8 @@
 
 ## Exam Overview
 
-| Section | Questions | Marks |
-|---------|-----------|-------|
+| Part | Questions | Marks |
+|------|-----------|-------|
 | Part A | 10 MCQs (not included in mock) | 40 |
 | Part B | Answer BOTH questions | 60 |
 | **Total** | | **100** |
@@ -255,25 +255,53 @@ CREATE TABLE BookAuthor (
 
 **E/R Diagram (FRBR-inspired):**
 
-```
-┌──────────┐    creates    ┌──────────┐
-│  Person  │──────────────▶│   Work   │
-└──────────┘      M:N      └────┬─────┘
-                                │ 1:M
-                                ▼
-                          ┌───────────┐
-                          │Expression │
-                          └────┬──────┘
-                               │ 1:M
-                               ▼
-┌───────────────┐        ┌─────────────┐
-│CorporateBody  │◀───────│Manifestation│
-│  (Publisher)  │  M:1   └─────┬───────┘
-└───────────────┘              │ 1:M
-                               ▼
-                          ┌──────────┐
-                          │   Item   │
-                          └──────────┘
+```mermaid
+erDiagram
+    Person ||--o{ Work : "creates"
+    Work ||--o{ Expression : "has"
+    Expression ||--o{ Manifestation : "has"
+    CorporateBody ||--o{ Manifestation : "publishes"
+    Manifestation ||--o{ Item : "has"
+
+    Person {
+        int person_id PK
+        string name_display
+        string name_inverted
+        date birth_date
+        date death_date
+    }
+    Work {
+        int work_id PK
+        string uniform_title
+        string original_language
+    }
+    Expression {
+        int expression_id PK
+        int work_id FK
+        string language
+        string form
+    }
+    Manifestation {
+        int manifestation_id PK
+        int expression_id FK
+        string publisher
+        string place
+        date date
+        int pages
+        string dimensions
+    }
+    Item {
+        int item_id PK
+        int manifestation_id FK
+        int library_id FK
+        string call_number
+        string condition
+    }
+    CorporateBody {
+        int corp_id PK
+        string name
+        string location
+    }
 ```
 
 ---
@@ -507,8 +535,8 @@ An academic conference system covering:
 | **Conference** | conference_id (PK), name, start_date, end_date, location, registration_deadline, submission_deadline |
 | **Person** | person_id (PK), name, email, affiliation, dietary_requirements |
 | **Paper** | paper_id (PK), title, abstract, pdf_path, submission_date, status (submitted/under_review/accepted/rejected) |
-| **Review** | review_id (PK), score, feedback, confidence, recommendation (accept/weak_accept/weak_reject/reject), submitted_date |
-| **Registration** | registration_id (PK), name_tag_text, registration_date, amount_paid |
+| **Review** | review_id (PK), paper_id (FK), reviewer_id (FK), score, feedback, confidence, recommendation (accept/weak_accept/weak_reject/reject), submitted_date |
+| **Registration** | registration_id (PK), person_id (FK), conference_id (FK), name_tag_text, registration_date, amount_paid |
 | **Day** | day_id (PK), conference_id (FK), date, description |
 | **Workshop** | workshop_id (PK), conference_id (FK), name, date, capacity, extra_cost |
 | **Dinner** | dinner_id (PK), conference_id (FK), date, venue, price |
@@ -529,29 +557,89 @@ An academic conference system covering:
 
 **E/R Diagram:**
 
-```
-┌──────────┐         ┌──────────┐         ┌──────────┐
-│  Person  │─submits─▶│  Paper   │◀─reviews─│  Person  │
-│ (Author) │   M:N   └────┬─────┘    M:N   │(Reviewer)│
-└──────────┘              │                └──────────┘
-      │                   │
-      │ registers         │ has_review
-      ▼                   ▼
-┌──────────────┐    ┌──────────┐
-│ Registration │    │  Review  │
-└──────┬───────┘    └──────────┘
-       │
-       │ attends
-       ▼
-┌──────────────────────────────────┐
-│  Day  │  Workshop  │   Dinner   │
-└──────────────────────────────────┘
-              │
-              │ belongs_to
-              ▼
-        ┌────────────┐
-        │ Conference │
-        └────────────┘
+```mermaid
+erDiagram
+    Person ||--o{ PaperAuthor : "submits"
+    Paper ||--o{ PaperAuthor : "authored_by"
+    Person ||--o{ Review : "writes"
+    Paper ||--o{ Review : "receives"
+    Person ||--o{ Registration : "registers"
+    Conference ||--o{ Registration : "has"
+    Registration ||--o{ AttendsDay : "attends"
+    Registration ||--o{ AttendsWorkshop : "attends"
+    Registration ||--o{ AttendsDinner : "attends"
+    Conference ||--o{ Day : "has"
+    Conference ||--o{ Workshop : "has"
+    Conference ||--o{ Dinner : "has"
+    Day ||--o{ AttendsDay : "has"
+    Workshop ||--o{ AttendsWorkshop : "has"
+    Dinner ||--o{ AttendsDinner : "has"
+
+    Person {
+        int person_id PK
+        string name
+        string email
+        string affiliation
+    }
+    Paper {
+        int paper_id PK
+        string title
+        string abstract
+        string status
+    }
+    Review {
+        int review_id PK
+        int paper_id FK
+        int reviewer_id FK
+        int score
+        string feedback
+    }
+    Registration {
+        int registration_id PK
+        int person_id FK
+        int conference_id FK
+        string name_tag_text
+    }
+    Conference {
+        int conference_id PK
+        string name
+        date start_date
+        date end_date
+    }
+    Day {
+        int day_id PK
+        int conference_id FK
+        date date
+    }
+    Workshop {
+        int workshop_id PK
+        int conference_id FK
+        string name
+    }
+    Dinner {
+        int dinner_id PK
+        int conference_id FK
+        string venue
+    }
+    PaperAuthor {
+        int paper_id PK_FK
+        int person_id PK_FK
+        string role
+        int author_order
+    }
+    AttendsDay {
+        int registration_id PK_FK
+        int day_id PK_FK
+    }
+    AttendsWorkshop {
+        int registration_id PK_FK
+        int workshop_id PK_FK
+    }
+    AttendsDinner {
+        int registration_id PK_FK
+        int dinner_id PK_FK
+        int ticket_count
+    }
 ```
 
 ---
