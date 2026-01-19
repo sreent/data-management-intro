@@ -1,4 +1,4 @@
-# Comprehensive Revision Notes: Data Management
+# Revision Notes: Databases & Advanced Data Techniques
 
 ## Exam Preparation Guide
 
