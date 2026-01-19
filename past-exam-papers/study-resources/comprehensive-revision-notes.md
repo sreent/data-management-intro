@@ -313,6 +313,9 @@ WHERE conditions
 GROUP BY columns
 HAVING group_conditions
 ORDER BY columns;
+
+-- Use DISTINCT to eliminate duplicates (frequently forgotten!)
+SELECT DISTINCT column FROM table;
 ```
 
 ### JOINs
@@ -418,6 +421,12 @@ WHERE review_count > (SELECT AVG(cnt) FROM (
 ) AS avg_calc);
 ```
 
+---
+
+### Advanced Query Patterns
+
+The following patterns appear frequently in exams and build on the basics above.
+
 ### Common Table Expressions (CTEs) - WITH Clause
 
 CTEs create temporary named result sets that make complex queries readable.
@@ -515,6 +524,8 @@ SELECT COUNT(DISTINCT SpeciesName) AS unique_species FROM Sightings;
 ```
 
 ### Star Schema / Dimensional Modeling 🟢 KNOW THE BASICS
+
+*This schema design pattern affects how you write SQL queries, particularly for aggregation and reporting.*
 
 Used for analytical databases (data warehouses). Separates:
 - **Fact tables**: Measurements/events (sales, counts, transactions)
@@ -696,7 +707,7 @@ A common exam question asks about advantages/disadvantages of databases over fil
 | **Key-Value** | Simple key→value pairs | GET/PUT | Caching, session storage |
 | **XML** | Hierarchical markup | XPath, XQuery | Document-centric, markup preservation |
 
-## 2.2 Decision Framework
+## 2.3 Decision Framework
 
 ### When to Use Relational (SQL)
 
@@ -738,7 +749,7 @@ A common exam question asks about advantages/disadvantages of databases over fil
 - Need aggregation queries
 - Data isn't relationship-focused
 
-## 2.3 Comparison Table
+## 2.4 Comparison Table
 
 | Factor | Relational | Document | Graph |
 |--------|------------|----------|-------|
@@ -749,7 +760,7 @@ A common exam question asks about advantages/disadvantages of databases over fil
 | **Transactions** | Strong ACID | Varies (often eventual) | Varies |
 | **Best query type** | Analytical, aggregation | Document retrieval | Path finding |
 
-## 2.4 Worked Example: Choosing a Database
+## 2.5 Worked Example: Choosing a Database
 
 **Scenario:** A university needs a system to track:
 - Students and their enrollments
@@ -769,7 +780,7 @@ A common exam question asks about advantages/disadvantages of databases over fil
 
 **When Graph might help:** If you frequently need queries like "find all prerequisite chains" or "what courses can I take given my completed courses" - these traverse relationships recursively.
 
-## 2.5 Common Exam Question Patterns
+## 2.6 Common Exam Question Patterns
 
 1. **"What database would you recommend for X? Justify."**
    - State your choice
