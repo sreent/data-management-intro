@@ -813,19 +813,26 @@ This design resembles a **star schema** common in data warehousing:
 SELECT
     ct.TypeName AS CharacteristicType,
     c.CharName AS Characteristic,
-    a.Value AS PercentAStarToC
-FROM Attainment a
-INNER JOIN Characteristic c ON a.CharId = c.CharId
+    ROUND(a_ac.Value / a_total.Value * 100, 2) AS PercentAStarToC
+FROM Attainment a_ac
+INNER JOIN Attainment a_total
+    ON a_ac.CharId = a_total.CharId
+    AND a_ac.SubjectId = a_total.SubjectId
+    AND a_ac.AcademicYear = a_total.AcademicYear
+INNER JOIN Characteristic c ON a_ac.CharId = c.CharId
 INNER JOIN CharacteristicType ct ON c.CharTypeId = ct.CharTypeId
-INNER JOIN Subject s ON a.SubjectId = s.SubjectId
+INNER JOIN Subject s ON a_ac.SubjectId = s.SubjectId
 INNER JOIN SubjectArea sa ON s.SubjectAreaId = sa.SubjectAreaId
-INNER JOIN GradeMetric m ON a.MetricId = m.MetricId
+INNER JOIN GradeMetric m_ac ON a_ac.MetricId = m_ac.MetricId
+INNER JOIN GradeMetric m_total ON a_total.MetricId = m_total.MetricId
 WHERE sa.AreaName = 'Classical Studies'
-  AND m.MetricName = 'Number achieving grade A*-C'
+  AND m_ac.MetricName = 'Number achieving grade A*-C'
+  AND m_total.MetricName = 'Total Students'
+  AND a_total.Value > 0
 ORDER BY ct.TypeName, c.CharName;
 ```
 
-**Alternative if percentage is a separate metric:**
+**Simpler alternative (if percentage is stored directly as a metric):**
 
 ```sql
 SELECT
