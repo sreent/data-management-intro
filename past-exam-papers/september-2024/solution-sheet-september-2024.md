@@ -8,7 +8,7 @@
 | Section B | Answer 2 of 3 | 60 |
 | **Total** | | **100** |
 
-**Note:** Section A MCQs are taken separately on the Inspera platform. This solution sheet covers Section B questions.
+**Note:** Part A and Part B are completed online together on the Inspera platform. This solution sheet covers Section B questions.
 
 ---
 
@@ -577,8 +577,10 @@ A researcher queries Wikidata for Belgian artists born before 1600.
 | `SHOW` should be `SELECT` | Line 1 | `SELECT ?person ?personLabel ?placeLabel ?dob` |
 | `{{` should be `{` | Line 2 | Single braces for WHERE clause |
 | `}}` should be `}` | End | Single closing brace |
-| Missing `?` on `person` | Multiple | `?person wdt:P19 ?place` |
-| Semicolon placement | Line 5-7 | Predicates for same subject use `;` |
+| Missing `?` on `person` | Line 4 | `?person wdt:P19 ?place` |
+| Missing `?` on `place` | Line 7 | `?place wdt:P17 ?country` |
+| `,` should be `;` | Lines 4-5 | Same subject, different predicates use `;` not `,` |
+| `;` should be `.` | Line 6 | End of `?person` triples before new subject `?place` |
 
 **Corrected Query:**
 
