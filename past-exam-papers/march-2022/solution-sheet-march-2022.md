@@ -421,6 +421,47 @@ CREATE TABLE ParentChild (
 );
 ```
 
+**E/R Diagram:**
+
+```mermaid
+erDiagram
+    Royals ||--o{ Titles : "has"
+    Royals ||--o{ Relationships : "has"
+    Royals ||--o{ ParentChild : "parent"
+    Royals ||--o{ ParentChild : "child"
+    Relationships }o--|| Royals : "spouse"
+
+    Royals {
+        string Id PK
+        string Name
+    }
+
+    Titles {
+        int Id PK
+        string RoyalId FK
+        string Rank
+        string Territory
+        string Regnal
+        date FromDate
+        date ToDate
+    }
+
+    Relationships {
+        int Id PK
+        string RoyalId FK
+        string Type
+        string SpouseId FK
+        date FromDate
+        date ToDate
+    }
+
+    ParentChild {
+        string ParentId PK_FK
+        string ChildId PK_FK
+        int RelationshipId FK
+    }
+```
+
 **Example Query - Find all monarchs:**
 ```sql
 SELECT R.Name, T.Rank, T.Territory, T.Regnal

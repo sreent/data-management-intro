@@ -369,6 +369,28 @@ AND Client.familyName = "Avery";
 - (ii) Wrong join conditions (Meeting.ID = Client.ID is incorrect)
 - (v) NATURAL JOIN without Meeting doesn't work
 
+```mermaid
+erDiagram
+    Client ||--o{ Meeting : "has"
+    Employee ||--o{ Meeting : "attends"
+    Client {
+        int ID PK
+        string givenName
+        string familyName
+    }
+    Employee {
+        int ID PK
+        string givenName
+        string familyName
+    }
+    Meeting {
+        int MeetingID PK
+        int ClientID FK
+        int EmployeeID FK
+        date MeetingDate
+    }
+```
+
 ---
 
 ## Question 1(i) [4 marks]
@@ -529,6 +551,30 @@ GROUP BY TestYear, Gender, Age, City
    - Student table references CityId and SchoolId
    - Ensures consistent grouping in aggregations
 
+```mermaid
+erDiagram
+    Cities ||--o{ Schools : "contains"
+    Cities ||--o{ Students : "residence"
+    Schools ||--o{ Students : "attends"
+    Cities {
+        int CityId PK
+        string CityName
+        string Country
+    }
+    Schools {
+        int SchoolId PK
+        string SchoolName
+        int CityId FK
+    }
+    Students {
+        int Id PK
+        string GivenName
+        string FamilyName
+        int SchoolId FK
+        int CityId FK
+    }
+```
+
 ---
 
 ## Question 2(c) [4 marks]
@@ -668,6 +714,40 @@ CREATE TABLE Students (
     FOREIGN KEY (SchoolId) REFERENCES Schools(SchoolId),
     FOREIGN KEY (CityId) REFERENCES Cities(CityId)
 );
+```
+
+```mermaid
+erDiagram
+    Cities ||--o{ Schools : "located_in"
+    Cities ||--o{ Students : "resides_in"
+    Schools ||--o{ Students : "enrolled_at"
+    Students ||--o{ Tests : "takes"
+    Cities {
+        int CityId PK
+        string CityName
+        string Country
+    }
+    Schools {
+        int SchoolId PK
+        string SchoolName
+        int CityId FK
+    }
+    Students {
+        int Id PK
+        string ExternalId UK
+        string GivenName
+        string FamilyName
+        string Gender
+        date BirthDate
+        int SchoolId FK
+        int CityId FK
+    }
+    Tests {
+        int TestId PK
+        int StudentId FK
+        date TestDate
+        decimal Score
+    }
 ```
 
 ---
@@ -893,6 +973,25 @@ ORDER BY ItemNumber;
 - Use `ORDER BY` for retrieval in correct sequence
 - UNIQUE constraint ensures no duplicate item numbers per manuscript
 - Consider hierarchical items with ParentItemId for nested structures
+
+```mermaid
+erDiagram
+    Manuscripts ||--o{ ManuscriptItems : "contains"
+    ManuscriptItems ||--o{ ManuscriptItems : "parent_of"
+    Manuscripts {
+        string ManuscriptId PK
+        string Title
+    }
+    ManuscriptItems {
+        int ItemId PK
+        string ManuscriptId FK
+        int ItemNumber
+        int ParentItemId FK
+        text Incipit
+        text Explicit
+        text Notes
+    }
+```
 
 ---
 
@@ -1188,6 +1287,36 @@ WHERE {
                          └──────────────┘
 ```
 
+```mermaid
+erDiagram
+    Persons ||--o{ Annotations : "creates"
+    Annotations ||--|| Bodies : "has_body"
+    Annotations ||--|| Targets : "has_target"
+    Persons {
+        int PersonId PK
+        string Name
+    }
+    Annotations {
+        int AnnotationId PK
+        datetime Created
+        string Motivation
+        int CreatorId FK
+    }
+    Bodies {
+        int BodyId PK
+        int AnnotationId FK
+        string BodyType
+        text Value
+    }
+    Targets {
+        int TargetId PK
+        int AnnotationId FK
+        string SourceURI
+        int StartPos
+        int EndPos
+    }
+```
+
 ---
 
 ## Question 4(f) [5 marks]
@@ -1214,6 +1343,48 @@ WHERE {
 | **Targets** | TargetId | AnnotationId → Annotations(AnnotationId) |
 | **Sources** | SourceId | - |
 | **Selectors** | SelectorId | TargetId → Targets(TargetId) |
+
+```mermaid
+erDiagram
+    Persons ||--o{ Annotations : "creates"
+    Annotations ||--o{ Bodies : "has_body"
+    Annotations ||--o{ Targets : "has_target"
+    Sources ||--o{ Targets : "referenced_by"
+    Targets ||--o{ Selectors : "has_selector"
+    Persons {
+        int PersonId PK
+        string Name
+    }
+    Annotations {
+        int AnnotationId PK
+        int CreatorId FK
+        datetime Created
+        string Motivation
+    }
+    Bodies {
+        int BodyId PK
+        int AnnotationId FK
+        string BodyType
+        text Value
+    }
+    Sources {
+        int SourceId PK
+        string URI
+        string Title
+    }
+    Targets {
+        int TargetId PK
+        int AnnotationId FK
+        int SourceId FK
+    }
+    Selectors {
+        int SelectorId PK
+        int TargetId FK
+        string SelectorType
+        int StartPos
+        int EndPos
+    }
+```
 
 ---
 
