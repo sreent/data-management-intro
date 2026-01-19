@@ -130,42 +130,31 @@ wd:P1477 schema:description "full name of a person at birth, if different from t
 
 ### Answer
 
-**11 triples**
+**12 triples**
 
 **Breakdown:**
 
-| Subject | Predicate | Object | Count |
-|---------|-----------|--------|-------|
+| Subject | Predicate | Object | Triple # |
+|---------|-----------|--------|----------|
 | `<.../names/18065>` | `a` (rdf:type) | `chm:Entity` | 1 |
-| `<.../names/18065>` | `a` (rdf:type) | `schema:Person` | 1 |
-| `<.../names/18065>` | `rdfs:label` | `"Maria Callas"` | 1 |
-| `<.../names/18065>` | `gnd:playedInstrument` | `chi:61` | 1 |
-| `<.../names/18065>` | `schema:birthDate` | `"1923-12-02"` | 1 |
-| `<.../names/18065>` | `schema:birthPlace` | `<.../5128581/>` | 1 |
-| `<.../names/18065>` | `schema:deathDate` | `"1977-09-16"` | 1 |
-| `<.../names/18065>` | `schema:name` | `"Maria Callas"` | 1 |
-| `<.../names/18065>` | `skos:exactMatch` | `<.../Maria_Callas>` | 1 |
-| `<.../names/18065>` | `skos:exactMatch` | `<.../n50032183>` | 1 |
-| `<.../names/18065>` | `skos:exactMatch` | `wd:Q128297` | 1 |
-| `<.../names/18065>` | `skos:exactMatch` | `<.../9dee40b2...>` | 1 |
+| `<.../names/18065>` | `a` (rdf:type) | `schema:Person` | 2 |
+| `<.../names/18065>` | `rdfs:label` | `"Maria Callas"` | 3 |
+| `<.../names/18065>` | `gnd:playedInstrument` | `chi:61` | 4 |
+| `<.../names/18065>` | `schema:birthDate` | `"1923-12-02"^^xsd:date` | 5 |
+| `<.../names/18065>` | `schema:birthPlace` | `<.../5128581/>` | 6 |
+| `<.../names/18065>` | `schema:deathDate` | `"1977-09-16"^^xsd:date` | 7 |
+| `<.../names/18065>` | `schema:name` | `"Maria Callas"` | 8 |
+| `<.../names/18065>` | `skos:exactMatch` | `<.../Maria_Callas>` | 9 |
+| `<.../names/18065>` | `skos:exactMatch` | `<.../n50032183>` | 10 |
+| `<.../names/18065>` | `skos:exactMatch` | `wd:Q128297` | 11 |
+| `<.../names/18065>` | `skos:exactMatch` | `<.../9dee40b2...>` | 12 |
 
-Wait - let me recount. The `skos:exactMatch` uses comma syntax which means same subject and predicate, multiple objects:
-- 4 objects for `skos:exactMatch`
+**Counting explanation:**
+- `a chm:Entity, schema:Person` = **2 triples** (comma separates multiple objects for same subject+predicate)
+- Other predicates with single objects = **6 triples**
+- `skos:exactMatch` with 4 objects = **4 triples** (comma separates objects)
 
-Total: **11 triples** (7 unique predicates + 4 exactMatch objects = 8 + 3 additional = 11)
-
-Actually, let me be precise:
-- `a chm:Entity` = 1
-- `a schema:Person` = 1
-- `rdfs:label` = 1
-- `gnd:playedInstrument` = 1
-- `schema:birthDate` = 1
-- `schema:birthPlace` = 1
-- `schema:deathDate` = 1
-- `schema:name` = 1
-- `skos:exactMatch` x 4 = 4
-
-**Total = 11 triples**
+**Total = 2 + 6 + 4 = 12 triples**
 
 ---
 
@@ -224,6 +213,7 @@ The prefix declaration `@prefix wd: <http://www.wikidata.org/entity/> .` means:
 ```sparql
 PREFIX gnd: <http://d-nb.info/standards/elementset/gnd#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX chi: <http://data.carnegiehall.org/instruments/>
 
