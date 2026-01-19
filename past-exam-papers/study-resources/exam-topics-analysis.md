@@ -1,4 +1,4 @@
-# Exam Topics & Concepts Analysis (Updated)
+# Exam Topics & Concepts Analysis
 
 ## Overview
 
