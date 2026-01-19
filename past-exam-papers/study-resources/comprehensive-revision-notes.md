@@ -418,6 +418,140 @@ WHERE review_count > (SELECT AVG(cnt) FROM (
 ) AS avg_calc);
 ```
 
+### Common Table Expressions (CTEs) - WITH Clause
+
+CTEs create temporary named result sets that make complex queries readable.
+
+```sql
+-- Basic CTE syntax
+WITH cte_name AS (
+    SELECT ...
+)
+SELECT * FROM cte_name;
+
+-- Multiple CTEs
+WITH
+    first_cte AS (SELECT ...),
+    second_cte AS (SELECT ...)
+SELECT * FROM first_cte JOIN second_cte ON ...;
+```
+
+**Example: Compare yearly totals from two sources**
+```sql
+WITH parish_totals AS (
+    SELECT year, SUM(count_n) AS total
+    FROM parish_counts
+    GROUP BY year
+),
+city_totals AS (
+    SELECT year, SUM(count_n) AS total
+    FROM city_counts
+    GROUP BY year
+)
+SELECT
+    p.year,
+    p.total AS parish_total,
+    c.total AS city_total,
+    (p.total - c.total) AS difference
+FROM parish_totals p
+LEFT JOIN city_totals c ON p.year = c.year;
+```
+
+### Finding Records NOT in a Set
+
+Three equivalent patterns for finding items that DON'T match:
+
+**Method 1: NOT IN**
+```sql
+-- Find pieces NOT associated with a specific composer
+SELECT * FROM Piece
+WHERE ConcNo NOT IN (
+    SELECT ConcNo FROM Concordance
+    WHERE ComposerId = (SELECT ComposerId FROM Composer WHERE Name = 'John Dowland')
+);
+```
+
+**Method 2: NOT EXISTS**
+```sql
+-- Same query using NOT EXISTS
+SELECT * FROM Piece p
+WHERE NOT EXISTS (
+    SELECT 1 FROM Concordance c
+    JOIN Composer comp ON c.ComposerId = comp.ComposerId
+    WHERE c.ConcNo = p.ConcNo AND comp.Name = 'John Dowland'
+);
+```
+
+**Method 3: LEFT JOIN + IS NULL**
+```sql
+-- Same query using LEFT JOIN
+SELECT p.*
+FROM Piece p
+LEFT JOIN Concordance c ON p.ConcNo = c.ConcNo
+LEFT JOIN Composer comp ON c.ComposerId = comp.ComposerId
+                        AND comp.Name = 'John Dowland'
+WHERE comp.ComposerId IS NULL;
+```
+
+| Method | Best For | Caveat |
+|--------|----------|--------|
+| `NOT IN` | Simple cases | Fails with NULLs in subquery |
+| `NOT EXISTS` | Complex conditions | Most reliable |
+| `LEFT JOIN + IS NULL` | When you need other columns | Verbose but clear |
+
+### DISTINCT Keyword
+
+`DISTINCT` eliminates duplicate rows - **frequently forgotten in exams!**
+
+```sql
+-- Without DISTINCT: may return same species multiple times
+SELECT SpeciesName FROM Sightings WHERE Date > '2021-01-01';
+
+-- With DISTINCT: each species appears once
+SELECT DISTINCT SpeciesName FROM Sightings WHERE Date > '2021-01-01';
+
+-- COUNT with DISTINCT
+SELECT COUNT(DISTINCT SpeciesName) AS unique_species FROM Sightings;
+```
+
+### Star Schema / Dimensional Modeling 🟢 KNOW THE BASICS
+
+Used for analytical databases (data warehouses). Separates:
+- **Fact tables**: Measurements/events (sales, counts, transactions)
+- **Dimension tables**: Descriptive attributes (who, what, when, where)
+
+```
+        ┌──────────┐
+        │   Date   │ (Dimension)
+        └────┬─────┘
+             │
+┌──────────┐ │ ┌──────────┐
+│ Product  │─┼─│  Sales   │ (Fact)
+└──────────┘ │ └──────────┘
+             │
+        ┌────┴─────┐
+        │  Store   │ (Dimension)
+        └──────────┘
+```
+
+**Example: Mortality data schema**
+```sql
+-- Dimension tables (slowly changing)
+CREATE TABLE week (week_id CHAR(7) PRIMARY KEY, year INT, week_no INT);
+CREATE TABLE parish (parcode CHAR(4) PRIMARY KEY, parish_name VARCHAR(100));
+
+-- Fact table (transactional)
+CREATE TABLE weekly_count (
+    week_id CHAR(7),
+    parcode CHAR(4),
+    count_type VARCHAR(20),
+    count_n INT,
+    PRIMARY KEY (week_id, parcode, count_type),
+    FOREIGN KEY (week_id) REFERENCES week(week_id),
+    FOREIGN KEY (parcode) REFERENCES parish(parcode)
+);
+```
+
 ---
 
 ## 1.5 SQL Transactions 🟢 KNOW THE BASICS
@@ -524,7 +658,35 @@ GRANT ALL ON Paper, Review, PaperAuthor, Person TO pc_chair_role;
 
 > **Exam Frequency: 90%** - Almost always includes a "which database type" question
 
-## 2.1 Database Types Overview
+## 2.1 File-Based vs Database Systems
+
+A common exam question asks about advantages/disadvantages of databases over file-based systems.
+
+| Aspect | File-Based (CSV, JSON files) | Database System |
+|--------|------------------------------|-----------------|
+| **Data Independence** | Low - apps tied to file format | High - apps use queries |
+| **Redundancy Control** | Manual - must enforce consistency | Automatic via normalization |
+| **Integrity Constraints** | None - any data allowed | Enforced (FK, CHECK, NOT NULL) |
+| **Concurrent Access** | Problematic - file locks | Managed via transactions |
+| **Query Language** | None (custom scripts) | SQL, SPARQL, etc. |
+| **Backup/Recovery** | Manual | Built-in |
+| **Version Control** | Easy (Git works well) | Harder to track changes |
+
+**When Files Are Appropriate:**
+- Small datasets
+- Simple read-only access
+- Version control needed (Git)
+- Human-editable data
+
+**When Database Is Better:**
+- Multiple users/applications
+- Complex queries needed
+- Data integrity critical
+- Large datasets
+
+---
+
+## 2.2 Database Types Overview
 
 | Type | Structure | Query Language | Best For |
 |------|-----------|----------------|----------|
@@ -766,6 +928,46 @@ GRANT ALL ON Paper, Review, PaperAuthor, Person TO pc_chair_role;
 | Get author name | `//datafield[@tag='100']/subfield[@code='a']/text()` |
 | Get title | `//datafield[@tag='245']/subfield[@code='a']/text()` |
 | All datafield tags | `//datafield/@tag` |
+
+### XML Namespaces in XPath
+
+When XML uses namespaces (common with TEI, MEI, XSLT), XPath queries must account for them.
+
+**Example with TEI namespace:**
+```xml
+<competition xmlns:tei="http://www.tei-c.org/ns/1.0">
+  <entry>
+    <poem>
+      <tei:lg type="stanza">
+        <tei:l>There was an old man of Dumbree</tei:l>
+        <tei:l>Who taught little owls to drink tea</tei:l>
+      </tei:lg>
+    </poem>
+  </entry>
+</competition>
+```
+
+**Querying namespaced elements:**
+
+| Wrong | Correct | Why |
+|-------|---------|-----|
+| `//lg` | `//tei:lg` | Must use namespace prefix |
+| `//l/text()` | `//tei:l/text()` | `l` is in TEI namespace |
+
+**XPath with namespace prefixes:**
+```xpath
+//tei:lg[@type='stanza']/tei:l/text()
+```
+
+**Common namespaces in exams:**
+| Prefix | Namespace | Domain |
+|--------|-----------|--------|
+| `tei:` | TEI | Text encoding |
+| `mei:` | MEI | Music encoding |
+| `xsl:` | XSLT | Transformations |
+| `xs:` | XSD | Schema |
+
+**Key Point:** The prefix in your XPath must match the prefix declared in the XML document (or be registered in your XPath processor).
 
 ---
 
@@ -1428,6 +1630,46 @@ db.books.find({
 })
 ```
 
+### ⚠️ $elemMatch vs Dot Notation - IMPORTANT DISTINCTION
+
+This is **frequently tested** and commonly misunderstood!
+
+**Document:**
+```json
+{
+    "reviews": [
+        { "user": "alice", "rating": 3 },
+        { "user": "bob", "rating": 5 }
+    ]
+}
+```
+
+**Dot notation (ANY element matches):**
+```javascript
+// This matches! alice has a review AND someone gave rating 5
+// (but NOT the same review)
+db.books.find({
+    "reviews.user": "alice",
+    "reviews.rating": 5
+})
+```
+
+**$elemMatch (SAME element must match all):**
+```javascript
+// This does NOT match! No single review has both
+// user="alice" AND rating=5
+db.books.find({
+    reviews: {
+        $elemMatch: { user: "alice", rating: 5 }
+    }
+})
+```
+
+| Method | Use When |
+|--------|----------|
+| **Dot notation** | Single condition on array, OR conditions can be on different elements |
+| **$elemMatch** | Multiple conditions that must ALL be true for the SAME array element |
+
 ### Regular Expressions
 
 ```javascript
@@ -1692,6 +1934,18 @@ WHERE col IS NULL / IS NOT NULL
 
 -- Subquery
 SELECT * FROM t1 WHERE col IN (SELECT col FROM t2 WHERE ...)
+
+-- CTE (Common Table Expression)
+WITH cte AS (SELECT ...) SELECT * FROM cte;
+
+-- Finding records NOT in a set
+WHERE col NOT IN (SELECT ...)           -- Simple (watch for NULLs)
+WHERE NOT EXISTS (SELECT 1 FROM ...)    -- Most reliable
+LEFT JOIN ... WHERE id IS NULL          -- When need other columns
+
+-- DISTINCT (don't forget!)
+SELECT DISTINCT col FROM ...
+SELECT COUNT(DISTINCT col) FROM ...
 ```
 
 ## 7.2 XPath Cheat Sheet
