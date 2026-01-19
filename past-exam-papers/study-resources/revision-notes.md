@@ -55,10 +55,14 @@ M:N relationships **cannot be directly implemented** in relational databases. Yo
 
 **Pattern:**
 ```
+BEFORE (cannot implement directly):
+    Student ══════M:N══════ Course
+
+AFTER (resolved with junction table):
 ┌───────────┐         ┌─────────────────┐         ┌───────────┐
-│  Student  │───M:N───│   Enrollment    │───M:N───│  Course   │
+│  Student  │───1:M───│   Enrollment    │───M:1───│  Course   │
 ├───────────┤         ├─────────────────┤         ├───────────┤
-│student_id │◄───────►│ student_id (FK) │◄───────►│ course_id │
+│student_id │◄────────│ student_id (FK) │────────►│ course_id │
 │name       │         │ course_id (FK)  │         │title      │
 └───────────┘         │ grade           │         └───────────┘
                       │ enrollment_date │
@@ -66,6 +70,10 @@ M:N relationships **cannot be directly implemented** in relational databases. Yo
                          Junction Table
                       (can have its own attributes!)
 ```
+
+**Key insight:** The M:N relationship becomes TWO 1:M relationships:
+- One Student → Many Enrollments (1:M)
+- One Course → Many Enrollments (1:M)
 
 **SQL Implementation:**
 ```sql
@@ -113,28 +121,24 @@ CREATE TABLE Enrollment (
 **Step 3: E/R Diagram**
 
 ```
-┌──────────┐       ┌──────────┐       ┌──────────┐
-│  AUTHOR  │──1:M──│   BOOK   │──M:N──│  MEMBER  │
-├──────────┤       ├──────────┤       ├──────────┤
-│author_id │       │ book_id  │       │member_id │
-│name      │       │ title    │       │name      │
-│birth_year│       │ isbn     │       │email     │
-└──────────┘       │ year     │       │join_date │
-                   │author_id │       └──────────┘
-                   └──────────┘             │
-                        │                   │
-                        └───────┬───────────┘
-                                │
-                          ┌─────┴─────┐
-                          │   LOAN    │
-                          ├───────────┤
-                          │ loan_id   │
-                          │ book_id   │
-                          │ member_id │
-                          │ date_borr │
-                          │ date_ret  │
-                          └───────────┘
+Original M:N (cannot implement):
+    BOOK ══════M:N══════ MEMBER
+
+Resolved with LOAN junction table:
+┌──────────┐       ┌──────────┐       ┌───────────┐       ┌──────────┐
+│  AUTHOR  │──1:M──│   BOOK   │──1:M──│   LOAN    │──M:1──│  MEMBER  │
+├──────────┤       ├──────────┤       ├───────────┤       ├──────────┤
+│author_id │       │ book_id  │◄──────│ book_id   │──────►│member_id │
+│name      │       │ title    │       │ member_id │       │name      │
+│birth_year│       │ isbn     │       │ loan_id   │       │email     │
+└──────────┘       │ year     │       │ date_borr │       │join_date │
+                   │author_id │       │ date_ret  │       └──────────┘
+                   └──────────┘       └───────────┘
+                                        Junction
+                                         Table
 ```
+
+Note: LOAN acts as a junction table resolving the M:N between BOOK and MEMBER into two 1:M relationships.
 
 ### Common Exam Patterns
 
