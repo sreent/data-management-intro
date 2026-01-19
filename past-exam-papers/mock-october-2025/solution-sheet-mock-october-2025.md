@@ -260,7 +260,7 @@ erDiagram
     Person }|--o{ Work : "creates (M:N)"
     Work ||--o{ Expression : "has (1:M)"
     Expression ||--o{ Manifestation : "has (1:M)"
-    CorporateBody ||--o{ Manifestation : "publishes (M:1)"
+    CorporateBody ||--o{ Manifestation : "publishes (1:M)"
     Manifestation ||--o{ Item : "has (1:M)"
 
     Person {
@@ -620,6 +620,25 @@ erDiagram
         int dinner_id PK
         int conference_id FK
         string venue
+    }
+    PaperAuthor {
+        int paper_id PK_FK
+        int person_id PK_FK
+        string role
+        int author_order
+    }
+    AttendsDay {
+        int registration_id PK_FK
+        int day_id PK_FK
+    }
+    AttendsWorkshop {
+        int registration_id PK_FK
+        int workshop_id PK_FK
+    }
+    AttendsDinner {
+        int registration_id PK_FK
+        int dinner_id PK_FK
+        int ticket_count
     }
 ```
 
