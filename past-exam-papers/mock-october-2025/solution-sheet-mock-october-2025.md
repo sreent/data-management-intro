@@ -255,25 +255,53 @@ CREATE TABLE BookAuthor (
 
 **E/R Diagram (FRBR-inspired):**
 
-```
-┌──────────┐    creates    ┌──────────┐
-│  Person  │──────────────▶│   Work   │
-└──────────┘      M:N      └────┬─────┘
-                                │ 1:M
-                                ▼
-                          ┌───────────┐
-                          │Expression │
-                          └────┬──────┘
-                               │ 1:M
-                               ▼
-┌───────────────┐        ┌─────────────┐
-│CorporateBody  │◀───────│Manifestation│
-│  (Publisher)  │  M:1   └─────┬───────┘
-└───────────────┘              │ 1:M
-                               ▼
-                          ┌──────────┐
-                          │   Item   │
-                          └──────────┘
+```mermaid
+erDiagram
+    Person }|--o{ Work : "creates (M:N)"
+    Work ||--o{ Expression : "has (1:M)"
+    Expression ||--o{ Manifestation : "has (1:M)"
+    CorporateBody ||--o{ Manifestation : "publishes (M:1)"
+    Manifestation ||--o{ Item : "has (1:M)"
+
+    Person {
+        int person_id PK
+        string name_display
+        string name_inverted
+        date birth_date
+        date death_date
+    }
+    Work {
+        int work_id PK
+        string uniform_title
+        string original_language
+    }
+    Expression {
+        int expression_id PK
+        int work_id FK
+        string language
+        string form
+    }
+    Manifestation {
+        int manifestation_id PK
+        int expression_id FK
+        string publisher
+        string place
+        date date
+        int pages
+        string dimensions
+    }
+    Item {
+        int item_id PK
+        int manifestation_id FK
+        int library_id FK
+        string call_number
+        string condition
+    }
+    CorporateBody {
+        int corp_id PK
+        string name
+        string location
+    }
 ```
 
 ---
@@ -529,29 +557,70 @@ An academic conference system covering:
 
 **E/R Diagram:**
 
-```
-┌──────────┐         ┌──────────┐         ┌──────────┐
-│  Person  │─submits─▶│  Paper   │◀─reviews─│  Person  │
-│ (Author) │   M:N   └────┬─────┘    M:N   │(Reviewer)│
-└──────────┘              │                └──────────┘
-      │                   │
-      │ registers         │ has_review
-      ▼                   ▼
-┌──────────────┐    ┌──────────┐
-│ Registration │    │  Review  │
-└──────┬───────┘    └──────────┘
-       │
-       │ attends
-       ▼
-┌──────────────────────────────────┐
-│  Day  │  Workshop  │   Dinner   │
-└──────────────────────────────────┘
-              │
-              │ belongs_to
-              ▼
-        ┌────────────┐
-        │ Conference │
-        └────────────┘
+```mermaid
+erDiagram
+    Person }|--o{ PaperAuthor : "submits"
+    Paper ||--o{ PaperAuthor : "authored_by"
+    Person ||--o{ Review : "writes"
+    Paper ||--o{ Review : "receives"
+    Person ||--o{ Registration : "registers"
+    Conference ||--o{ Registration : "has"
+    Registration }|--o{ AttendsDay : "attends"
+    Registration }|--o{ AttendsWorkshop : "attends"
+    Registration }|--o{ AttendsDinner : "attends"
+    Conference ||--o{ Day : "has"
+    Conference ||--o{ Workshop : "has"
+    Conference ||--o{ Dinner : "has"
+    Day ||--o{ AttendsDay : ""
+    Workshop ||--o{ AttendsWorkshop : ""
+    Dinner ||--o{ AttendsDinner : ""
+
+    Person {
+        int person_id PK
+        string name
+        string email
+        string affiliation
+    }
+    Paper {
+        int paper_id PK
+        string title
+        string abstract
+        string status
+    }
+    Review {
+        int review_id PK
+        int paper_id FK
+        int reviewer_id FK
+        int score
+        string feedback
+    }
+    Registration {
+        int registration_id PK
+        int person_id FK
+        int conference_id FK
+        string name_tag_text
+    }
+    Conference {
+        int conference_id PK
+        string name
+        date start_date
+        date end_date
+    }
+    Day {
+        int day_id PK
+        int conference_id FK
+        date date
+    }
+    Workshop {
+        int workshop_id PK
+        int conference_id FK
+        string name
+    }
+    Dinner {
+        int dinner_id PK
+        int conference_id FK
+        string venue
+    }
 ```
 
 ---
