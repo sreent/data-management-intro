@@ -2,8 +2,8 @@
 
 ## Exam Overview
 
-| Section | Questions | Marks |
-|---------|-----------|-------|
+| Part | Questions | Marks |
+|------|-----------|-------|
 | Part A | 10 MCQs (not included in mock) | 40 |
 | Part B | Answer BOTH questions | 60 |
 | **Total** | | **100** |
