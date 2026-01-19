@@ -507,8 +507,8 @@ An academic conference system covering:
 | **Conference** | conference_id (PK), name, start_date, end_date, location, registration_deadline, submission_deadline |
 | **Person** | person_id (PK), name, email, affiliation, dietary_requirements |
 | **Paper** | paper_id (PK), title, abstract, pdf_path, submission_date, status (submitted/under_review/accepted/rejected) |
-| **Review** | review_id (PK), score, feedback, confidence, recommendation (accept/weak_accept/weak_reject/reject), submitted_date |
-| **Registration** | registration_id (PK), name_tag_text, registration_date, amount_paid |
+| **Review** | review_id (PK), paper_id (FK), reviewer_id (FK), score, feedback, confidence, recommendation (accept/weak_accept/weak_reject/reject), submitted_date |
+| **Registration** | registration_id (PK), person_id (FK), conference_id (FK), name_tag_text, registration_date, amount_paid |
 | **Day** | day_id (PK), conference_id (FK), date, description |
 | **Workshop** | workshop_id (PK), conference_id (FK), name, date, capacity, extra_cost |
 | **Dinner** | dinner_id (PK), conference_id (FK), date, venue, price |
