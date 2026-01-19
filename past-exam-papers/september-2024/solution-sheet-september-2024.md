@@ -8,7 +8,7 @@
 | Section B | Answer 2 of 3 | 60 |
 | **Total** | | **100** |
 
-**Note:** Section A MCQs are completed on the Inspera platform. This solution sheet covers Section B questions.
+**Note:** Section A MCQs are taken separately on the Inspera platform. This solution sheet covers Section B questions.
 
 ---
 
