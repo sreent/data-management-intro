@@ -1,4 +1,4 @@
-# Comprehensive Revision Notes: Data Management
+# Revision Notes: Databases & Advanced Data Techniques
 
 ## Exam Preparation Guide
 
@@ -2132,6 +2132,6 @@ db.collection.aggregate([
 
 ---
 
-*End of Comprehensive Revision Notes*
+*End of Revision Notes*
 
 *Last updated: Covering Mock March 2021 - Mock October 2025*
