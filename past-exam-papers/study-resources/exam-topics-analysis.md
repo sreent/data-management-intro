@@ -56,7 +56,7 @@ This document provides a comprehensive analysis of exam questions and solution s
 
 ---
 
-## Narrative: General Testing Patterns and Trends
+## General Testing Patterns and Trends
 
 ### Core Topics (Tested Every Exam)
 
