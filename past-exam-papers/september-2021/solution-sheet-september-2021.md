@@ -1047,7 +1047,7 @@ measure
 ### Answer
 
 ```xpath
-//staff[@n="2"]/layer/chord[note/@pname="c"]
+//staff[@n="2"]/layer/chord[note/@pname="f"]
 ```
 
 ---
