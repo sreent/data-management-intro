@@ -1,4 +1,4 @@
-# Solution Sheet - March 2022 (Updated)
+# Solution Sheet - March 2022
 
 ## Exam Overview
 
