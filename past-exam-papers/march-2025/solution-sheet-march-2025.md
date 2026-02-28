@@ -1,4 +1,4 @@
-# Solution Sheet - March 2025 (Updated)
+# Solution Sheet - March 2025
 
 ## Exam Overview
 
