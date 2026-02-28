@@ -1,4 +1,4 @@
-# Solution Sheet - March 2024 (Updated)
+# Solution Sheet - March 2024
 
 ## Exam Overview
 
