@@ -1,4 +1,4 @@
-# Solution Sheet - September 2023 (Updated)
+# Solution Sheet - September 2023
 
 ## Exam Overview
 
