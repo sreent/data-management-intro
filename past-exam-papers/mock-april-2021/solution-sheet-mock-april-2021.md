@@ -1,4 +1,4 @@
-# Solution Sheet - Mock April 2021 (Updated)
+# Solution Sheet - Mock April 2021
 
 ## Exam Overview
 
