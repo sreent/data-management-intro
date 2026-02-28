@@ -1,4 +1,4 @@
-# Solution Sheet - Mock October 2025 (Updated)
+# Solution Sheet - Mock October 2025
 
 ## Exam Overview
 
