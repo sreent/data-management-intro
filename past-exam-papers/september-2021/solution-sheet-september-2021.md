@@ -1,4 +1,4 @@
-# Solution Sheet - September 2021 (Updated)
+# Solution Sheet - September 2021
 
 ## Exam Overview
 
