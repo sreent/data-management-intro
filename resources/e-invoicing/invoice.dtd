@@ -1,0 +1,25 @@
+<!ELEMENT Invoice (InvoiceNumber, IssueDate, Supplier, Customer,
+                   InvoiceLines, MonetaryTotal, PaymentMeans*, Note?)>
+<!ELEMENT InvoiceNumber (#PCDATA)>
+<!ELEMENT IssueDate (#PCDATA)>
+<!ELEMENT Supplier (Name, Address)>
+<!ELEMENT Customer (Name, Address)>
+<!ELEMENT Name (#PCDATA)>
+<!ELEMENT Address (#PCDATA)>
+<!ELEMENT InvoiceLines (InvoiceLine+)>
+<!ELEMENT InvoiceLine (ItemName, Quantity, LineAmount)>
+<!ELEMENT ItemName (#PCDATA)>
+<!ELEMENT Quantity (#PCDATA)>
+<!ELEMENT LineAmount (#PCDATA)>
+<!ATTLIST LineAmount currencyID CDATA #REQUIRED>
+<!ELEMENT MonetaryTotal (LineExtensionAmount, TaxAmount, PayableAmount)>
+<!ELEMENT LineExtensionAmount (#PCDATA)>
+<!ATTLIST LineExtensionAmount currencyID CDATA #REQUIRED>
+<!ELEMENT TaxAmount (#PCDATA)>
+<!ATTLIST TaxAmount currencyID CDATA #REQUIRED>
+<!ELEMENT PayableAmount (#PCDATA)>
+<!ATTLIST PayableAmount currencyID CDATA #REQUIRED>
+<!ELEMENT PaymentMeans (PaymentMethodCode, PaymentDueDate)>
+<!ELEMENT PaymentMethodCode (#PCDATA)>
+<!ELEMENT PaymentDueDate (#PCDATA)>
+<!ELEMENT Note (#PCDATA)>

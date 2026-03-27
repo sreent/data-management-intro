@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inv:Invoice xmlns:inv="urn:example:invoice">
+  <inv:InvoiceNumber>INV-2025-0042</inv:InvoiceNumber>
+  <inv:IssueDate>2025-02-13</inv:IssueDate>
+  <inv:Supplier>
+    <inv:Name>Kopi Tech Pte Ltd</inv:Name>
+    <inv:Address>88 Amoy Street, Singapore 069907</inv:Address>
+  </inv:Supplier>
+  <inv:Customer>
+    <inv:Name>Marina Bay Trading Co.</inv:Name>
+    <inv:Address>10 Collyer Quay, Singapore 049315</inv:Address>
+  </inv:Customer>
+  <inv:InvoiceLines>
+    <inv:InvoiceLine>
+      <inv:ItemName>Cloud Hosting (Annual)</inv:ItemName>
+      <inv:Quantity>1</inv:Quantity>
+      <inv:LineAmount currencyID="SGD">12000.00</inv:LineAmount>
+    </inv:InvoiceLine>
+    <inv:InvoiceLine>
+      <inv:ItemName>SSL Certificate</inv:ItemName>
+      <inv:Quantity>5</inv:Quantity>
+      <inv:LineAmount currencyID="SGD">250.00</inv:LineAmount>
+    </inv:InvoiceLine>
+    <inv:InvoiceLine>
+      <inv:ItemName>Technical Support (Hours)</inv:ItemName>
+      <inv:Quantity>20</inv:Quantity>
+      <inv:LineAmount currencyID="SGD">3000.00</inv:LineAmount>
+    </inv:InvoiceLine>
+  </inv:InvoiceLines>
+  <inv:MonetaryTotal>
+    <inv:LineExtensionAmount currencyID="SGD">15250.00</inv:LineExtensionAmount>
+    <inv:TaxAmount currencyID="SGD">1372.50</inv:TaxAmount>
+    <inv:PayableAmount currencyID="SGD">16622.50</inv:PayableAmount>
+  </inv:MonetaryTotal>
+  <inv:PaymentMeans>
+    <inv:PaymentMethodCode>30</inv:PaymentMethodCode>
+    <inv:PaymentDueDate>2025-03-15</inv:PaymentDueDate>
+  </inv:PaymentMeans>
+  <inv:Note>Payment within 30 days of invoice date.</inv:Note>
+</inv:Invoice>

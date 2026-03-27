@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice>
+  <InvoiceNumber>INV-2025-0099</InvoiceNumber>
+  <IssueDate>2025-02-20</IssueDate>
+  <Supplier>
+    <Name>Bukit Timah Supplies</Name>
+    <Address>21 Bukit Timah Road, Singapore 228464</Address>
+  </Supplier>
+  <Customer>
+    <Name>Orchard Electronics Pte Ltd</Name>
+    <Address>391 Orchard Road, Singapore 238872</Address>
+  </Customer>
+  <!-- ERROR 1: MonetaryTotal appears before InvoiceLines (xs:sequence violation) -->
+  <MonetaryTotal>
+    <LineExtensionAmount currencyID="SGD">500.00</LineExtensionAmount>
+    <TaxAmount currencyID="SGD">45.00</TaxAmount>
+    <PayableAmount currencyID="SGD">545.00</PayableAmount>
+  </MonetaryTotal>
+  <InvoiceLines>
+    <InvoiceLine>
+      <ItemName>Network Cable (Cat6)</ItemName>
+      <!-- ERROR 2: Quantity is -3 (xs:positiveInteger violation) -->
+      <Quantity>-3</Quantity>
+      <LineAmount currencyID="SGD">29.97</LineAmount>
+    </InvoiceLine>
+  </InvoiceLines>
+  <!-- ERROR 3: "bank_transfer" not in PaymentMethodCodeType enumeration -->
+  <PaymentMeans>
+    <PaymentMethodCode>bank_transfer</PaymentMethodCode>
+    <PaymentDueDate>2025-03-20</PaymentDueDate>
+  </PaymentMeans>
+  <Note>Urgent delivery required.</Note>
+  <!-- ERROR 4: Second Note element (maxOccurs="1" violation) -->
+  <Note>Please confirm receipt.</Note>
+</Invoice>
